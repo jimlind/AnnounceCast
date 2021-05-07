@@ -1,9 +1,32 @@
 {
+  "name": "tapedeck",
+  "description": "Yet Another Podcast Bot",
+  "version": "0.0.1",
+  "private": true,
+  "license": "AGPL-3.0",
+  "author": "Jim Lind",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jimlind/tapedeck"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "start": "ts-node src/app.ts"
+  },
   "dependencies": {
     "awilix": "^4.3.4",
     "axios": "^0.21.1",
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
-    "htmlparser2": "^6.1.0"
+    "htmlparser2": "^6.1.0",
+    "signal-exit": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^15.0.2",
+    "@types/signal-exit": "^3.0.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   }
 }
