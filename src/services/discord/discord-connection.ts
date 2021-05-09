@@ -1,5 +1,5 @@
 import { RESOLVER } from 'awilix';
-import * as discordJs from 'discord.js';
+import * as discordJS from 'discord.js';
 import { Config } from '../../models/config';
 
 export class DiscordConnection {
@@ -9,14 +9,14 @@ export class DiscordConnection {
     locked: boolean = false;
 
     config: Config;
-    discordClient: discordJs.Client;
+    discordClient: discordJS.Client;
 
-    constructor(config: Config, discordClient: discordJs.Client) {
+    constructor(config: Config, discordClient: discordJS.Client) {
         this.config = config;
         this.discordClient = discordClient;
     }
 
-    getConnectedClient(): Promise<discordJs.Client> {
+    getConnectedClient(): Promise<discordJS.Client> {
         return new Promise((resolve, reject) => {
             // If no token set reject the request
             if (!this.config.discordBotToken) {
