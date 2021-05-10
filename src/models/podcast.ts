@@ -1,3 +1,6 @@
+import * as normalizeUrl from 'normalize-url';
+import * as prettyMilliseconds from 'pretty-ms';
+
 export class Podcast {
     private _showTitle: string = '';
     public get showTitle(): string {
@@ -7,12 +10,36 @@ export class Podcast {
         this._showTitle = value;
     }
 
+    private _showLink: string = '';
+    public get showLink(): string {
+        return normalizeUrl(this._showLink);
+    }
+    public set showLink(value: string) {
+        this._showLink = value;
+    }
+
     private _showImage: string = '';
     public get showImage(): string {
         return this._showImage;
     }
     public set showImage(value: string) {
         this._showImage = value;
+    }
+
+    private _seasonNumber = '';
+    public get seasonNumber() {
+        return this._seasonNumber;
+    }
+    public set seasonNumber(value) {
+        this._seasonNumber = value;
+    }
+
+    private _episodeNumber = '';
+    public get episodeNumber() {
+        return this._episodeNumber;
+    }
+    public set episodeNumber(value) {
+        this._episodeNumber = value;
     }
 
     private _episodeGuid: string = '';
@@ -25,7 +52,7 @@ export class Podcast {
 
     private _episodeLink: string = '';
     public get episodeLink(): string {
-        return this._episodeLink;
+        return normalizeUrl(this._episodeLink);
     }
     public set episodeLink(value: string) {
         this._episodeLink = value;
@@ -53,5 +80,21 @@ export class Podcast {
     }
     public set episodeDescription(value: string) {
         this._episodeDescription = value;
+    }
+
+    private _episodeDuration: string = '';
+    public get episodeDuration(): string {
+        return prettyMilliseconds(parseInt(this._episodeDuration) * 1000);
+    }
+    public set episodeDuration(value: string) {
+        this._episodeDuration = value;
+    }
+
+    private _episodeExplicit: boolean = false;
+    public get episodeExplicit(): boolean {
+        return this._episodeExplicit;
+    }
+    public set episodeExplicit(value: boolean) {
+        this._episodeExplicit = value;
     }
 }

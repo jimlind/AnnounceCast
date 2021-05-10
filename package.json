@@ -1,7 +1,7 @@
 {
   "name": "tapedeck",
   "description": "Yet Another Podcast Bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "license": "AGPL-3.0",
   "author": "Jim Lind",
@@ -18,9 +18,12 @@
   "dependencies": {
     "awilix": "^4.3.4",
     "axios": "^0.21.1",
+    "boolean": "^3.0.3",
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
     "htmlparser2": "^6.1.0",
+    "normalize-url": "^6.0.0",
+    "pretty-ms": "^7.0.1",
     "signal-exit": "^3.0.3"
   },
   "devDependencies": {

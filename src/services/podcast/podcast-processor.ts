@@ -1,5 +1,6 @@
 import { RESOLVER } from 'awilix';
 import { AxiosInstance, AxiosResponse } from 'axios';
+import { boolean } from 'boolean';
 import * as htmlparser2 from 'htmlparser2';
 import { Podcast } from '../../models/podcast';
 
@@ -14,15 +15,10 @@ export class PodcastProcessor {
         this.htmlParser2 = htmlParser2;
     }
 
-    process(): Promise<Podcast> {
-        const feeds = [
-            'https://feeds.simplecast.com/DPfrjtYE',
-            'https://anchor.fm/s/184b0a38/podcast/rss',
-        ];
-
+    process(feedUrl: string): Promise<Podcast> {
         return new Promise((resolve, reject) => {
             this.axios
-                .get(feeds[0])
+                .get(feedUrl)
                 .then((response: AxiosResponse) => {
                     return resolve(this.parseRSS(response.data));
                 })
@@ -41,17 +37,41 @@ export class PodcastProcessor {
         const showTitle = domUtils.getElementsByTagName('title', document, true, 1);
         podcast.showTitle = domUtils.getText(showTitle);
 
+        const showLink = domUtils.getElementsByTagName('link', document, true, 1);
+        podcast.showLink = domUtils.getText(showLink);
+
         const showImage = domUtils.getElementsByTagName('image', document, true, 1);
         const showImageUrl = domUtils.getElementsByTagName('url', showImage, true, 1);
         podcast.showImage = domUtils.getText(showImageUrl);
 
         const episode = domUtils.getElementsByTagName('item', document, true, 1);
 
+        const seasonNumber = domUtils.getElementsByTagName('itunes:season', episode, true, 1);
+        podcast.seasonNumber = domUtils.getText(seasonNumber);
+
+        const episodeNumber = domUtils.getElementsByTagName('itunes:episode', episode, true, 1);
+        podcast.episodeNumber = domUtils.getText(episodeNumber);
+
         const episodeGuid = domUtils.getElementsByTagName('guid', episode, true, 1);
         podcast.episodeGuid = domUtils.getText(episodeGuid);
 
         const episodeLink = domUtils.getElementsByTagName('link', episode, true, 1);
         podcast.episodeLink = domUtils.getText(episodeLink);
+
+        const episodeExplicit = domUtils.getElementsByTagName('itunes:explicit', episode, true, 1);
+        podcast.episodeExplicit = boolean(domUtils.getText(episodeExplicit));
+
+        var episodeDuration = domUtils.getElementsByTagName('itunes:duration', episode, true, 1);
+        var episodeDurationText = domUtils.getText(episodeDuration);
+        if (episodeDurationText.includes(':')) {
+            const t = episodeDurationText.split(':');
+            episodeDurationText = (
+                parseInt(t[0]) * 60 * 60 +
+                parseInt(t[1]) * 60 +
+                parseInt(t[2])
+            ).toString();
+        }
+        podcast.episodeDuration = episodeDurationText;
 
         const episodeImage = domUtils.getElementsByTagName('itunes:image', episode, true, 1);
         if (episodeImage.length === 1) {

@@ -5,6 +5,8 @@ import * as onExit from 'signal-exit';
 import { Container } from './container';
 import { Podcast } from './models/podcast';
 import { DiscordConnection } from './services/discord/discord-connection';
+import { DiscordMessageFactory } from './services/discord/discord-message-factory';
+import { DiscordMessageSender } from './services/discord/discord-message-sender';
 import { PodcastProcessor } from './services/podcast/podcast-processor';
 
 // Initialize the container
@@ -27,9 +29,30 @@ container
         interval = setInterval(() => {
             if (threadRunning) return;
 
+            const feeds = [
+                'https://feeds.simplecast.com/DPfrjtYE', // Hags
+                'https://anchor.fm/s/184b0a38/podcast/rss', // BANZ
+                'https://anchor.fm/s/23694498/podcast/rss', // WR4
+                'https://anchor.fm/s/3a0acd20/podcast/rss', // Nauts
+                'https://anchor.fm/s/12d1fabc/podcast/rss', // 70mm
+                'https://anchor.fm/s/238d77c8/podcast/rss', // Dune
+                'https://anchor.fm/s/3ae14da0/podcast/rss', // Lost
+            ];
             const processor = container.resolve<PodcastProcessor>('podcastProcessor');
-            processor.process().then((podcast: Podcast) => {
-                console.log(podcast);
+
+            feeds.forEach((feedUrl: string) => {
+                processor.process(feedUrl).then((podcast: Podcast) => {
+                    const message = container
+                        .resolve<DiscordMessageFactory>('discordMessageFactory')
+                        .build(podcast);
+
+                    container
+                        .resolve<DiscordMessageSender>('discordMessageSender')
+                        .send('812883182390607933', message)
+                        .then(() => {
+                            console.log('Message Sent');
+                        });
+                });
             });
 
             threadRunning = true;
