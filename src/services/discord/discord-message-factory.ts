@@ -10,7 +10,7 @@ export class DiscordMessageFactory {
 
         message.setAuthor(podcast.showTitle, podcast.showImage, podcast.showLink);
         message.setTitle(podcast.episodeTitle);
-        message.setURL(podcast.showLink);
+        message.setURL(podcast.episodeLink);
         message.setDescription(podcast.episodeDescription);
         message.setImage(podcast.episodeImage || podcast.showImage);
 
