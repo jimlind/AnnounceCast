@@ -24,7 +24,8 @@
     "htmlparser2": "^6.1.0",
     "normalize-url": "^6.0.0",
     "pretty-ms": "^7.0.1",
-    "signal-exit": "^3.0.3"
+    "signal-exit": "^3.0.3",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
     "@types/node": "^15.0.2",
