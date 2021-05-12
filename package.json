@@ -1,7 +1,7 @@
 {
   "name": "tapedeck",
   "description": "Yet Another Podcast Bot",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "license": "AGPL-3.0",
   "author": "Jim Lind",
