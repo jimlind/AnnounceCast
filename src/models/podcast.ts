@@ -2,6 +2,14 @@ import * as normalizeUrl from 'normalize-url';
 import * as prettyMilliseconds from 'pretty-ms';
 
 export class Podcast {
+    private _showFeed: string = '';
+    public get showFeed(): string {
+        return this._showFeed;
+    }
+    public set showFeed(value: string) {
+        this._showFeed = value;
+    }
+
     private _showTitle: string = '';
     public get showTitle(): string {
         return this._showTitle;
