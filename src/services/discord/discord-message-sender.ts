@@ -1,5 +1,3 @@
-'use strict';
-
 import { RESOLVER } from 'awilix';
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { DiscordConnection } from './discord-connection';
@@ -13,8 +11,8 @@ export class DiscordMessageSender {
         this.discordConnection = discordConnection;
     }
 
-    send(channelId: string, message: MessageEmbed) {
-        return new Promise((resolve, reject) => {
+    send(channelId: string, message: MessageEmbed): Promise<string> {
+        return new Promise((resolve: Function, reject: Function) => {
             this.discordConnection.getConnectedClient().then((client: Client) => {
                 const channel = client.channels.cache.find((ch) => ch.id === channelId);
 
