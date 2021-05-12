@@ -20,7 +20,7 @@ export class PodcastProcessor {
             this.axios
                 .get(feedUrl)
                 .then((response: AxiosResponse) => {
-                    return resolve(this.parseRSS(response.data));
+                    return resolve(this.parseRSS(feedUrl, response.data));
                 })
                 .catch(() => {
                     return reject('Failed to download or parse feed');
@@ -28,11 +28,12 @@ export class PodcastProcessor {
         });
     }
 
-    parseRSS(responseText: any): Podcast {
+    parseRSS(feedUrl: string, responseText: string): Podcast {
         const domUtils = this.htmlParser2.DomUtils;
         const document = this.htmlParser2.parseDocument(responseText, { xmlMode: true });
 
         const podcast = new Podcast();
+        podcast.showFeed = feedUrl;
 
         const showTitle = domUtils.getElementsByTagName('title', document, true, 1);
         podcast.showTitle = domUtils.getText(showTitle);
