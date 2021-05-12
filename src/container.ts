@@ -3,6 +3,7 @@ import * as axios from 'axios';
 import { Client as DiscordClient } from 'discord.js';
 import { config as configDotenv } from 'dotenv';
 import * as htmlparser2 from 'htmlparser2';
+import * as sqlite3 from 'sqlite3';
 import { Config } from './models/config';
 
 export class Container {
@@ -21,6 +22,7 @@ export class Container {
             config: awilix.asValue(configModel),
             discordClient: awilix.asClass(DiscordClient).classic(),
             htmlParser2: awilix.asValue(htmlparser2),
+            sqlite3: awilix.asValue(sqlite3),
         });
 
         // Load all other modules
