@@ -46,7 +46,8 @@ container
                     ];
 
                     const channels = [
-                        '812883182390607933', // Dev Channel
+                        '812883182390607933', // Bot Testing Channel
+                        '842188710393151519', // TAPEDECK Feed Channel
                     ];
 
                     const processor = container.resolve<PodcastProcessor>('podcastProcessor');
