@@ -46,7 +46,7 @@ container
                     ];
 
                     const channels = [
-                        '812883182390607933', // Bot Testing Channel
+                        '799785154032959528', // Bot Dev Channel
                         '842188710393151519', // TAPEDECK Feed Channel
                     ];
 
