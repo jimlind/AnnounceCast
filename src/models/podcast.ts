@@ -1,5 +1,5 @@
-import * as normalizeUrl from 'normalize-url';
-import * as prettyMilliseconds from 'pretty-ms';
+import normalizeUrl from 'normalize-url';
+import prettyMilliseconds from 'pretty-ms';
 
 export class Podcast {
     private _showFeed: string = '';

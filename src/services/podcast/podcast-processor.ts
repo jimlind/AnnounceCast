@@ -2,7 +2,7 @@ import { RESOLVER } from 'awilix';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { boolean } from 'boolean';
 import * as htmlparser2 from 'htmlparser2';
-import { Podcast } from '../../models/podcast';
+import { Podcast } from '../../models/podcast.js';
 
 export class PodcastProcessor {
     static [RESOLVER] = {};

@@ -1,10 +1,11 @@
-import * as awilix from 'awilix';
-import * as axios from 'axios';
+import awilix from 'awilix';
+import axios from 'axios';
 import { Client as DiscordClient } from 'discord.js';
 import { config as configDotenv } from 'dotenv';
 import * as htmlparser2 from 'htmlparser2';
-import * as sqlite3 from 'sqlite3';
-import { Config } from './models/config';
+import sqlite3 from 'sqlite3';
+import { URL } from 'url';
+import { Config } from './models/config.js';
 
 export class Container {
     container: awilix.AwilixContainer;
@@ -22,17 +23,20 @@ export class Container {
             config: awilix.asValue(configModel),
             discordClient: awilix.asClass(DiscordClient).classic(),
             htmlParser2: awilix.asValue(htmlparser2),
-            sqlite3: awilix.asValue(sqlite3),
+            sqlite3: awilix.asValue(sqlite3.verbose()),
         });
+    }
 
+    register(): Promise<awilix.AwilixContainer> {
         // Load all other modules
-        this.container.loadModules(['services/**/*.ts'], {
+        return this.container.loadModules(['services/**/*.{ts,js}'], {
             formatName: 'camelCase',
             resolverOptions: {
                 lifetime: awilix.Lifetime.SINGLETON,
                 injectionMode: awilix.InjectionMode.CLASSIC,
             },
-            cwd: __dirname,
+            cwd: new URL('.', import.meta.url).pathname,
+            esModules: true,
         });
     }
 

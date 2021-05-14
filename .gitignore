@@ -3,4 +3,9 @@ node_modules/
 
 # Environment Variables
 .env
+
+# Sqlite3 Database File
 db/podcasts.db
+
+# Transpiled Application
+dist

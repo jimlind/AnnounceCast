@@ -1,5 +1,5 @@
 import { RESOLVER } from 'awilix';
-import * as sqlite3 from 'sqlite3';
+import sqlite3 from 'sqlite3';
 
 export class PodcastDataStorage {
     static [RESOLVER] = {};

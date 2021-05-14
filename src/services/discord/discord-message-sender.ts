@@ -1,6 +1,6 @@
 import { RESOLVER } from 'awilix';
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
-import { DiscordConnection } from './discord-connection';
+import { DiscordConnection } from './discord-connection.js';
 
 export class DiscordMessageSender {
     static [RESOLVER] = {};

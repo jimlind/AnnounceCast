@@ -1,6 +1,6 @@
 import { RESOLVER } from 'awilix';
 import { MessageEmbed } from 'discord.js';
-import { Podcast } from '../../models/podcast';
+import { Podcast } from '../../models/podcast.js';
 
 export class DiscordMessageFactory {
     static [RESOLVER] = {};

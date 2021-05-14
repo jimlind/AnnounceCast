@@ -1,6 +1,6 @@
 import { RESOLVER } from 'awilix';
 import * as discordJS from 'discord.js';
-import { Config } from '../../models/config';
+import { Config } from '../../models/config.js';
 
 export class DiscordConnection {
     static [RESOLVER] = {};
