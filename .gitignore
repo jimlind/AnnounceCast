@@ -7,5 +7,8 @@ node_modules/
 # Sqlite3 Database File
 db/podcasts.db
 
+# Application Log File
+log/application.log
+
 # Transpiled Application
 dist
