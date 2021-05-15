@@ -24,8 +24,6 @@ export class PodcastDataStorage {
     getPostedData(): Promise<Array<Object>> {
         return new Promise((resolve) => {
             this.db.all('SELECT * FROM posted', (err, rows) => {
-                console.log(err);
-
                 const reducedRows = rows.reduce((accumulator, current) => {
                     return { ...accumulator, [current.url]: current.guid };
                 }, {});
