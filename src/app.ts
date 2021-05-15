@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { Logger } from 'log4js';
 import { Client as DiscordClient } from 'discord.js';
 import onExit from 'signal-exit';
 import { Container } from './container.js';
@@ -20,7 +21,8 @@ container.register().then(() => {
         .then((discordClient: DiscordClient) => {
             // Log a message on successful connection
             const serverCount: Number = discordClient.guilds.cache.size;
-            console.log(`Discord Client Logged In on ${serverCount} Servers`);
+            const logger = container.resolve<Logger>('logger');
+            logger.debug(`Discord Client Logged In on ${serverCount} Servers`);
 
             // Open the database connection
             const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
@@ -47,7 +49,7 @@ container.register().then(() => {
 
                         const channels = [
                             '799785154032959528', // Bot Dev Channel
-                            //'842188710393151519', // TAPEDECK Feed Channel
+                            '842188710393151519', // TAPEDECK Feed Channel
                         ];
 
                         const processor = container.resolve<PodcastProcessor>('podcastProcessor');
@@ -81,6 +83,9 @@ container.register().then(() => {
                                                     podcast.showFeed,
                                                     podcast.episodeGuid,
                                                 );
+                                                logger.info(
+                                                    `Message sent: ${message.author} -- ${message.title}`,
+                                                );
                                             });
                                     });
                                 });
@@ -96,7 +101,7 @@ container.register().then(() => {
             onExit((code: any, signal: any) => {
                 discordClient.destroy();
                 data.close();
-                console.log(`Program Terminated ${code}:${signal}`);
+                logger.debug(`Program Terminated ${code}:${signal}`);
             });
         });
 });
