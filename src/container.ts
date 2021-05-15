@@ -1,3 +1,4 @@
+import log4js from 'log4js';
 import awilix from 'awilix';
 import axios from 'axios';
 import { Client as DiscordClient } from 'discord.js';
@@ -18,11 +19,29 @@ export class Container {
         const configModel: Config = new Config();
         configModel.discordBotToken = process.env.DISCORD_BOT_TOKEN || '';
 
+        log4js.configure({
+            appenders: {
+                log_to_file: {
+                    type: 'file',
+                    filename: 'log/application.log',
+                    maxLogSize: 10485760,
+                    backups: 3,
+                    compress: true,
+                },
+                out: { type: 'stdout' },
+            },
+            categories: {
+                default: { appenders: ['log_to_file', 'out'], level: 'debug' },
+            },
+        });
+        const logger = log4js.getLogger();
+
         this.container.register({
             axios: awilix.asValue(axios),
             config: awilix.asValue(configModel),
             discordClient: awilix.asClass(DiscordClient).classic(),
             htmlParser2: awilix.asValue(htmlparser2),
+            logger: awilix.asValue(logger),
             sqlite3: awilix.asValue(sqlite3.verbose()),
         });
     }
