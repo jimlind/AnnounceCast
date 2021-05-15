@@ -1,0 +1,14 @@
+[Unit]
+Description=Discord Podcasts Bot
+Documentation=https://github.com/jimlind/discord.podcasts
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/app/discord.podcasts
+ExecStart=/usr/bin/node --optimize_for_size --max-old-space-size=128 --gc_interval=100 /opt/app/discord.podcasts/dist/app.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
