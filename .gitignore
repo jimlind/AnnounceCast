@@ -12,3 +12,6 @@ log/application.log
 
 # Transpiled Application
 dist
+
+# MacOS System Files
+.DS_Store
