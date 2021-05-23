@@ -31,7 +31,7 @@ export class DiscordConnection {
             // If the connecting process is happening reject additional attempts
             // Multiple connections means something terrible has happened
             if (this.locked) {
-                return reject();
+                return reject('Can Not Make Duplicate Connection Attempts');
             }
 
             // Indicate the connecting process is active

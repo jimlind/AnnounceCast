@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
-import { Logger } from 'log4js';
 import { Client as DiscordClient } from 'discord.js';
+import { Logger } from 'log4js';
 import onExit from 'signal-exit';
 import { Container } from './container.js';
 import { Podcast } from './models/podcast.js';
+import { Bot } from './services/bot.js';
 import { DiscordConnection } from './services/discord/discord-connection';
-import { DiscordMessageFactory } from './services/discord/discord-message-factory';
-import { DiscordMessageSender } from './services/discord/discord-message-sender';
 import { PodcastDataStorage } from './services/podcast/podcast-data-storage';
 import { PodcastProcessor } from './services/podcast/podcast-processor';
 
@@ -30,7 +29,7 @@ container.register().then(() => {
             // Keeps track of if an active diary entry thread is running
             let threadRunning: boolean = false;
             let interval: NodeJS.Timeout;
-            const processRestInterval: number = 1; //60000; // Give it up to 60 seconds to rest
+            const processRestInterval: number = 60000; // Give it up to 60 seconds to rest
 
             data.setup().then(() => {
                 data.getPostedData().then((postedData: any) => {
@@ -53,6 +52,7 @@ container.register().then(() => {
                         ];
 
                         const processor = container.resolve<PodcastProcessor>('podcastProcessor');
+                        const bot = container.resolve<Bot>('bot');
 
                         let feedCount = 1; // Adjust for length index-zero
                         feeds.forEach((feedUrl: string, index: number) => {
@@ -64,30 +64,13 @@ container.register().then(() => {
                                         threadRunning = false;
                                     }
 
-                                    // Exit early if the podcast isn't latest
-                                    if (podcast.episodeGuid === postedData[podcast.showFeed]) {
+                                    // Exit early if the podcast is already latest
+                                    if (bot.podcastIsLatest(podcast)) {
                                         return;
                                     }
 
-                                    const message = container
-                                        .resolve<DiscordMessageFactory>('discordMessageFactory')
-                                        .build(podcast);
-
-                                    channels.forEach((channelId: string) => {
-                                        container
-                                            .resolve<DiscordMessageSender>('discordMessageSender')
-                                            .send(channelId, message)
-                                            .then(() => {
-                                                postedData[podcast.showFeed] = podcast.episodeGuid;
-                                                data.updatePostedData(
-                                                    podcast.showFeed,
-                                                    podcast.episodeGuid,
-                                                );
-                                                logger.info(
-                                                    `Message sent: ${message.author} -- ${message.title}`,
-                                                );
-                                            });
-                                    });
+                                    // Write podcast to a channel list
+                                    bot.writePodcastToChannelList(podcast, channels);
                                 });
                             }, 1000 * index);
                         });
