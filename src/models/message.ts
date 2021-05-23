@@ -18,11 +18,11 @@ export class Message {
     }
 
     // Subsequent strings in the message
-    private _arguments: string = '';
-    public get arguments(): string {
+    private _arguments: string[] = [''];
+    public get arguments(): string[] {
         return this._arguments;
     }
-    public set arguments(value: string) {
+    public set arguments(value: string[]) {
         this._arguments = value;
     }
 
