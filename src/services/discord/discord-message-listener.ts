@@ -26,7 +26,7 @@ export class DiscordMessageListener {
 
     createUserTextMessage(discordMessage: discordJS.Message) {
         // Convert to plain lower case text split on the first space
-        const messageTextList = discordMessage.content.toLowerCase().split(/ +/);
+        const messageTextList = discordMessage.content.split(/ +/);
 
         // Callback on the message parsed into a subscription message object
         const userMessage = new Message();
