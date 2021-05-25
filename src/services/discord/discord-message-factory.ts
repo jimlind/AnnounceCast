@@ -5,7 +5,20 @@ import { Podcast } from '../../models/podcast.js';
 export class DiscordMessageFactory {
     static [RESOLVER] = {};
 
-    build(podcast: Podcast): MessageEmbed {
+    buildFollowingMessage(rows: Array<any>): MessageEmbed {
+        const message = new MessageEmbed().setColor(0x7e4ea3);
+        message.setTitle('Podcasts Followed in this Channel');
+
+        const feeds: Array<string> = ['  ID   /   TITLE'];
+        rows.forEach((row) => {
+            feeds.push(`${row.id} : ${row.title}`);
+        });
+        message.setDescription('```\n' + feeds.join('\n') + '\n```');
+
+        return message;
+    }
+
+    buildEpisodeMessage(podcast: Podcast): MessageEmbed {
         const message = new MessageEmbed().setColor(0x7e4ea3);
 
         message.setAuthor(podcast.showTitle, podcast.showImage, podcast.showLink);
