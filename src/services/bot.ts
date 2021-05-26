@@ -1,43 +1,112 @@
 import { RESOLVER } from 'awilix';
 import { Logger } from 'log4js';
+import { Message } from '../models/message';
 import { Podcast } from '../models/podcast';
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage';
 import { DiscordMessageFactory } from './discord/discord-message-factory';
 import { DiscordMessageSender } from './discord/discord-message-sender';
+import { PodcastProcessor } from './podcast/podcast-processor';
 
 export class Bot {
     static [RESOLVER] = {};
 
     discordMessageFactory: DiscordMessageFactory;
     discordMessageSender: DiscordMessageSender;
-    postcastDataStorage: PodcastDataStorage;
+    podcastDataStorage: PodcastDataStorage;
+    podcastProcessor: PodcastProcessor;
     logger: Logger;
 
     constructor(
         discordMessageFactory: DiscordMessageFactory,
         discordMessageSender: DiscordMessageSender,
         podcastDataStorage: PodcastDataStorage,
+        podcastProcessor: PodcastProcessor,
         logger: Logger,
     ) {
         this.discordMessageFactory = discordMessageFactory;
         this.discordMessageSender = discordMessageSender;
-        this.postcastDataStorage = podcastDataStorage;
+        this.podcastDataStorage = podcastDataStorage;
+        this.podcastProcessor = podcastProcessor;
         this.logger = logger;
     }
 
-    writePodcastToChannelList(podcast: Podcast, channelList: Array<string>) {
-        const message = this.discordMessageFactory.build(podcast);
+    actOnUserMessage(message: Message) {
+        switch (message.command) {
+            case 'follow':
+                this.follow(message);
+                break;
+            case 'unfollow':
+                this.unfollow(message);
+                break;
+            case 'following':
+                this.following(message);
+                break;
+        }
+    }
 
-        channelList.forEach((channelId: string) => {
-            this.discordMessageSender.send(channelId, message).then(() => {
-                this.postcastDataStorage.updatePostedData(podcast.showFeed, podcast.episodeGuid);
-                this.logger.info(`Message sent: ${message.author?.name} -- ${message.title}`);
+    follow(message: Message) {
+        message.arguments.forEach((feedUrl: string) => {
+            this.podcastProcessor
+                .process(feedUrl)
+                .then((podcast: Podcast) => {
+                    this.podcastDataStorage.addFeed(podcast, message.channelId).then((feedList) => {
+                        const followingMessage =
+                            this.discordMessageFactory.buildFollowingMessage(feedList);
+
+                        this.discordMessageSender
+                            .send(message.channelId, followingMessage)
+                            .then(() => {
+                                this.logger.info(
+                                    `Message Sent: Follow ${podcast.showTitle} on Channel ${message.channelId}`,
+                                );
+                            });
+                    });
+                })
+                .catch(() => {
+                    this.logger.info(`Unable to Follow Podcast ${feedUrl}`);
+                });
+        });
+    }
+
+    unfollow(message: Message) {
+        message.arguments.forEach((feedId: string) => {
+            this.podcastDataStorage.removeFeed(feedId, message.channelId).then((feedList) => {
+                const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
+
+                this.discordMessageSender.send(message.channelId, followingMessage).then(() => {
+                    this.logger.info(
+                        `Message Sent: Unfollowed ${feedId} on Channel ${message.channelId}`,
+                    );
+                });
+            });
+        });
+    }
+
+    following(message: Message) {
+        this.podcastDataStorage.getFeedsByChannelId(message.channelId).then((feedList) => {
+            const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
+
+            this.discordMessageSender.send(message.channelId, followingMessage).then(() => {
+                this.logger.info(`Message Sent: All Follows on Channel ${message.channelId}`);
+            });
+        });
+    }
+
+    writePodcastAnnouncement(podcast: Podcast) {
+        const message = this.discordMessageFactory.buildEpisodeMessage(podcast);
+
+        this.podcastDataStorage.getChannelsByFeedUrl(podcast.showFeed).then((channelList) => {
+            channelList.forEach((channelId: string) => {
+                this.discordMessageSender.send(channelId, message).then(() => {
+                    this.podcastDataStorage.updatePostedData(podcast.showFeed, podcast.episodeGuid);
+                    this.logger.info(`Message Sent: ${message.author?.name} -- ${message.title}`);
+                });
             });
         });
     }
 
     podcastIsLatest(podcast: Podcast): boolean {
-        const guid = this.postcastDataStorage.getPostedFromUrl(podcast.showFeed);
+        const guid = this.podcastDataStorage.getPostedFromUrl(podcast.showFeed);
 
         return podcast.episodeGuid == guid;
     }
