@@ -9,9 +9,9 @@ export class DiscordMessageFactory {
         const message = new MessageEmbed().setColor(0x7e4ea3);
         message.setTitle('Podcasts Followed in this Channel');
 
-        const feeds: Array<string> = ['  ID   /   TITLE'];
+        const feeds: Array<string> = ['ID     / TITLE'];
         rows.forEach((row) => {
-            feeds.push(`${row.id} : ${row.title}`);
+            feeds.push(`${row.id} / ${row.title}`);
         });
         message.setDescription('```\n' + feeds.join('\n') + '\n```');
 
