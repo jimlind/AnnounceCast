@@ -18,11 +18,18 @@ Lost Light       |  https://anchor.fm/s/3ae14da0/podcast/rss
 Will Run For...  |  https://anchor.fm/s/23694498/podcast/rss
 ```
 
-### System Commands
+## Local Installation Guidelines
 
-copy discordpodcasts.service to /lib/systemd/system/
+### System Software Installs
+
+```shell
+sudo apt-get install sqlite3
+```
+
+### Service Software Installs
+
+```shell
+sudo cp ./docs/discordpodcasts.service /lib/systemd/system/discordpodcasts.service
 sudo systemctl daemon-reload
 sudo systemctl start discordpodcasts
-
-sudo systemctl status discordpodcasts
-sudo systemctl stop discordpodcasts
+```
