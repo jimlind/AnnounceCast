@@ -113,6 +113,14 @@ export class PodcastDataStorage {
         });
     }
 
+    getFeedUrlByFeedId(feedId: string): Promise<string> {
+        return new Promise((resolve) => {
+            this.db.get('SELECT url FROM feeds WHERE id = ?', feedId, (error, row) => {
+                resolve(row?.url || '');
+            });
+        });
+    }
+
     cachePostedDataLocally(): Promise<void> {
         return new Promise((resolve) => {
             this.db.all(
