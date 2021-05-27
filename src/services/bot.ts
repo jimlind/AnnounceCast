@@ -41,6 +41,9 @@ export class Bot {
             case 'following':
                 this.following(message);
                 break;
+            case 'play':
+                this.play(message);
+                break;
         }
     }
 
@@ -107,6 +110,36 @@ export class Bot {
                     this.logger.error(
                         `Unable to Send All Follows Message on ${message.channelId} [${error}]`,
                     );
+                });
+        });
+    }
+
+    play(message: Message) {
+        if (!message.voiceChannel) return;
+        const voiceChannel = message.voiceChannel;
+
+        this.podcastDataStorage.getFeedUrlByFeedId(message.arguments[0]).then((feedUrl) => {
+            const podcast = this.podcastProcessor
+                .process(feedUrl)
+                .then((podcast) => {
+                    voiceChannel
+                        .join()
+                        .then((connection) => {
+                            connection
+                                .play(podcast.showAudio)
+                                .on('finish', () => {
+                                    voiceChannel.leave();
+                                })
+                                .on('error', (error) =>
+                                    this.logger.error(`Unable to Play Podcast [${error}]`),
+                                );
+                        })
+                        .catch(() => {
+                            this.logger.error(`Unable to Join Voice Channel`);
+                        });
+                })
+                .catch(() => {
+                    this.logger.error(`Unable to Process Podcast`);
                 });
         });
     }
