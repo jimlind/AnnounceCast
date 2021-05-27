@@ -59,6 +59,11 @@ export class Bot {
                                 this.logger.info(
                                     `Message Sent: Follow ${podcast.showTitle} on Channel ${message.channelId}`,
                                 );
+                            })
+                            .catch((error: string) => {
+                                this.logger.error(
+                                    `Unable to Send Follows Message on ${message.channelId} [${error}]`,
+                                );
                             });
                     });
                 })
@@ -73,11 +78,18 @@ export class Bot {
             this.podcastDataStorage.removeFeed(feedId, message.channelId).then((feedList) => {
                 const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
 
-                this.discordMessageSender.send(message.channelId, followingMessage).then(() => {
-                    this.logger.info(
-                        `Message Sent: Unfollowed ${feedId} on Channel ${message.channelId}`,
-                    );
-                });
+                this.discordMessageSender
+                    .send(message.channelId, followingMessage)
+                    .then(() => {
+                        this.logger.info(
+                            `Message Sent: Unfollowed ${feedId} on Channel ${message.channelId}`,
+                        );
+                    })
+                    .catch((error: string) => {
+                        this.logger.error(
+                            `Unable to Send Unfollowed Message on ${message.channelId} [${error}]`,
+                        );
+                    });
             });
         });
     }
@@ -86,9 +98,16 @@ export class Bot {
         this.podcastDataStorage.getFeedsByChannelId(message.channelId).then((feedList) => {
             const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
 
-            this.discordMessageSender.send(message.channelId, followingMessage).then(() => {
-                this.logger.info(`Message Sent: All Follows on Channel ${message.channelId}`);
-            });
+            this.discordMessageSender
+                .send(message.channelId, followingMessage)
+                .then(() => {
+                    this.logger.info(`Message Sent: All Follows on Channel ${message.channelId}`);
+                })
+                .catch((error: string) => {
+                    this.logger.error(
+                        `Unable to Send All Follows Message on ${message.channelId} [${error}]`,
+                    );
+                });
         });
     }
 
@@ -97,10 +116,22 @@ export class Bot {
 
         this.podcastDataStorage.getChannelsByFeedUrl(podcast.showFeed).then((channelList) => {
             channelList.forEach((channelId: string) => {
-                this.discordMessageSender.send(channelId, message).then(() => {
-                    this.podcastDataStorage.updatePostedData(podcast.showFeed, podcast.episodeGuid);
-                    this.logger.info(`Message Sent: ${message.author?.name} -- ${message.title}`);
-                });
+                this.discordMessageSender
+                    .send(channelId, message)
+                    .then(() => {
+                        this.podcastDataStorage.updatePostedData(
+                            podcast.showFeed,
+                            podcast.episodeGuid,
+                        );
+                        this.logger.info(
+                            `Message Sent: ${message.author?.name} -- ${message.title}`,
+                        );
+                    })
+                    .catch((error: string) => {
+                        this.logger.error(
+                            `Unable to Send Podcast Announcment ${message.title} on ${channelId} [${error}]`,
+                        );
+                    });
             });
         });
     }
