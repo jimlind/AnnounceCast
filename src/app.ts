@@ -45,7 +45,9 @@ container.register().then(() => {
                     if (threadRunning) return;
 
                     const feeds = data.getPostedFeeds();
-                    logger.debug(`Running on ${feeds.length} Feeds`);
+                    const used = process.memoryUsage().heapUsed / 1024 / 1024;
+
+                    logger.debug(`Running on ${feeds.length} Feeds [${used} MB]`);
                     // TODO: If there are zero feeds this doesn't work at all.
 
                     const processor = container.resolve<PodcastProcessor>('podcastProcessor');
