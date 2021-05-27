@@ -1,6 +1,6 @@
 # discord.podcasts
 
-Discord Podcasts Bot
+Discord Podcasts Announcement Bot
 
 ## Install in Discord
 

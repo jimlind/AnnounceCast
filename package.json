@@ -1,22 +1,23 @@
 {
-  "name": "tapedeck",
-  "description": "Yet Another Podcast Bot",
-  "version": "0.0.5",
-  "private": true,
+  "name": "discord.podcasts",
+  "description": "Discord Podcasts Announcement Bot",
+  "version": "0.1.0",
+  "private": false,
   "license": "AGPL-3.0",
   "author": "Jim Lind",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jimlind/tapedeck"
+    "url": "https://github.com/jimlind/discord.podcasts"
   },
   "engines": {
     "node": ">=16"
   },
   "type": "module",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "tsc --build && node dist/app.js",
-    "build": "tsc --build",
-    "production": "node dist/app.js"
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "start": "npm run build && node dist/app.js"
   },
   "dependencies": {
     "awilix": "^4.3.4",
