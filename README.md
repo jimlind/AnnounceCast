@@ -23,7 +23,9 @@ Will Run For...  |  https://anchor.fm/s/23694498/podcast/rss
 ### System Software Installs
 
 ```shell
-sudo apt-get install sqlite3
+apt-get install sqlite3
+apt-get install ffmpeg --no-install-recommends
+apt-get install build-essential --no-install-recommends
 ```
 
 ### Service Software Installs
