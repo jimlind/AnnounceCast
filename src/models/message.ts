@@ -1,3 +1,5 @@
+import { VoiceChannel } from 'discord.js';
+
 export class Message {
     // Was the message sent from a user with manage permissions
     private _manageServer: boolean = false;
@@ -33,5 +35,14 @@ export class Message {
     }
     public set channelId(value: string) {
         this._channelId = value;
+    }
+
+    // Voice channel the user is in
+    private _voiceChannel: VoiceChannel | null = null;
+    public get voiceChannel(): VoiceChannel | null {
+        return this._voiceChannel;
+    }
+    public set voiceChannel(value: VoiceChannel | null) {
+        this._voiceChannel = value;
     }
 }

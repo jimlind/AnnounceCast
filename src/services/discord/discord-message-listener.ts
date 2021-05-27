@@ -36,6 +36,12 @@ export class DiscordMessageListener {
         userMessage.channelId = discordMessage.channel.id;
         userMessage.arguments = messageTextList.slice(1);
 
+        const voiceChannel = discordMessage.member?.voice.channel || null;
+        const user = discordMessage.client.user || '';
+        if (voiceChannel && voiceChannel.permissionsFor(user)?.has('SPEAK')) {
+            userMessage.voiceChannel = voiceChannel;
+        }
+
         return userMessage;
     }
 }
