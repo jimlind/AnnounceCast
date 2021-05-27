@@ -34,6 +34,14 @@ export class Podcast {
         this._showImage = value;
     }
 
+    private _showAudio: string = '';
+    public get showAudio(): string {
+        return this._showAudio;
+    }
+    public set showAudio(value: string) {
+        this._showAudio = value;
+    }
+
     private _seasonNumber = '';
     public get seasonNumber() {
         return this._seasonNumber;

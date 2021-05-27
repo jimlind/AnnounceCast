@@ -45,6 +45,9 @@ export class PodcastProcessor {
         const showImageUrl = domUtils.getElementsByTagName('url', showImage, true, 1);
         podcast.showImage = domUtils.getText(showImageUrl);
 
+        const enclosure = domUtils.getElementsByTagName('enclosure', document, true, 1);
+        podcast.showAudio = domUtils.getAttributeValue(enclosure[0], 'url') || '';
+
         const episode = domUtils.getElementsByTagName('item', document, true, 1);
 
         const seasonNumber = domUtils.getElementsByTagName('itunes:season', episode, true, 1);
