@@ -58,11 +58,6 @@ container.register().then(() => {
                         processor
                             .process(feedUrl)
                             .then((podcast: Podcast) => {
-                                // Prodcast fetching and process completed (the hard part)
-                                // Allow the thread to start again
-                                if (feedCount++ === feeds.length) {
-                                    threadRunning = false;
-                                }
                                 // Exit early if the podcast is already latest
                                 if (bot.podcastIsLatest(podcast)) {
                                     return;
@@ -72,6 +67,12 @@ container.register().then(() => {
                             })
                             .catch((error: string) => {
                                 logger.error(`Problem Processing Feeds [${error}]`);
+                            })
+                            .finally(() => {
+                                // Allow the thread to start again
+                                if (feedCount++ === feeds.length) {
+                                    threadRunning = false;
+                                }
                             });
                     });
 
