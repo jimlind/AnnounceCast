@@ -17,8 +17,28 @@ export class Container {
         // Create config model
         configDotenv();
         const configModel: Config = new Config();
-        configModel.discordBotToken = process.env.DISCORD_BOT_TOKEN || '';
 
+        switch (process.argv[2]) {
+            case 'dev':
+                configModel.discordBotToken = process.env.DISCORD_BOT_TOKEN_DEV || '';
+                break;
+            default:
+                configModel.discordBotToken = process.env.DISCORD_BOT_TOKEN_PROD || '';
+                break;
+        }
+
+        // Create Discord client
+        const client = new DiscordClient({
+            presence: {
+                status: 'online',
+                activity: {
+                    name: '`podcast` command',
+                    type: 'LISTENING',
+                },
+            },
+        });
+
+        // Create logger
         log4js.configure({
             appenders: {
                 log_to_file: {
@@ -39,7 +59,7 @@ export class Container {
         this.container.register({
             axios: awilix.asValue(axios),
             config: awilix.asValue(configModel),
-            discordClient: awilix.asClass(DiscordClient).classic(),
+            discordClient: awilix.asValue(client),
             htmlParser2: awilix.asValue(htmlparser2),
             logger: awilix.asValue(logger),
             sqlite3: awilix.asValue(sqlite3.verbose()),

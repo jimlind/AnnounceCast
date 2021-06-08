@@ -17,7 +17,8 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc",
-    "start": "npm run build && node dist/app.js"
+    "start": "npm run build && node dist/app.js",
+    "dev": "npm run build && node dist/app.js dev"
   },
   "dependencies": {
     "@discordjs/opus": "^0.5.0",
