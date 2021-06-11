@@ -1,7 +1,7 @@
 {
   "name": "discord.podcasts",
   "description": "Discord Podcasts Bot",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": false,
   "license": "AGPL-3.0",
   "author": "Jim Lind",

@@ -17,6 +17,8 @@ export class Container {
         // Create config model
         configDotenv();
         const configModel: Config = new Config();
+        configModel.appName = process.env.npm_package_name || '';
+        configModel.appVersion = process.env.npm_package_version || '';
 
         switch (process.argv[2]) {
             case 'dev':

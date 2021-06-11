@@ -36,14 +36,22 @@ export class Bot {
 
     actOnUserMessage(message: Message) {
         switch (message.command) {
-            case 'follow':
-                this.follow(message);
-                break;
-            case 'unfollow':
-                this.unfollow(message);
-                break;
             case 'following':
                 this.following(message);
+                break;
+            case 'follow':
+                if (message.manageServer) {
+                    this.follow(message);
+                } else {
+                    this.writeInadequatePermissionsMessage(message);
+                }
+                break;
+            case 'unfollow':
+                if (message.manageServer) {
+                    this.unfollow(message);
+                } else {
+                    this.writeInadequatePermissionsMessage(message);
+                }
                 break;
             case 'play':
                 this.play(message);
@@ -156,8 +164,10 @@ export class Bot {
 
         switch (message.arguments[0]) {
             case 'prefix':
-                if (guildId) {
+                if (message.manageServer && guildId) {
                     this.discordDataStorage.setPrefix(guildId, message.arguments[1] || '!');
+                } else {
+                    this.writeInadequatePermissionsMessage(message);
                 }
             default:
                 const helpMessage = this.discordMessageFactory.buildHelpMessage(guildId);
@@ -189,6 +199,11 @@ export class Bot {
                     });
             });
         });
+    }
+
+    writeInadequatePermissionsMessage(message: Message) {
+        const permissionsMessage = this.discordMessageFactory.buildInadequatePermissionsMessage();
+        this.discordMessageSender.send(message.channelId, permissionsMessage);
     }
 
     podcastIsLatest(podcast: Podcast): boolean {

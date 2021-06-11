@@ -8,6 +8,7 @@ import { Message } from './models/message.js';
 import { Podcast } from './models/podcast.js';
 import { Bot } from './services/bot.js';
 import { DiscordConnection } from './services/discord/discord-connection';
+import { DiscordDataStorage } from './services/discord/discord-data-storage.js';
 import { DiscordMessageListener } from './services/discord/discord-message-listener';
 import { PodcastDataStorage } from './services/podcast/podcast-data-storage';
 import { PodcastProcessor } from './services/podcast/podcast-processor';
@@ -15,6 +16,9 @@ import { PodcastProcessor } from './services/podcast/podcast-processor';
 // Initialize the container
 const container: Container = new Container();
 container.register().then(() => {
+    // Setup this Data Storage, It can happen async probably?
+    container.resolve<DiscordDataStorage>('discordDataStorage').setup();
+
     // Get a Discord connection to use in the primary loop
     container
         .resolve<DiscordConnection>('discordConnection')
