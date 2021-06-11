@@ -4,8 +4,9 @@ node_modules/
 # Environment Variables
 .env
 
-# Sqlite3 Database File
+# Sqlite3 Database Files
 db/podcasts.db
+db/servers.db
 
 # Application Log File
 log/application.log
