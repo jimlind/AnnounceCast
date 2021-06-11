@@ -130,8 +130,14 @@ export class Bot {
     }
 
     play(message: Message) {
-        if (!message.voiceChannel) return;
+        if (!message.voiceChannel) {
+            const response = this.discordMessageFactory.buildMessage();
+            response.setDescription('You must also be in a voice channel to play a podcast.');
+            this.discordMessageSender.send(message.channelId, response);
+            return;
+        }
         const voiceChannel = message.voiceChannel;
+        const voiceChannelName = voiceChannel.name;
 
         this.podcastDataStorage.getFeedUrlByFeedId(message.arguments[0]).then((feedUrl) => {
             const podcast = this.podcastProcessor
@@ -140,21 +146,48 @@ export class Bot {
                     voiceChannel
                         .join()
                         .then((connection) => {
+                            this.logger.debug(`[play] Attempting to play ${podcast.showTitle}`);
                             connection
                                 .play(podcast.showAudio)
+                                .on('start', () => {
+                                    this.logger.debug(
+                                        `[play] Started playing ${podcast.showTitle}`,
+                                    );
+                                    const response = this.discordMessageFactory.buildMessage();
+                                    response.setDescription(
+                                        `Podcast has started playing in ${voiceChannelName}`,
+                                    );
+                                    this.discordMessageSender.send(message.channelId, response);
+                                })
                                 .on('finish', () => {
+                                    this.logger.debug(
+                                        `[play] Completed playing ${podcast.showTitle}`,
+                                    );
                                     voiceChannel.leave();
                                 })
-                                .on('error', (error) =>
-                                    this.logger.error(`Unable to Play Podcast [${error}]`),
-                                );
+                                .on('error', (error) => {
+                                    this.logger.error(`[play] Unable to Play Podcast [${error}]`);
+                                    const response = this.discordMessageFactory.buildMessage();
+                                    response.setDescription(
+                                        `Error trying to play the podcast in ${voiceChannelName}`,
+                                    );
+                                    this.discordMessageSender.send(message.channelId, response);
+                                });
                         })
                         .catch(() => {
-                            this.logger.error(`Unable to Join Voice Channel`);
+                            this.logger.error(`[play] Unable to Join Voice Channel`);
+                            const response = this.discordMessageFactory.buildMessage();
+                            response.setDescription(
+                                `Bot was unable to join ${voiceChannelName} to play podcast`,
+                            );
+                            this.discordMessageSender.send(message.channelId, response);
                         });
                 })
                 .catch(() => {
-                    this.logger.error(`Unable to Process Podcast`);
+                    this.logger.error(`[play] Unable to Process Podcast`);
+                    const response = this.discordMessageFactory.buildMessage();
+                    response.setDescription(`There was a problem with the selected podcast feed.`);
+                    this.discordMessageSender.send(message.channelId, response);
                 });
         });
     }
