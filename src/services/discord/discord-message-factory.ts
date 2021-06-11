@@ -15,6 +15,11 @@ export class DiscordMessageFactory {
         this.discordDataStorage = discordDataStorage;
     }
 
+    buildMessage(): MessageEmbed {
+        const message = new MessageEmbed().setColor(0x7e4ea3);
+        return message;
+    }
+
     buildFollowingMessage(rows: Array<any>): MessageEmbed {
         const message = new MessageEmbed().setColor(0x7e4ea3);
         message.setTitle('Podcasts Followed in this Channel');
