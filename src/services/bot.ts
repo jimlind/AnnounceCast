@@ -136,6 +136,8 @@ export class Bot {
             this.discordMessageSender.send(message.channelId, response);
             return;
         }
+
+        // TODO: Can this Voice Channel be on a different server?
         const voiceChannel = message.voiceChannel;
         const voiceChannelName = voiceChannel.name;
 
