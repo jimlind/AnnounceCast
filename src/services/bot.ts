@@ -3,6 +3,7 @@ import { Logger } from 'log4js';
 import { Message } from '../models/message';
 import { Podcast } from '../models/podcast';
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage';
+import { DiscordDataStorage } from './discord/discord-data-storage';
 import { DiscordMessageFactory } from './discord/discord-message-factory';
 import { DiscordMessageSender } from './discord/discord-message-sender';
 import { PodcastProcessor } from './podcast/podcast-processor';
@@ -12,6 +13,7 @@ export class Bot {
 
     discordMessageFactory: DiscordMessageFactory;
     discordMessageSender: DiscordMessageSender;
+    discordDataStorage: DiscordDataStorage;
     podcastDataStorage: PodcastDataStorage;
     podcastProcessor: PodcastProcessor;
     logger: Logger;
@@ -19,12 +21,14 @@ export class Bot {
     constructor(
         discordMessageFactory: DiscordMessageFactory,
         discordMessageSender: DiscordMessageSender,
+        discordDataStorage: DiscordDataStorage,
         podcastDataStorage: PodcastDataStorage,
         podcastProcessor: PodcastProcessor,
         logger: Logger,
     ) {
         this.discordMessageFactory = discordMessageFactory;
         this.discordMessageSender = discordMessageSender;
+        this.discordDataStorage = discordDataStorage;
         this.podcastDataStorage = podcastDataStorage;
         this.podcastProcessor = podcastProcessor;
         this.logger = logger;
@@ -43,6 +47,9 @@ export class Bot {
                 break;
             case 'play':
                 this.play(message);
+                break;
+            default:
+                this.system(message);
                 break;
         }
     }
@@ -142,6 +149,21 @@ export class Bot {
                     this.logger.error(`Unable to Process Podcast`);
                 });
         });
+    }
+
+    system(message: Message) {
+        const guildId = message.guildId;
+
+        switch (message.arguments[0]) {
+            case 'prefix':
+                if (guildId) {
+                    this.discordDataStorage.setPrefix(guildId, message.arguments[1] || '!');
+                }
+            default:
+                const helpMessage = this.discordMessageFactory.buildHelpMessage(guildId);
+                this.discordMessageSender.send(message.channelId, helpMessage);
+                break;
+        }
     }
 
     writePodcastAnnouncement(podcast: Podcast) {
