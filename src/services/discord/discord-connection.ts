@@ -47,4 +47,9 @@ export class DiscordConnection {
             this.discordClient.login(this.config.discordBotToken);
         });
     }
+
+    // Will return the discordJS client in use with no gaurantee that it is connected
+    getClient(): discordJS.Client {
+        return this.discordClient;
+    }
 }

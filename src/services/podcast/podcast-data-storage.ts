@@ -86,6 +86,10 @@ export class PodcastDataStorage {
         });
     }
 
+    getFeedCount(): number {
+        return Object.keys(this.postedCache).length;
+    }
+
     getFeedsByChannelId(channelId: string): Promise<Dictionary[]> {
         return new Promise((resolve) => {
             this.db.all(
