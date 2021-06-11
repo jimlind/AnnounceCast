@@ -2,17 +2,28 @@ import { RESOLVER } from 'awilix';
 import { MessageEmbed } from 'discord.js';
 import { Config } from '../../models/config.js';
 import { Podcast } from '../../models/podcast.js';
+import { PodcastDataStorage } from '../podcast/podcast-data-storage.js';
+import { DiscordConnection } from './discord-connection.js';
 import { DiscordDataStorage } from './discord-data-storage.js';
 
 export class DiscordMessageFactory {
     static [RESOLVER] = {};
 
     config: Config;
+    discordConnection: DiscordConnection;
     discordDataStorage: DiscordDataStorage;
+    podcastDataStorage: PodcastDataStorage;
 
-    constructor(config: Config, discordDataStorage: DiscordDataStorage) {
+    constructor(
+        config: Config,
+        discordConnection: DiscordConnection,
+        discordDataStorage: DiscordDataStorage,
+        podcastDataStorage: PodcastDataStorage,
+    ) {
         this.config = config;
+        this.discordConnection = discordConnection;
         this.discordDataStorage = discordDataStorage;
+        this.podcastDataStorage = podcastDataStorage;
     }
 
     buildMessage(): MessageEmbed {
@@ -64,30 +75,37 @@ export class DiscordMessageFactory {
 
     buildHelpMessage(guildId: string): MessageEmbed {
         const prefix = this.discordDataStorage.getPrefix(guildId);
+        const feedCount = this.podcastDataStorage.getFeedCount();
+        const serverCount = this.discordConnection.getClient().guilds.cache.size;
 
         const message = new MessageEmbed().setColor(0x7e4ea3);
-        message.setTitle(`${this.config.appName} v${this.config.appVersion} [ prefix: ${prefix} ]`);
+        message.setTitle(
+            `${this.config.appName} v${this.config.appVersion} (prefix: \`${prefix}\` )`,
+        );
         message.setURL('https://github.com/jimlind/discord.podcasts');
-        message.addField('?podcasts', 'View this help message.');
+
+        message.setDescription(`Tracking ${feedCount} podcasts on ${serverCount} servers.`);
+
+        message.addField('?podcasts', '> View this help message.');
         message.addField(
-            '?podcasts prefix <value> 🔒',
-            'Set the bots prefix with the string <value> argument.',
+            '?podcasts prefix <value> 🔒 ',
+            "> Set the bot's custom prefix with the string <value> argument.",
         );
         message.addField(
             `${prefix}following`,
-            'Display all podcasts bot is following in this channel.',
+            '> Display the podcasts (ids and names) followed in this channel.',
         );
         message.addField(
             `${prefix}follow <url> 🔒`,
-            'Follow a podcast in this channel with the feed URL <url> argument.',
+            '> Follow a podcast in this channel with the feed URL <url> argument.',
         );
         message.addField(
             `${prefix}unfollow <id> 🔒`,
-            'Unfollow a podcast in this channel with the following ID <id> argument',
+            '> Unfollow a podcast with the podcast id <id> argument.',
         );
         message.addField(
             `${prefix}play <id>`,
-            'Play the most recent episode of a podcast in your voice channel with the following ID <id> argument',
+            '> Play the most recent episode of a podcast with the podcast id <id> argument.',
         );
         message.setFooter(
             'The 🔒 commands are only available to users with Manage Server permissions.',

@@ -1,5 +1,8 @@
 # Shortcuts
 
+Install Dev Version of the Bot
+https://discord.com/oauth2/authorize?client_id=851611029687500850&permissions=278528&scope=bot
+
 Follow local application logs:
 
 ```shell
