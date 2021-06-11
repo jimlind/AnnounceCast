@@ -1,9 +1,16 @@
 import { RESOLVER } from 'awilix';
 import { MessageEmbed } from 'discord.js';
 import { Podcast } from '../../models/podcast.js';
+import { DiscordDataStorage } from './discord-data-storage.js';
 
 export class DiscordMessageFactory {
     static [RESOLVER] = {};
+
+    discordDataStorage: DiscordDataStorage;
+
+    constructor(discordDataStorage: DiscordDataStorage) {
+        this.discordDataStorage = discordDataStorage;
+    }
 
     buildFollowingMessage(rows: Array<any>): MessageEmbed {
         const message = new MessageEmbed().setColor(0x7e4ea3);
@@ -29,6 +36,15 @@ export class DiscordMessageFactory {
 
         message.setFooter(this.createFooterText(podcast));
 
+        return message;
+    }
+
+    buildHelpMessage(guildId: string): MessageEmbed {
+        const prefix = this.discordDataStorage.getPrefix(guildId);
+
+        const message = new MessageEmbed().setColor(0x7e4ea3);
+        const description = `[Prefix:${prefix}] \n It seems you are looking for some help.`;
+        message.setDescription(description);
         return message;
     }
 
