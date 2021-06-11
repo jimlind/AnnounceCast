@@ -28,6 +28,15 @@ export class Message {
         this._arguments = value;
     }
 
+    // Guild the message was sent from
+    private _guildId: string = '0';
+    public get guildId(): string {
+        return this._guildId;
+    }
+    public set guildId(value: string) {
+        this._guildId = value;
+    }
+
     // Channel the message was sent from
     private _channelId: string = '0';
     public get channelId(): string {
