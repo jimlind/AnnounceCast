@@ -32,7 +32,7 @@ export class Container {
             presence: {
                 status: 'online',
                 activity: {
-                    name: '`podcast` command',
+                    name: '`?podcasts` command',
                     type: 'LISTENING',
                 },
             },
