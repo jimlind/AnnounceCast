@@ -1,30 +1,41 @@
 import { RESOLVER } from 'awilix';
+import * as discordJS from 'discord.js';
 import { Message } from '../../models/message.js';
 import { DiscordConnection } from './discord-connection';
-import * as discordJS from 'discord.js';
+import { DiscordDataStorage } from './discord-data-storage.js';
 
 export class DiscordMessageListener {
     static [RESOLVER] = {};
 
     discordConnection: DiscordConnection;
+    discordDataStorage: DiscordDataStorage;
 
-    constructor(discordConnection: DiscordConnection) {
+    constructor(discordConnection: DiscordConnection, discordDataStorage: DiscordDataStorage) {
         this.discordConnection = discordConnection;
+        this.discordDataStorage = discordDataStorage;
     }
 
     onMessage(callback: Function) {
         // Get connected client and listen for messages
         this.discordConnection.getConnectedClient().then((client) => {
             client.on('message', (message: discordJS.Message) => {
-                // Only process actions that start with a '!`
-                if (message.content[0] === '!') {
-                    callback(this.createUserTextMessage(message));
+                // Skip messges from bots
+                if (message.author.bot) {
+                    return;
                 }
+
+                // Only process actions that start with the correct prefix or global
+                const prefix = this.discordDataStorage.getPrefix(message.guild?.id || '');
+                [prefix, '?podcasts'].forEach((value) => {
+                    if (message.content.startsWith(value)) {
+                        callback(this.createUserTextMessage(value, message));
+                    }
+                });
             });
         });
     }
 
-    createUserTextMessage(discordMessage: discordJS.Message) {
+    createUserTextMessage(prefix: string, discordMessage: discordJS.Message) {
         // Convert to plain lower case text split on the first space
         const messageTextList = discordMessage.content.split(/ +/);
 
@@ -32,7 +43,8 @@ export class DiscordMessageListener {
         const userMessage = new Message();
 
         userMessage.manageServer = discordMessage.member?.permissions.has('MANAGE_GUILD') || false;
-        userMessage.command = messageTextList[0].substring(1);
+        userMessage.command = messageTextList[0].substring(prefix.length);
+        userMessage.guildId = discordMessage.guild?.id || '';
         userMessage.channelId = discordMessage.channel.id;
         userMessage.arguments = messageTextList.slice(1);
 
