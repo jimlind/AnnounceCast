@@ -38,7 +38,6 @@ Discord Podcasts Announcement Bot
 
 ### Authorize the Bot for Your Server
 
-Production Bot
 https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=278528&scope=bot
 
 ### Some Great Podcast URLs to Experiment With
