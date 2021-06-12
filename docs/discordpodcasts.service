@@ -7,7 +7,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/opt/app/discord.podcasts
-ExecStart=/usr/bin/node --optimize_for_size --max-old-space-size=128 --gc_interval=100 /opt/app/discord.podcasts/dist/app.js
+ExecStart=npm start --prefix /opt/app/discord.podcasts
 Restart=on-failure
 
 [Install]

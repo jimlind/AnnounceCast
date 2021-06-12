@@ -1,7 +1,7 @@
 {
   "name": "discord.podcasts",
   "description": "Discord Podcasts Bot",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": false,
   "license": "AGPL-3.0",
   "author": "Jim Lind",
@@ -17,7 +17,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc",
-    "start": "npm run build && node dist/app.js",
+    "start": "npm run build && node --optimize_for_size --max-old-space-size=128 --gc_interval=100 dist/app.js",
     "dev": "npm run build && node dist/app.js dev"
   },
   "dependencies": {
