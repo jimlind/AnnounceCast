@@ -2,6 +2,8 @@
 
 Discord Podcasts Announcement Bot
 
+---
+
 ## Commands
 
 #### ?podcasts
@@ -29,6 +31,8 @@ Discord Podcasts Announcement Bot
 
 > Play the most recent episode of a podcast with the podcast id <id> argument.
 > This command requires the issuer to be in a voice channel that the bot has permission to join and speak in.
+
+---
 
 ## Use the Hosted Version of the Bot
 
@@ -65,6 +69,7 @@ DISCORD_BOT_TOKEN_PROD=ABC.123.XZY.098
 
 ```shell
 apt-get install sqlite3
+apt-get install python3 --no-install-recommends
 apt-get install ffmpeg --no-install-recommends
 apt-get install build-essential --no-install-recommends
 ```
