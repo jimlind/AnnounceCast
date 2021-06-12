@@ -6,29 +6,29 @@ Discord Podcasts Announcement Bot
 
 #### ?podcasts
 
-Display the help message.
+> Display the help message.
 
 #### ?podcasts prefix <value>
 
-Set the bot's custom prefix with the string <value> argument.
-If you don't use this the server will default to `!` as your prefix.
+> Set the bot's custom prefix with the string <value> argument.
+> If you don't use this the server will default to `!` as your prefix.
 
 #### <prefix>following
 
-Display the podcasts (ids and names) followed in this channel.
+> Display the podcasts (ids and names) followed in this channel.
 
 #### <prefix>follow <url>
 
-Follow a podcast in this channel with the feed URL <url> argument.
+> Follow a podcast in this channel with the feed URL <url> argument.
 
 #### <prefix>unfollow <id>
 
-Unfollow a podcast with the podcast id <id> argument.
+> Unfollow a podcast with the podcast id <id> argument.
 
 #### <prefix>play <id>
 
-Play the most recent episode of a podcast with the podcast id <id> argument.
-This command requires the issuer to be in a voice channel that the bot has permission to join and speak in.
+> Play the most recent episode of a podcast with the podcast id <id> argument.
+> This command requires the issuer to be in a voice channel that the bot has permission to join and speak in.
 
 ## Use the Hosted Version of the Bot
 
