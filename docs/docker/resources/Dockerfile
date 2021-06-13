@@ -5,6 +5,7 @@ RUN apt-get update
 # Install tools neccessary to build the audio streaming in discord.js
 RUN apt-get install build-essential --no-install-recommends --yes
 RUN apt-get install python3 --no-install-recommends --yes
+RUN apt-get install ffmpeg --no-install-recommends --yes
 RUN apt-get install sqlite3 --yes
 
 # Install OhMyZsh with Clean template
