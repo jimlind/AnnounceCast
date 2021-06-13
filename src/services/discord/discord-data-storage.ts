@@ -1,5 +1,5 @@
 import { RESOLVER } from 'awilix';
-import sqlite3 from 'sqlite3';
+import bettersqlite3 from 'better-sqlite3';
 
 type Dictionary = {
     [key: string]: any;
@@ -8,29 +8,30 @@ type Dictionary = {
 export class DiscordDataStorage {
     static [RESOLVER] = {};
 
-    db: sqlite3.Database;
+    db: bettersqlite3.Database;
     prefixCache: Dictionary;
 
-    constructor(sqlite3: sqlite3.sqlite3) {
-        this.db = new sqlite3.Database('./db/servers.db');
+    constructor(betterSqlite3: typeof bettersqlite3) {
+        this.db = betterSqlite3('./db/servers.db');
         this.prefixCache = {};
+
+        this.setup();
     }
 
-    setup(): Promise<void> {
-        return new Promise((resolve) => {
-            function createPrefixes(db: sqlite3.Database, callback: Function) {
-                db.run(
-                    'CREATE TABLE IF NOT EXISTS prefixes (guild_id TEXT PRIMARY KEY, prefix TEXT)',
-                    callback,
-                );
-            }
+    setup() {
+        this.db.exec(
+            'CREATE TABLE IF NOT EXISTS prefixes (guild_id TEXT PRIMARY KEY, prefix TEXT)',
+        );
+        this.cachePrefixesDataLocally();
+    }
 
-            createPrefixes(this.db, () => {
-                this.cachePrefixesDataLocally().then(() => {
-                    return resolve();
-                });
-            });
-        });
+    cachePrefixesDataLocally() {
+        this.prefixCache = this.db
+            .prepare('SELECT guild_id, prefix FROM prefixes')
+            .all()
+            .reduce((accumulator, current) => {
+                return { ...accumulator, [current.guild_id]: current.prefix };
+            }, {});
     }
 
     getPrefix(guildId: string): string {
@@ -39,21 +40,9 @@ export class DiscordDataStorage {
 
     setPrefix(guildId: string, prefix: string) {
         this.prefixCache[guildId] = prefix;
-        this.db.run('REPLACE INTO prefixes (guild_id, prefix) VALUES (?, ?)', [guildId, prefix]);
-    }
-
-    cachePrefixesDataLocally(): Promise<void> {
-        return new Promise((resolve) => {
-            this.db.all('SELECT guild_id, prefix FROM prefixes', (err, rows) => {
-                const reducedRows = rows.reduce((accumulator, current) => {
-                    return { ...accumulator, [current.guild_id]: current.prefix };
-                }, {});
-                // Set the local cache
-                this.prefixCache = reducedRows;
-                // Resolve promise
-                return resolve();
-            });
-        });
+        this.db
+            .prepare('REPLACE INTO prefixes (guild_id, prefix) VALUES (?, ?)')
+            .run(guildId, prefix);
     }
 
     close() {

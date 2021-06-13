@@ -67,23 +67,22 @@ export class Bot {
             this.podcastProcessor
                 .process(feedUrl)
                 .then((podcast: Podcast) => {
-                    this.podcastDataStorage.addFeed(podcast, message.channelId).then((feedList) => {
-                        const followingMessage =
-                            this.discordMessageFactory.buildFollowingMessage(feedList);
+                    const feedList = this.podcastDataStorage.addFeed(podcast, message.channelId);
+                    const followingMessage =
+                        this.discordMessageFactory.buildFollowingMessage(feedList);
 
-                        this.discordMessageSender
-                            .send(message.channelId, followingMessage)
-                            .then(() => {
-                                this.logger.info(
-                                    `Message Sent: Follow ${podcast.showTitle} on Channel ${message.channelId}`,
-                                );
-                            })
-                            .catch((error: string) => {
-                                this.logger.error(
-                                    `Unable to Send Follows Message on ${message.channelId} [${error}]`,
-                                );
-                            });
-                    });
+                    this.discordMessageSender
+                        .send(message.channelId, followingMessage)
+                        .then(() => {
+                            this.logger.info(
+                                `Message Sent: Follow ${podcast.showTitle} on Channel ${message.channelId}`,
+                            );
+                        })
+                        .catch((error: string) => {
+                            this.logger.error(
+                                `Unable to Send Follows Message on ${message.channelId} [${error}]`,
+                            );
+                        });
                 })
                 .catch(() => {
                     this.logger.info(`Unable to Follow Podcast ${feedUrl}`);
@@ -93,40 +92,36 @@ export class Bot {
 
     unfollow(message: Message) {
         message.arguments.forEach((feedId: string) => {
-            this.podcastDataStorage.removeFeed(feedId, message.channelId).then((feedList) => {
-                const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
-
-                this.discordMessageSender
-                    .send(message.channelId, followingMessage)
-                    .then(() => {
-                        this.logger.info(
-                            `Message Sent: Unfollowed ${feedId} on Channel ${message.channelId}`,
-                        );
-                    })
-                    .catch((error: string) => {
-                        this.logger.error(
-                            `Unable to Send Unfollowed Message on ${message.channelId} [${error}]`,
-                        );
-                    });
-            });
+            const feedList = this.podcastDataStorage.removeFeed(feedId, message.channelId);
+            const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
+            this.discordMessageSender
+                .send(message.channelId, followingMessage)
+                .then(() => {
+                    this.logger.info(
+                        `Message Sent: Unfollowed ${feedId} on Channel ${message.channelId}`,
+                    );
+                })
+                .catch((error: string) => {
+                    this.logger.error(
+                        `Unable to Send Unfollowed Message on ${message.channelId} [${error}]`,
+                    );
+                });
         });
     }
 
     following(message: Message) {
-        this.podcastDataStorage.getFeedsByChannelId(message.channelId).then((feedList) => {
-            const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
-
-            this.discordMessageSender
-                .send(message.channelId, followingMessage)
-                .then(() => {
-                    this.logger.info(`Message Sent: All Follows on Channel ${message.channelId}`);
-                })
-                .catch((error: string) => {
-                    this.logger.error(
-                        `Unable to Send All Follows Message on ${message.channelId} [${error}]`,
-                    );
-                });
-        });
+        const feedList = this.podcastDataStorage.getFeedsByChannelId(message.channelId);
+        const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
+        this.discordMessageSender
+            .send(message.channelId, followingMessage)
+            .then(() => {
+                this.logger.info(`Message Sent: All Follows on Channel ${message.channelId}`);
+            })
+            .catch((error: string) => {
+                this.logger.error(
+                    `Unable to Send All Follows Message on ${message.channelId} [${error}]`,
+                );
+            });
     }
 
     play(message: Message) {
@@ -141,57 +136,53 @@ export class Bot {
         const voiceChannel = message.voiceChannel;
         const voiceChannelName = voiceChannel.name;
 
-        this.podcastDataStorage.getFeedUrlByFeedId(message.arguments[0]).then((feedUrl) => {
-            const podcast = this.podcastProcessor
-                .process(feedUrl)
-                .then((podcast) => {
-                    voiceChannel
-                        .join()
-                        .then((connection) => {
-                            this.logger.debug(`[play] Attempting to play ${podcast.showTitle}`);
-                            connection
-                                .play(podcast.showAudio)
-                                .on('start', () => {
-                                    this.logger.debug(
-                                        `[play] Started playing ${podcast.showTitle}`,
-                                    );
-                                    const response = this.discordMessageFactory.buildMessage();
-                                    response.setDescription(
-                                        `Podcast has started playing in ${voiceChannelName}`,
-                                    );
-                                    this.discordMessageSender.send(message.channelId, response);
-                                })
-                                .on('finish', () => {
-                                    this.logger.debug(
-                                        `[play] Completed playing ${podcast.showTitle}`,
-                                    );
-                                    voiceChannel.leave();
-                                })
-                                .on('error', (error) => {
-                                    this.logger.error(`[play] Unable to Play Podcast [${error}]`);
-                                    const response = this.discordMessageFactory.buildMessage();
-                                    response.setDescription(
-                                        `Error trying to play the podcast in ${voiceChannelName}`,
-                                    );
-                                    this.discordMessageSender.send(message.channelId, response);
-                                });
-                        })
-                        .catch(() => {
-                            this.logger.error(`[play] Unable to Join Voice Channel`);
-                            const response = this.discordMessageFactory.buildMessage();
-                            response.setDescription(
-                                `Bot was unable to join ${voiceChannelName} to play podcast`,
-                            );
-                            this.discordMessageSender.send(message.channelId, response);
-                        });
-                })
-                .catch(() => {
-                    this.logger.error(`[play] Unable to Process Podcast`);
-                    const response = this.discordMessageFactory.buildMessage();
-                    response.setDescription(`There was a problem with the selected podcast feed.`);
-                    this.discordMessageSender.send(message.channelId, response);
-                });
-        });
+        const feedUrl = this.podcastDataStorage.getFeedUrlByFeedId(message.arguments[0]);
+        const podcast = this.podcastProcessor
+            .process(feedUrl)
+            .then((podcast) => {
+                voiceChannel
+                    .join()
+                    .then((connection) => {
+                        this.logger.debug(`[play] Attempting to play ${podcast.showTitle}`);
+                        connection
+                            .play(podcast.showAudio)
+                            .on('start', () => {
+                                this.logger.debug(`[play] Started playing ${podcast.showTitle}`);
+                                const response = this.discordMessageFactory.buildMessage();
+                                response.setDescription(
+                                    `Podcast has started playing in ${voiceChannelName}`,
+                                );
+                                this.discordMessageSender.send(message.channelId, response);
+                            })
+                            .on('finish', () => {
+                                this.logger.debug(`[play] Completed playing ${podcast.showTitle}`);
+                                voiceChannel.leave();
+                            })
+                            .on('error', (error) => {
+                                this.logger.error(`[play] Unable to Play Podcast [${error}]`);
+                                const response = this.discordMessageFactory.buildMessage();
+                                response.setDescription(
+                                    `Error trying to play the podcast in ${voiceChannelName}`,
+                                );
+                                this.discordMessageSender.send(message.channelId, response);
+                            });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        this.logger.error(`[play] Unable to Join Voice Channel`);
+                        const response = this.discordMessageFactory.buildMessage();
+                        response.setDescription(
+                            `Bot was unable to join ${voiceChannelName} to play podcast`,
+                        );
+                        this.discordMessageSender.send(message.channelId, response);
+                    });
+            })
+            .catch(() => {
+                this.logger.error(`[play] Unable to Process Podcast`);
+                const response = this.discordMessageFactory.buildMessage();
+                response.setDescription(`There was a problem with the selected podcast feed.`);
+                this.discordMessageSender.send(message.channelId, response);
+            });
     }
 
     system(message: Message) {
@@ -213,26 +204,19 @@ export class Bot {
 
     writePodcastAnnouncement(podcast: Podcast) {
         const message = this.discordMessageFactory.buildEpisodeMessage(podcast);
-
-        this.podcastDataStorage.getChannelsByFeedUrl(podcast.showFeed).then((channelList) => {
-            channelList.forEach((channelId: string) => {
-                this.discordMessageSender
-                    .send(channelId, message)
-                    .then(() => {
-                        this.podcastDataStorage.updatePostedData(
-                            podcast.showFeed,
-                            podcast.episodeGuid,
-                        );
-                        this.logger.info(
-                            `Message Sent: ${message.author?.name} -- ${message.title}`,
-                        );
-                    })
-                    .catch((error: string) => {
-                        this.logger.error(
-                            `Unable to Send Podcast Announcment ${message.title} on ${channelId} [${error}]`,
-                        );
-                    });
-            });
+        const channelList = this.podcastDataStorage.getChannelsByFeedUrl(podcast.showFeed);
+        channelList.forEach((channelId: string) => {
+            this.discordMessageSender
+                .send(channelId, message)
+                .then(() => {
+                    this.podcastDataStorage.updatePostedData(podcast.showFeed, podcast.episodeGuid);
+                    this.logger.info(`Message Sent: ${message.author?.name} -- ${message.title}`);
+                })
+                .catch((error: string) => {
+                    this.logger.error(
+                        `Unable to Send Podcast Announcment ${message.title} on ${channelId} [${error}]`,
+                    );
+                });
         });
     }
 

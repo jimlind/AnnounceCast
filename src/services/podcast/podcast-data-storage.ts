@@ -1,5 +1,5 @@
 import { RESOLVER } from 'awilix';
-import sqlite3 from 'sqlite3';
+import bettersqlite3 from 'better-sqlite3';
 import { Podcast } from '../../models/podcast';
 
 type Dictionary = {
@@ -9,137 +9,88 @@ type Dictionary = {
 export class PodcastDataStorage {
     static [RESOLVER] = {};
 
-    db: sqlite3.Database;
+    db: bettersqlite3.Database;
     postedCache: Dictionary;
 
-    constructor(sqlite3: sqlite3.sqlite3) {
-        this.db = new sqlite3.Database('./db/podcasts.db');
+    constructor(betterSqlite3: typeof bettersqlite3) {
+        this.db = betterSqlite3('./db/podcasts.db');
         this.postedCache = {};
+
+        this.setup();
     }
 
-    setup(): Promise<void> {
-        return new Promise((resolve) => {
-            function createFeeds(db: sqlite3.Database, callback: Function) {
-                db.run(
-                    'CREATE TABLE IF NOT EXISTS feeds (id TEXT PRIMARY KEY, url TEXT UNIQUE, title TEXT)',
-                    callback,
-                );
-            }
-            function createChannels(db: sqlite3.Database, callback: Function) {
-                db.run(
-                    'CREATE TABLE IF NOT EXISTS channels (feed_id TEXT, channel_id TEXT, UNIQUE(feed_id, channel_id))',
-                    callback,
-                );
-            }
-            function createPosted(db: sqlite3.Database, callback: Function) {
-                db.run(
-                    'CREATE TABLE IF NOT EXISTS posted (feed_id TEXT PRIMARY KEY UNIQUE, guid TEXT)',
-                    callback,
-                );
-            }
-
-            createFeeds(this.db, () => {
-                createChannels(this.db, () => {
-                    createPosted(this.db, () => {
-                        this.cachePostedDataLocally().then(() => {
-                            return resolve();
-                        });
-                    });
-                });
-            });
-        });
+    setup() {
+        this.db.exec(
+            'CREATE TABLE IF NOT EXISTS feeds (id TEXT PRIMARY KEY, url TEXT UNIQUE, title TEXT)',
+        );
+        this.db.exec(
+            'CREATE TABLE IF NOT EXISTS channels (feed_id TEXT, channel_id TEXT, UNIQUE(feed_id, channel_id))',
+        );
+        this.db.exec(
+            'CREATE TABLE IF NOT EXISTS posted (feed_id TEXT PRIMARY KEY UNIQUE, guid TEXT)',
+        );
+        this.cachePostedDataLocally();
     }
 
-    addFeed(podcast: Podcast, channelId: string): Promise<Dictionary[]> {
-        return new Promise((resolve) => {
-            this.postedCache[podcast.showFeed] = this.postedCache[podcast.showFeed] || null;
+    cachePostedDataLocally() {
+        this.postedCache = this.db
+            .prepare('SELECT f.url, p.guid FROM feeds f LEFT JOIN posted p ON f.id = p.feed_id')
+            .all()
+            .reduce((accumulator, current) => {
+                return { ...accumulator, [current.url]: current.guid };
+            }, {});
+    }
 
-            this.db.run(
+    addFeed(podcast: Podcast, channelId: string): Dictionary[] {
+        this.postedCache[podcast.showFeed] = this.postedCache[podcast.showFeed] || null;
+        this.db
+            .prepare(
                 'INSERT OR IGNORE INTO feeds (id, url, title) VALUES (lower(hex(randomblob(3))), ?, ?)',
-                [podcast.showFeed, podcast.showTitle],
-            );
-            this.db.get(
-                'SELECT id FROM feeds WHERE url = ? LIMIT 1',
-                podcast.showFeed,
-                (error, row) => {
-                    this.db.run(
-                        'INSERT OR IGNORE INTO channels (feed_id, channel_id) VALUES (?, ?)',
-                        [row.id, channelId],
-                    );
-                    this.getFeedsByChannelId(channelId).then((rows) => {
-                        resolve(rows);
-                    });
-                },
-            );
-        });
+            )
+            .run(podcast.showFeed, podcast.showTitle);
+        const feedId =
+            this.db
+                .prepare('SELECT id FROM feeds WHERE url = ? LIMIT 1')
+                .pluck()
+                .get(podcast.showFeed) || '';
+        this.db
+            .prepare('INSERT OR IGNORE INTO channels (feed_id, channel_id) VALUES (?, ?)')
+            .run(feedId, channelId);
+
+        return this.getFeedsByChannelId(channelId);
     }
 
-    removeFeed(feedId: string, channelId: string): Promise<Dictionary[]> {
-        return new Promise((resolve) => {
-            this.db.run('DELETE FROM channels WHERE feed_id = ? AND channel_id = ?', [
-                feedId,
-                channelId,
-            ]);
-            this.getFeedsByChannelId(channelId).then((rows) => {
-                resolve(rows);
-            });
-        });
+    removeFeed(feedId: string, channelId: string): Dictionary[] {
+        this.db
+            .prepare('DELETE FROM channels WHERE feed_id = ? AND channel_id = ?')
+            .run(feedId, channelId);
+
+        return this.getFeedsByChannelId(channelId);
     }
 
     getFeedCount(): number {
         return Object.keys(this.postedCache).length;
     }
 
-    getFeedsByChannelId(channelId: string): Promise<Dictionary[]> {
-        return new Promise((resolve) => {
-            this.db.all(
+    getFeedsByChannelId(channelId: string): Dictionary[] {
+        return this.db
+            .prepare(
                 'SELECT id, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title',
-                channelId,
-                (error, rows) => {
-                    resolve(rows);
-                },
-            );
-        });
+            )
+            .all(channelId);
     }
 
-    getChannelsByFeedUrl(feedUrl: string): Promise<Array<string>> {
-        return new Promise((resolve) => {
-            this.db.all(
+    getChannelsByFeedUrl(feedUrl: string): Array<string> {
+        return this.db
+            .prepare(
                 'SELECT channel_id FROM channels c INNER JOIN feeds f ON c.feed_id = f.id WHERE f.url = ?',
-                feedUrl,
-                (error, rows) => {
-                    const reducedRows = rows.reduce((accumulator, current) => {
-                        return [...accumulator, current.channel_id];
-                    }, []);
-                    resolve(reducedRows);
-                },
-            );
-        });
+            )
+            .pluck()
+            .all(feedUrl);
     }
 
-    getFeedUrlByFeedId(feedId: string): Promise<string> {
-        return new Promise((resolve) => {
-            this.db.get('SELECT url FROM feeds WHERE id = ?', feedId, (error, row) => {
-                resolve(row?.url || '');
-            });
-        });
-    }
-
-    cachePostedDataLocally(): Promise<void> {
-        return new Promise((resolve) => {
-            this.db.all(
-                'SELECT f.url, p.guid FROM feeds f LEFT JOIN posted p ON f.id = p.feed_id',
-                (err, rows) => {
-                    const reducedRows = rows.reduce((accumulator, current) => {
-                        return { ...accumulator, [current.url]: current.guid };
-                    }, {});
-                    // Set the local cache
-                    this.postedCache = reducedRows;
-                    // Resolve promise
-                    return resolve();
-                },
-            );
-        });
+    getFeedUrlByFeedId(feedId: string): string {
+        return this.db.prepare('SELECT url FROM feeds WHERE id = ?').pluck().get(feedId) || '';
     }
 
     getPostedFeeds(): Array<string> {
@@ -150,9 +101,8 @@ export class PodcastDataStorage {
         // Update the local cache
         this.postedCache[url] = guid;
 
-        this.db.get('SELECT id FROM feeds WHERE url = ?', url, (error, row) => {
-            this.db.run('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)', [row.id, guid]);
-        });
+        const feedId = this.db.prepare('SELECT id FROM feeds WHERE url = ?').pluck().get(url);
+        this.db.prepare('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)').run(feedId, guid);
     }
 
     getPostedFromUrl(url: string): string {

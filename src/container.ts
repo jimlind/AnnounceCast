@@ -1,10 +1,10 @@
-import log4js from 'log4js';
 import awilix from 'awilix';
 import axios from 'axios';
+import bettersqlite3 from 'better-sqlite3';
 import { Client as DiscordClient } from 'discord.js';
 import { config as configDotenv } from 'dotenv';
 import * as htmlparser2 from 'htmlparser2';
-import sqlite3 from 'sqlite3';
+import log4js from 'log4js';
 import { URL } from 'url';
 import { Config } from './models/config.js';
 
@@ -60,11 +60,11 @@ export class Container {
 
         this.container.register({
             axios: awilix.asValue(axios),
+            betterSqlite3: awilix.asValue(bettersqlite3),
             config: awilix.asValue(configModel),
             discordClient: awilix.asValue(client),
             htmlParser2: awilix.asValue(htmlparser2),
             logger: awilix.asValue(logger),
-            sqlite3: awilix.asValue(sqlite3.verbose()),
         });
     }
 
