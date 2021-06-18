@@ -1,5 +1,5 @@
 import { RESOLVER } from 'awilix';
-import * as discordJS from 'discord.js';
+import { Message } from 'discord.js';
 import { IncomingMessageFactory } from '../incoming-message/incoming-message-factory';
 import { DiscordConnection } from './discord-connection';
 import { DiscordDataStorage } from './discord-data-storage.js';
@@ -28,7 +28,7 @@ export class DiscordMessageListener {
     onMessage(callback: Function) {
         // Get connected client and listen for messages
         this.discordConnection.getConnectedClient().then((client) => {
-            client.on(this.MESSAGE_ACTION_KEY, (message: discordJS.Message) => {
+            client.on(this.MESSAGE_ACTION_KEY, (message: Message) => {
                 // Skip messges from bots
                 if (message.author.bot) {
                     return;
