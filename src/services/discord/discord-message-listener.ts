@@ -1,33 +1,45 @@
 import { RESOLVER } from 'awilix';
 import * as discordJS from 'discord.js';
+import { IncomingMessageFactory } from '../incoming-message/incoming-message-factory';
 import { DiscordConnection } from './discord-connection';
 import { DiscordDataStorage } from './discord-data-storage.js';
 
 export class DiscordMessageListener {
-    static [RESOLVER] = {};
+    static [RESOLVER] = {}; // So Awilix autoloads the class
+    MESSAGE_ACTION_KEY = 'message';
 
     discordConnection: DiscordConnection;
     discordDataStorage: DiscordDataStorage;
+    incomingMessageFactory: IncomingMessageFactory;
+    magicPrefix: string;
 
-    constructor(discordConnection: DiscordConnection, discordDataStorage: DiscordDataStorage) {
+    constructor(
+        discordConnection: DiscordConnection,
+        discordDataStorage: DiscordDataStorage,
+        incomingMessageFactory: IncomingMessageFactory,
+        magicPrefix: string,
+    ) {
         this.discordConnection = discordConnection;
         this.discordDataStorage = discordDataStorage;
+        this.incomingMessageFactory = incomingMessageFactory;
+        this.magicPrefix = magicPrefix;
     }
 
     onMessage(callback: Function) {
         // Get connected client and listen for messages
         this.discordConnection.getConnectedClient().then((client) => {
-            client.on('message', (message: discordJS.Message) => {
+            client.on(this.MESSAGE_ACTION_KEY, (message: discordJS.Message) => {
                 // Skip messges from bots
                 if (message.author.bot) {
                     return;
                 }
 
                 // Only process actions that start with the correct prefix or global
-                const prefix = this.discordDataStorage.getPrefix(message.guild?.id || '');
-                [prefix, '?podcasts'].forEach((value) => {
+                const guildId = message.guild?.id || '';
+                const prefixList = [this.discordDataStorage.getPrefix(guildId), this.magicPrefix];
+                prefixList.forEach((value) => {
                     if (message.content.startsWith(value)) {
-                        callback(this.createUserTextMessage(value, message));
+                        callback(this.incomingMessageFactory.build(value, message));
                     }
                 });
             });
