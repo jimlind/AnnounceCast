@@ -1,6 +1,7 @@
 import { RESOLVER } from 'awilix';
 import bettersqlite3 from 'better-sqlite3';
-import { Podcast } from '../../models/podcast';
+import { PodcastFeedRow } from '../../models/db/podcast-feed-row.js';
+import { PodcastEpisode } from '../../models/podcast-episode.js';
 
 type Dictionary = {
     [key: string]: any;
@@ -41,18 +42,19 @@ export class PodcastDataStorage {
             }, {});
     }
 
-    addFeed(podcast: Podcast, channelId: string): Dictionary[] {
-        this.postedCache[podcast.showFeed] = this.postedCache[podcast.showFeed] || null;
+    addFeed(podcastEpisode: PodcastEpisode, channelId: string): PodcastFeedRow[] {
+        this.postedCache[podcastEpisode.showFeed] =
+            this.postedCache[podcastEpisode.showFeed] || null;
         this.db
             .prepare(
                 'INSERT OR IGNORE INTO feeds (id, url, title) VALUES (lower(hex(randomblob(3))), ?, ?)',
             )
-            .run(podcast.showFeed, podcast.showTitle);
+            .run(podcastEpisode.showFeed, podcastEpisode.showTitle);
         const feedId =
             this.db
                 .prepare('SELECT id FROM feeds WHERE url = ? LIMIT 1')
                 .pluck()
-                .get(podcast.showFeed) || '';
+                .get(podcastEpisode.showFeed) || '';
         this.db
             .prepare('INSERT OR IGNORE INTO channels (feed_id, channel_id) VALUES (?, ?)')
             .run(feedId, channelId);
@@ -60,7 +62,7 @@ export class PodcastDataStorage {
         return this.getFeedsByChannelId(channelId);
     }
 
-    removeFeed(feedId: string, channelId: string): Dictionary[] {
+    removeFeed(feedId: string, channelId: string): PodcastFeedRow[] {
         this.db
             .prepare('DELETE FROM channels WHERE feed_id = ? AND channel_id = ?')
             .run(feedId, channelId);
@@ -72,12 +74,18 @@ export class PodcastDataStorage {
         return Object.keys(this.postedCache).length;
     }
 
-    getFeedsByChannelId(channelId: string): Dictionary[] {
+    getFeedsByChannelId(channelId: string): PodcastFeedRow[] {
         return this.db
             .prepare(
                 'SELECT id, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title',
             )
-            .all(channelId);
+            .all(channelId)
+            .map((dataRow) => {
+                const row = new PodcastFeedRow();
+                row.id = dataRow.id || '';
+                row.title = dataRow.title || '';
+                return row;
+            });
     }
 
     getChannelsByFeedUrl(feedUrl: string): Array<string> {

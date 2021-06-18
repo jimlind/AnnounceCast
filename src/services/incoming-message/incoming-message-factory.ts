@@ -1,7 +1,10 @@
+import { RESOLVER } from 'awilix';
 import * as discordJS from 'discord.js';
 import { IncomingMessage } from '../../models/incoming-message.js';
 
 export class IncomingMessageFactory {
+    static [RESOLVER] = {}; // So Awilix autoloads the class
+
     build(prefix: string, discordMessage: discordJS.Message) {
         // Convert to plain lower case text split on the first space
         const messageTextList = discordMessage.content.split(/ +/);
