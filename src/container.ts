@@ -65,6 +65,7 @@ export class Container {
             discordClient: awilix.asValue(client),
             htmlParser2: awilix.asValue(htmlparser2),
             logger: awilix.asValue(logger),
+            magicPrefix: awilix.asValue('?podcasts'),
         });
     }
 
