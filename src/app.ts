@@ -4,8 +4,8 @@ import { Client as DiscordClient } from 'discord.js';
 import { Logger } from 'log4js';
 import onExit from 'signal-exit';
 import { Container } from './container.js';
-import { Message } from './models/message.js';
-import { Podcast } from './models/podcast.js';
+import { IncomingMessage } from './models/incoming-message.js';
+import { PodcastEpisode } from './models/podcast-episode.js';
 import { Bot } from './services/bot.js';
 import { DiscordConnection } from './services/discord/discord-connection';
 import { DiscordDataStorage } from './services/discord/discord-data-storage.js';
@@ -30,8 +30,8 @@ container.register().then(() => {
             const bot = container.resolve<Bot>('bot');
             container
                 .resolve<DiscordMessageListener>('discordMessageListener')
-                .onMessage((message: Message) => {
-                    bot.actOnUserMessage(message);
+                .onMessage((incomingMessage: IncomingMessage) => {
+                    bot.actOnUserMessage(incomingMessage);
                 });
 
             // Keeps track of if an active diary entry thread is running
@@ -57,13 +57,13 @@ container.register().then(() => {
                 feeds.forEach((feedUrl: string, index: number) => {
                     processor
                         .process(feedUrl)
-                        .then((podcast: Podcast) => {
+                        .then((podcastEpisode: PodcastEpisode) => {
                             // Exit early if the podcast is already latest
-                            if (bot.podcastIsLatest(podcast)) {
+                            if (bot.podcastIsLatest(podcastEpisode)) {
                                 return;
                             }
                             // Write podcast to a channel list
-                            bot.writePodcastAnnouncement(podcast);
+                            bot.writePodcastAnnouncement(podcastEpisode);
                         })
                         .catch((error: string) => {
                             logger.error(`Problem Processing Feeds [${error}]`);
