@@ -1,13 +1,13 @@
 import { VoiceChannel } from 'discord.js';
 
-export class Message {
+export class IncomingMessage {
     // Was the message sent from a user with manage permissions
-    private _manageServer: boolean = false;
-    public get manageServer(): boolean {
-        return this._manageServer;
+    private _fromServerManager: boolean = false;
+    public get fromServerManager(): boolean {
+        return this._fromServerManager;
     }
-    public set manageServer(value: boolean) {
-        this._manageServer = value;
+    public set fromServerManager(value: boolean) {
+        this._fromServerManager = value;
     }
 
     // The first string in the message
