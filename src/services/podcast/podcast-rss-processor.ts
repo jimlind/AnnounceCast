@@ -65,6 +65,7 @@ export class PodcastRssProcessor {
             const descriptionDocument = this.htmlParser2.parseDocument(
                 domUtils.getText(description),
             );
+            // Get the text from the first paragraph tag
             const paragraphs = domUtils.getElementsByTagName('p', descriptionDocument, true, 1);
             podcastEpisode.description = domUtils.getText(paragraphs);
 
