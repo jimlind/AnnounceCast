@@ -2,6 +2,7 @@ import { RESOLVER } from 'awilix';
 import bettersqlite3 from 'better-sqlite3';
 import { PodcastFeedRow } from '../../models/db/podcast-feed-row.js';
 import { PodcastEpisode } from '../../models/podcast-episode.js';
+import { Podcast } from '../../models/podcast.js';
 
 type Dictionary = {
     [key: string]: any;
@@ -42,19 +43,18 @@ export class PodcastDataStorage {
             }, {});
     }
 
-    addFeed(podcastEpisode: PodcastEpisode, channelId: string): PodcastFeedRow[] {
-        this.postedCache[podcastEpisode.showFeed] =
-            this.postedCache[podcastEpisode.showFeed] || null;
+    addFeed(podcast: Podcast, channelId: string): PodcastFeedRow[] {
+        this.postedCache[podcast.feed] = this.postedCache[podcast.feed] || null;
         this.db
             .prepare(
                 'INSERT OR IGNORE INTO feeds (id, url, title) VALUES (lower(hex(randomblob(3))), ?, ?)',
             )
-            .run(podcastEpisode.showFeed, podcastEpisode.showTitle);
+            .run(podcast.feed, podcast.title);
         const feedId =
             this.db
                 .prepare('SELECT id FROM feeds WHERE url = ? LIMIT 1')
                 .pluck()
-                .get(podcastEpisode.showFeed) || '';
+                .get(podcast.feed) || '';
         this.db
             .prepare('INSERT OR IGNORE INTO channels (feed_id, channel_id) VALUES (?, ?)')
             .run(feedId, channelId);
