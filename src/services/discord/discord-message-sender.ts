@@ -1,5 +1,5 @@
 import { RESOLVER } from 'awilix';
-import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, DiscordAPIError, MessageEmbed, TextChannel } from 'discord.js';
 import { DiscordConnection } from './discord-connection.js';
 
 export class DiscordMessageSender {
@@ -17,11 +17,12 @@ export class DiscordMessageSender {
                 const channel = client.channels.cache.find((ch) => ch.id === channelId);
 
                 if (!(channel instanceof TextChannel)) {
-                    return reject('Unable to Send Message: Bad Channel Id');
+                    return reject('No Text Channel Found');
                 }
 
-                if (!channel.viewable) {
-                    return reject('Unable to Send Message: Channel Not Visibile');
+                const botPermissions = channel.permissionsFor(client.user || '');
+                if (!botPermissions?.has(['VIEW_CHANNEL', 'SEND_MESSAGES', 'EMBED_LINKS'])) {
+                    return reject('Channel Has Bad Permissions');
                 }
 
                 channel
@@ -29,8 +30,11 @@ export class DiscordMessageSender {
                     .then(() => {
                         return resolve('Successfully Sent Message');
                     })
-                    .catch(() => {
-                        return reject('Unable to Send Message: Bad Channel Permissions');
+                    .catch((e) => {
+                        if (e instanceof DiscordAPIError) {
+                            return reject(e.message);
+                        }
+                        return reject('Unknown Error');
                     });
             });
         });

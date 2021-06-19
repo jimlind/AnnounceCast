@@ -1,5 +1,5 @@
 import normalizeUrl from 'normalize-url';
-import { PodcastEpisode } from './podcast-episode';
+import { PodcastEpisode } from './podcast-episode.js';
 
 export class Podcast {
     private _title: string = '';
@@ -48,5 +48,10 @@ export class Podcast {
     }
     public set episodeList(value: PodcastEpisode[]) {
         this._episodeList = value;
+    }
+
+    // Get the first episode or return an empty episode object
+    public getFirstEpisode(): PodcastEpisode {
+        return this._episodeList[0] || new PodcastEpisode();
     }
 }

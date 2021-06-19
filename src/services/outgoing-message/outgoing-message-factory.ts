@@ -1,10 +1,11 @@
 import { RESOLVER } from 'awilix';
 import { MessageEmbed } from 'discord.js';
 import { PodcastFeedRow } from '../../models/db/podcast-feed-row';
+import { Podcast } from '../../models/podcast';
 import { Following } from './messages/following';
 import { Help } from './messages/help';
 import { InadequatePermissions } from './messages/inadequate-permissions';
-import { PodcastEpisode } from './messages/podcast-episode';
+import { NewEpisode } from './messages/new-episode';
 
 export class OutgoingMessageFactory {
     static [RESOLVER] = {}; // So Awilix autoloads the class
@@ -13,26 +14,30 @@ export class OutgoingMessageFactory {
     following: Following;
     help: Help;
     inadequatePermissions: InadequatePermissions;
-    podcastEpisode: PodcastEpisode;
+    newEpisode: NewEpisode;
 
     constructor(
         following: Following,
         help: Help,
         inadequatePermissions: InadequatePermissions,
-        podcastEpisode: PodcastEpisode,
+        newEpisode: NewEpisode,
     ) {
         this.following = following;
         this.help = help;
         this.inadequatePermissions = inadequatePermissions;
-        this.podcastEpisode = podcastEpisode;
-    }
-
-    _baseMessage(): MessageEmbed {
-        const message = new MessageEmbed().setColor(this.MESSAGE_COLOR);
-        return message;
+        this.newEpisode = newEpisode;
     }
 
     buildFollowingMessage(rowList: PodcastFeedRow[]): MessageEmbed {
-        return this.following.build(this._baseMessage(), rowList);
+        return this.following.build(this._buildBaseMessage(), rowList);
+    }
+
+    buildNewEpisodeMessage(podcast: Podcast): MessageEmbed {
+        return this.newEpisode.build(this._buildBaseMessage(), podcast);
+    }
+
+    _buildBaseMessage(): MessageEmbed {
+        const message = new MessageEmbed().setColor(this.MESSAGE_COLOR);
+        return message;
     }
 }
