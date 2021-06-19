@@ -113,6 +113,11 @@ export class PodcastDataStorage {
         this.db.prepare('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)').run(feedId, guid);
     }
 
+    resetPostedData() {
+        this.db.prepare("UPDATE posted SET guid = ''").run();
+        this.cachePostedDataLocally();
+    }
+
     getPostedFromUrl(url: string): string {
         return this.postedCache[url] || '';
     }
