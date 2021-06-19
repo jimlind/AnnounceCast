@@ -39,4 +39,15 @@ export class DiscordMessageSender {
             });
         });
     }
+
+    // This is a barebones message sender.
+    // Not logging success or failures because it shouldn't be used for anything critical
+    sendString(channelId: string, message: string) {
+        this.discordConnection.getConnectedClient().then((client: Client) => {
+            const channel = client.channels.cache.find((ch) => ch.id === channelId);
+            if (channel instanceof TextChannel) {
+                channel.send(message);
+            }
+        });
+    }
 }
