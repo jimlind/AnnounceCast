@@ -70,7 +70,7 @@ container.register().then(() => {
                                 return;
                             }
                             // Write podcast to a channel list
-                            bot.writePodcastAnnouncement(podcast);
+                            bot.sendNewEpisodeAnnouncement(podcast);
                         })
                         .catch((error: string) => {
                             logger.error(`Problem Processing Feeds [${error}]`);

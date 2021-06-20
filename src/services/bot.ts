@@ -1,56 +1,69 @@
 import { RESOLVER } from 'awilix';
+import { AxiosInstance } from 'axios';
+import { MessageEmbed } from 'discord.js';
 import { Logger } from 'log4js';
-import { Message } from '../models/message';
-import { Podcast } from '../models/podcast';
+import { IncomingMessage } from '../models/incoming-message';
+import { Podcast } from '../models/podcast.js';
+import { PodcastEpisode } from '../models/podcast-episode';
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage';
 import { DiscordDataStorage } from './discord/discord-data-storage';
 import { DiscordMessageFactory } from './discord/discord-message-factory';
 import { DiscordMessageSender } from './discord/discord-message-sender';
-import { PodcastProcessor } from './podcast/podcast-processor';
+import { OutgoingMessageFactory } from './outgoing-message/outgoing-message-factory';
+import { PodcastRssProcessor } from './podcast/podcast-rss-processor';
 
 export class Bot {
     static [RESOLVER] = {};
 
+    axios: AxiosInstance;
     discordMessageFactory: DiscordMessageFactory;
     discordMessageSender: DiscordMessageSender;
     discordDataStorage: DiscordDataStorage;
+    outgoingMessageFactory: OutgoingMessageFactory;
     podcastDataStorage: PodcastDataStorage;
-    podcastProcessor: PodcastProcessor;
+    podcastRssProcessor: PodcastRssProcessor;
     logger: Logger;
 
     constructor(
+        axios: AxiosInstance,
         discordMessageFactory: DiscordMessageFactory,
         discordMessageSender: DiscordMessageSender,
         discordDataStorage: DiscordDataStorage,
+        outgoingMessageFactory: OutgoingMessageFactory,
         podcastDataStorage: PodcastDataStorage,
-        podcastProcessor: PodcastProcessor,
+        podcastRssProcessor: PodcastRssProcessor,
         logger: Logger,
     ) {
+        this.axios = axios;
         this.discordMessageFactory = discordMessageFactory;
         this.discordMessageSender = discordMessageSender;
         this.discordDataStorage = discordDataStorage;
+        this.outgoingMessageFactory = outgoingMessageFactory;
         this.podcastDataStorage = podcastDataStorage;
-        this.podcastProcessor = podcastProcessor;
+        this.podcastRssProcessor = podcastRssProcessor;
         this.logger = logger;
     }
 
-    actOnUserMessage(message: Message) {
+    actOnUserMessage(message: IncomingMessage) {
         switch (message.command) {
+            case 'find':
+                this.find(message);
+                break;
             case 'following':
                 this.following(message);
                 break;
             case 'follow':
-                if (message.manageServer) {
+                if (message.fromServerManager) {
                     this.follow(message);
                 } else {
-                    this.writeInadequatePermissionsMessage(message);
+                    this.sendInadequatePermissionsMessage(message);
                 }
                 break;
             case 'unfollow':
-                if (message.manageServer) {
+                if (message.fromServerManager) {
                     this.unfollow(message);
                 } else {
-                    this.writeInadequatePermissionsMessage(message);
+                    this.sendInadequatePermissionsMessage(message);
                 }
                 break;
             case 'play':
@@ -62,69 +75,63 @@ export class Bot {
         }
     }
 
-    follow(message: Message) {
-        message.arguments.forEach((feedUrl: string) => {
-            this.podcastProcessor
-                .process(feedUrl)
-                .then((podcast: Podcast) => {
-                    const feedList = this.podcastDataStorage.addFeed(podcast, message.channelId);
-                    const followingMessage =
-                        this.discordMessageFactory.buildFollowingMessage(feedList);
+    // TODO: Something with this
+    find(message: IncomingMessage) {
+        const searchTerm = encodeURIComponent(message.arguments.join(' '));
+        const url = `https://itunes.apple.com/search?term=${searchTerm}&country=US&media=podcast&attribute=titleTerm&limit=4`;
+        this.axios.get(url).then((response: any) => {
+            const data = response.data;
+            data.results.forEach((result: any) => {
+                console.log(result.collectionName);
+                console.log(result.artistName);
+                console.log(result.collectionViewUrl);
+                console.log(result.feedUrl);
+                console.log(result.artworkUrl600);
+            });
+        });
+    }
 
-                    this.discordMessageSender
-                        .send(message.channelId, followingMessage)
-                        .then(() => {
-                            this.logger.info(
-                                `Message Sent: Follow ${podcast.showTitle} on Channel ${message.channelId}`,
-                            );
-                        })
-                        .catch((error: string) => {
-                            this.logger.error(
-                                `Unable to Send Follows Message on ${message.channelId} [${error}]`,
-                            );
-                        });
+    follow(incomingMessage: IncomingMessage) {
+        const channelId = incomingMessage.channelId;
+        // TODO: If it isn't a URL use the find
+        incomingMessage.arguments.forEach((feedUrl: string) => {
+            this.podcastRssProcessor
+                .process(feedUrl, 0)
+                .then((podcast: Podcast) => {
+                    this.podcastDataStorage.addFeed(podcast, channelId);
+                    const followedMessage = this.outgoingMessageFactory.buildFollowedMessage(
+                        podcast,
+                        this.podcastDataStorage.getFeedsByChannelId(channelId),
+                    );
+                    this._sendMessageToChannel(channelId, followedMessage);
                 })
                 .catch(() => {
                     this.logger.info(`Unable to Follow Podcast ${feedUrl}`);
+                    this._sendErrorToChannel(channelId);
                 });
         });
     }
 
-    unfollow(message: Message) {
-        message.arguments.forEach((feedId: string) => {
-            const feedList = this.podcastDataStorage.removeFeed(feedId, message.channelId);
-            const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
-            this.discordMessageSender
-                .send(message.channelId, followingMessage)
-                .then(() => {
-                    this.logger.info(
-                        `Message Sent: Unfollowed ${feedId} on Channel ${message.channelId}`,
-                    );
-                })
-                .catch((error: string) => {
-                    this.logger.error(
-                        `Unable to Send Unfollowed Message on ${message.channelId} [${error}]`,
-                    );
-                });
+    unfollow(incomingMessage: IncomingMessage) {
+        incomingMessage.arguments.forEach((feedId: string) => {
+            const feed = this.podcastDataStorage.getFeedByFeedId(feedId);
+            this.podcastDataStorage.removeFeed(feedId, incomingMessage.channelId);
+            const unfollowedMessage = this.outgoingMessageFactory.buildUnfollowedMessage(
+                feed.title,
+                this.podcastDataStorage.getFeedsByChannelId(incomingMessage.channelId),
+            );
+            this._sendMessageToChannel(incomingMessage.channelId, unfollowedMessage);
         });
     }
 
-    following(message: Message) {
-        const feedList = this.podcastDataStorage.getFeedsByChannelId(message.channelId);
-        const followingMessage = this.discordMessageFactory.buildFollowingMessage(feedList);
-        this.discordMessageSender
-            .send(message.channelId, followingMessage)
-            .then(() => {
-                this.logger.info(`Message Sent: All Follows on Channel ${message.channelId}`);
-            })
-            .catch((error: string) => {
-                this.logger.error(
-                    `Unable to Send All Follows Message on ${message.channelId} [${error}]`,
-                );
-            });
+    following(incomingMessage: IncomingMessage) {
+        const feedList = this.podcastDataStorage.getFeedsByChannelId(incomingMessage.channelId);
+        const outgoingMessage = this.outgoingMessageFactory.buildFollowingMessage(feedList);
+        this._sendMessageToChannel(incomingMessage.channelId, outgoingMessage);
     }
 
-    play(message: Message) {
+    // TODO: This is a mess.
+    play(message: IncomingMessage) {
         if (!message.voiceChannel) {
             const response = this.discordMessageFactory.buildMessage();
             response.setDescription('You must also be in a voice channel to play a podcast.');
@@ -132,14 +139,17 @@ export class Bot {
             return;
         }
 
+        // const user = discordMessage.client.user || '';
+        // if (voiceChannel && voiceChannel.permissionsFor(user)?.has('SPEAK')) {
+
         // TODO: Can this Voice Channel be on a different server?
         const voiceChannel = message.voiceChannel;
         const voiceChannelName = voiceChannel.name;
 
-        const feedUrl = this.podcastDataStorage.getFeedUrlByFeedId(message.arguments[0]);
-        const podcast = this.podcastProcessor
-            .process(feedUrl)
-            .then((podcast) => {
+        const feedUrl = this.podcastDataStorage.getFeedByFeedId(message.arguments[0]).url;
+        this.podcastRssProcessor
+            .process(feedUrl, 0)
+            .then((podcast: any) => {
                 voiceChannel
                     .join()
                     .then((connection) => {
@@ -185,15 +195,16 @@ export class Bot {
             });
     }
 
-    system(message: Message) {
+    // TODO: Can we do better?
+    system(message: IncomingMessage) {
         const guildId = message.guildId;
 
         switch (message.arguments[0]) {
             case 'prefix':
-                if (message.manageServer && guildId) {
+                if (message.fromServerManager && guildId) {
                     this.discordDataStorage.setPrefix(guildId, message.arguments[1] || '!');
                 } else {
-                    this.writeInadequatePermissionsMessage(message);
+                    this.sendInadequatePermissionsMessage(message);
                 }
             default:
                 const helpMessage = this.discordMessageFactory.buildHelpMessage(guildId);
@@ -202,32 +213,58 @@ export class Bot {
         }
     }
 
-    writePodcastAnnouncement(podcast: Podcast) {
-        const message = this.discordMessageFactory.buildEpisodeMessage(podcast);
-        const channelList = this.podcastDataStorage.getChannelsByFeedUrl(podcast.showFeed);
+    sendNewEpisodeAnnouncement(podcast: Podcast) {
+        const outgoingMessage = this.outgoingMessageFactory.buildNewEpisodeMessage(podcast);
+
+        const channelList = this.podcastDataStorage.getChannelsByFeedUrl(podcast.feed);
         channelList.forEach((channelId: string) => {
-            this.discordMessageSender
-                .send(channelId, message)
-                .then(() => {
-                    this.podcastDataStorage.updatePostedData(podcast.showFeed, podcast.episodeGuid);
-                    this.logger.info(`Message Sent: ${message.author?.name} -- ${message.title}`);
-                })
-                .catch((error: string) => {
-                    this.logger.error(
-                        `Unable to Send Podcast Announcment ${message.title} on ${channelId} [${error}]`,
-                    );
-                });
+            this._sendMessageToChannel(channelId, outgoingMessage).then(() => {
+                this.podcastDataStorage.updatePostedData(
+                    podcast.feed,
+                    podcast.getFirstEpisode().guid,
+                );
+            });
         });
     }
 
-    writeInadequatePermissionsMessage(message: Message) {
+    // TODO: This should be simplified with the simple message sending.
+    sendInadequatePermissionsMessage(message: IncomingMessage) {
         const permissionsMessage = this.discordMessageFactory.buildInadequatePermissionsMessage();
         this.discordMessageSender.send(message.channelId, permissionsMessage);
     }
 
-    podcastIsLatest(podcast: Podcast): boolean {
-        const guid = this.podcastDataStorage.getPostedFromUrl(podcast.showFeed);
+    podcastHasLatestEpisode(podcast: Podcast): boolean {
+        const guid = this.podcastDataStorage.getPostedFromUrl(podcast.feed);
+        return podcast.episodeList.reduce((accumulator: boolean, current: PodcastEpisode) => {
+            return accumulator || current.guid == guid;
+        }, false);
+    }
 
-        return podcast.episodeGuid == guid;
+    _sendMessageToChannel(channelId: string, outgoingMessage: MessageEmbed): Promise<void> {
+        return new Promise((resolve) => {
+            this.discordMessageSender
+                .send(channelId, outgoingMessage)
+                .then(() => {
+                    const data = { title: outgoingMessage.title, channelId };
+                    this.logger.info(`Message Send Success: ${JSON.stringify(data)}`);
+                })
+                .catch((error: string) => {
+                    const data = {
+                        message: outgoingMessage.toJSON(),
+                        channelId,
+                        error,
+                    };
+                    this.logger.error(`Message Send Failure: ${JSON.stringify(data)}`);
+                })
+                .finally(() => {
+                    return resolve();
+                });
+        });
+    }
+
+    _sendErrorToChannel(channelId: string) {
+        const message =
+            'Something went wrong. Check the bot has all the proper permissions and that the podcasts you are following are not corrupted.';
+        this.discordMessageSender.sendString(channelId, message);
     }
 }

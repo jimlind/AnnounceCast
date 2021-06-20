@@ -92,8 +92,16 @@ export class PodcastDataStorage {
             .all(feedUrl);
     }
 
-    getFeedUrlByFeedId(feedId: string): string {
-        return this.db.prepare('SELECT url FROM feeds WHERE id = ?').pluck().get(feedId) || '';
+    getFeedByFeedId(feedId: string): PodcastFeedRow {
+        const statement = this.db.prepare('SELECT id, url, title FROM feeds WHERE id = ?');
+        const dataRow = statement.pluck().get(feedId) || '';
+
+        const row = new PodcastFeedRow();
+        row.id = dataRow.id;
+        row.url = dataRow.url;
+        row.title = dataRow.title;
+
+        return row;
     }
 
     getPostedFeeds(): Array<string> {

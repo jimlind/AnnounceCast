@@ -29,11 +29,11 @@ export class OutgoingMessageFactory {
         return outgoingMessage;
     }
 
-    buildUnfollowedMessage(podcast: Podcast, rowList: PodcastFeedRow[]): MessageEmbed {
+    buildUnfollowedMessage(title: string, rowList: PodcastFeedRow[]): MessageEmbed {
         const outgoingMessage = this.following.build(this._buildBaseMessage(), rowList);
         outgoingMessage.setTitle('Unfollow Successful');
         outgoingMessage.description =
-            `You are no longer following **${podcast.title}**\n` + outgoingMessage.description;
+            `You are no longer following **${title}**\n` + outgoingMessage.description;
 
         return outgoingMessage;
     }
