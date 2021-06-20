@@ -42,6 +42,10 @@ export class OutgoingMessageFactory {
         return this.following.build(this._buildBaseMessage(), rowList);
     }
 
+    buildHelpMessage(guildId: string): MessageEmbed {
+        return this.help.build(this._buildBaseMessage(), guildId);
+    }
+
     buildNewEpisodeMessage(podcast: Podcast): MessageEmbed {
         return this.newEpisode.build(this._buildBaseMessage(), podcast);
     }
