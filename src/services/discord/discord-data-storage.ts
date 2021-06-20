@@ -1,6 +1,7 @@
 import { RESOLVER } from 'awilix';
 import bettersqlite3 from 'better-sqlite3';
 
+//TODO: Make this a real data type instead of this local thing
 type Dictionary = {
     [key: string]: any;
 };
