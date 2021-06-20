@@ -5,17 +5,24 @@ import { Logger } from 'log4js';
 import onExit from 'signal-exit';
 import { Container } from './container.js';
 import { IncomingMessage } from './models/incoming-message.js';
-import { PodcastEpisode } from './models/podcast-episode.js';
+import { Podcast } from './models/podcast.js';
 import { Bot } from './services/bot.js';
-import { DiscordConnection } from './services/discord/discord-connection';
+import { DiscordConnection } from './services/discord/discord-connection.js';
 import { DiscordDataStorage } from './services/discord/discord-data-storage.js';
-import { DiscordMessageListener } from './services/discord/discord-message-listener';
-import { PodcastDataStorage } from './services/podcast/podcast-data-storage';
-import { PodcastProcessor } from './services/podcast/podcast-processor';
+import { DiscordMessageListener } from './services/discord/discord-message-listener.js';
+import { PodcastDataStorage } from './services/podcast/podcast-data-storage.js';
+import { PodcastRssProcessor } from './services/podcast/podcast-rss-processor.js';
 
 // Initialize the container
 const container: Container = new Container();
 container.register().then(() => {
+    // Catch a couple special use cases for now
+    switch (process.argv[3]) {
+        case 'reset-guids':
+            container.resolve<PodcastDataStorage>('podcastDataStorage').resetPostedData();
+            break;
+    }
+
     // Get a Discord connection to use in the primary loop
     container
         .resolve<DiscordConnection>('discordConnection')
@@ -50,26 +57,27 @@ container.register().then(() => {
                 logger.debug(`Running on ${feeds.length} Feeds [${used} MB]`);
                 // TODO: If there are zero feeds this doesn't work at all.
 
-                const processor = container.resolve<PodcastProcessor>('podcastProcessor');
+                const processor = container.resolve<PodcastRssProcessor>('podcastRssProcessor');
                 const bot = container.resolve<Bot>('bot');
 
                 let feedCount = 1; // Adjust for length index-zero
-                feeds.forEach((feedUrl: string, index: number) => {
+                feeds.forEach((feedUrl: string) => {
                     processor
-                        .process(feedUrl)
-                        .then((podcastEpisode: PodcastEpisode) => {
+                        .process(feedUrl, 1)
+                        .then((podcast: Podcast) => {
                             // Exit early if the podcast is already latest
-                            if (bot.podcastIsLatest(podcastEpisode)) {
+                            if (bot.podcastHasLatestEpisode(podcast)) {
                                 return;
                             }
                             // Write podcast to a channel list
-                            bot.writePodcastAnnouncement(podcastEpisode);
+                            bot.writePodcastAnnouncement(podcast);
                         })
                         .catch((error: string) => {
                             logger.error(`Problem Processing Feeds [${error}]`);
                         })
                         .finally(() => {
                             // Allow the thread to start again
+                            // Incrementing coung in the finally means no matter what it increments
                             if (feedCount++ === feeds.length) {
                                 threadRunning = false;
                             }
@@ -82,8 +90,8 @@ container.register().then(() => {
             // Clean up when process is told to end
             onExit((code: any, signal: any) => {
                 discordClient.destroy();
-                data.close();
                 container.resolve<DiscordDataStorage>('discordDataStorage').close();
+                container.resolve<PodcastDataStorage>('podcastDataStorage').close();
                 logger.debug(`Program Terminated ${code}:${signal}`);
             });
         });
