@@ -4,7 +4,6 @@ import { PodcastFeedRow } from '../../models/db/podcast-feed-row';
 import { Podcast } from '../../models/podcast';
 import { Following } from './messages/following';
 import { Help } from './messages/help';
-import { InadequatePermissions } from './messages/inadequate-permissions';
 import { NewEpisode } from './messages/new-episode';
 
 export class OutgoingMessageFactory {
@@ -13,19 +12,30 @@ export class OutgoingMessageFactory {
 
     following: Following;
     help: Help;
-    inadequatePermissions: InadequatePermissions;
     newEpisode: NewEpisode;
 
-    constructor(
-        following: Following,
-        help: Help,
-        inadequatePermissions: InadequatePermissions,
-        newEpisode: NewEpisode,
-    ) {
+    constructor(following: Following, help: Help, newEpisode: NewEpisode) {
         this.following = following;
         this.help = help;
-        this.inadequatePermissions = inadequatePermissions;
         this.newEpisode = newEpisode;
+    }
+
+    buildFollowedMessage(podcast: Podcast, rowList: PodcastFeedRow[]): MessageEmbed {
+        const outgoingMessage = this.following.build(this._buildBaseMessage(), rowList);
+        outgoingMessage.setTitle('Follow Successful');
+        outgoingMessage.description =
+            `You are now following **${podcast.title}**\n` + outgoingMessage.description;
+
+        return outgoingMessage;
+    }
+
+    buildUnfollowedMessage(podcast: Podcast, rowList: PodcastFeedRow[]): MessageEmbed {
+        const outgoingMessage = this.following.build(this._buildBaseMessage(), rowList);
+        outgoingMessage.setTitle('Unfollow Successful');
+        outgoingMessage.description =
+            `You are no longer following **${podcast.title}**\n` + outgoingMessage.description;
+
+        return outgoingMessage;
     }
 
     buildFollowingMessage(rowList: PodcastFeedRow[]): MessageEmbed {
