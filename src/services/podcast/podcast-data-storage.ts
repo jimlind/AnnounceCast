@@ -1,7 +1,6 @@
 import { RESOLVER } from 'awilix';
 import bettersqlite3 from 'better-sqlite3';
 import { PodcastFeedRow } from '../../models/db/podcast-feed-row.js';
-import { PodcastEpisode } from '../../models/podcast-episode.js';
 import { Podcast } from '../../models/podcast.js';
 
 type Dictionary = {
@@ -43,7 +42,7 @@ export class PodcastDataStorage {
             }, {});
     }
 
-    addFeed(podcast: Podcast, channelId: string): PodcastFeedRow[] {
+    addFeed(podcast: Podcast, channelId: string) {
         this.postedCache[podcast.feed] = this.postedCache[podcast.feed] || null;
         this.db
             .prepare(
@@ -58,16 +57,12 @@ export class PodcastDataStorage {
         this.db
             .prepare('INSERT OR IGNORE INTO channels (feed_id, channel_id) VALUES (?, ?)')
             .run(feedId, channelId);
-
-        return this.getFeedsByChannelId(channelId);
     }
 
-    removeFeed(feedId: string, channelId: string): PodcastFeedRow[] {
+    removeFeed(feedId: string, channelId: string) {
         this.db
             .prepare('DELETE FROM channels WHERE feed_id = ? AND channel_id = ?')
             .run(feedId, channelId);
-
-        return this.getFeedsByChannelId(channelId);
     }
 
     getFeedCount(): number {
