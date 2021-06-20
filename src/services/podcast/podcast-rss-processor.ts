@@ -25,7 +25,7 @@ export class PodcastRssProcessor {
                     return resolve(this._parseRSS(feedUrl, episodeCount, response.data));
                 })
                 .catch(() => {
-                    return reject('Failed to download or parse feed');
+                    return reject(`Failed to download or parse feed. [${feedUrl}]`);
                 });
         });
     }
@@ -36,6 +36,7 @@ export class PodcastRssProcessor {
 
         const podcast = new Podcast();
         podcast.title = this._getTextByTag(document, ['title']);
+        podcast.description = this._getTextByTag(document, ['description']);
         podcast.author = this._getTextByTag(document, ['itunes:author']);
         podcast.image = this._getTextByTag(document, ['image', 'url']);
         podcast.link = this._getTextByTag(document, ['link']);

@@ -1,3 +1,4 @@
+import { rejects } from 'assert';
 import { RESOLVER } from 'awilix';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { Podcast } from '../../models/podcast.js';
@@ -23,14 +24,25 @@ export class PodcastAppleAPIProcessor {
         return new Promise((resolve, reject) => {
             const url = `https://itunes.apple.com/search?term=${searchTerm}&country=US&media=podcast&attribute=titleTerm&limit=${podcastCount}`;
             this.axios.get(url).then((response: AxiosResponse) => {
-                const promiseList = response.data.results.map((result: Dictionary) => {
-                    return this.podcastRssProcessor.process(result.feedUrl, 0);
-                });
-                Promise.all(promiseList).then((results) => {
-                    // Yuck. Type guard functions are ugly.
-                    const isPodcast = (item: any): item is Podcast => item instanceof Podcast;
-                    return resolve(results.filter(isPodcast));
-                });
+                // Yuck. Type guard functions are ugly.
+                const isPromise = (item: any): item is Promise<any> => item instanceof Promise;
+                const promiseList: Promise<any>[] = response.data.results
+                    .map((result: Dictionary) => {
+                        // Some podcasts don't have an RSS feed, we ignore them because we can't scrape them.
+                        if (!result.feedUrl || !result.feedUrl.includes('http')) {
+                            return null; // Will get filtered out
+                        }
+                        return this.podcastRssProcessor.process(result.feedUrl, 0);
+                    })
+                    .filter(isPromise);
+
+                Promise.all(promiseList)
+                    .then((results) => {
+                        // Yuck. Type guard functions are ugly.
+                        const isPodcast = (item: any): item is Podcast => item instanceof Podcast;
+                        return resolve(results.filter(isPodcast));
+                    })
+                    .catch(reject);
             });
         });
     }

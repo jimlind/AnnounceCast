@@ -10,6 +10,14 @@ export class Podcast {
         this._title = value;
     }
 
+    private _description: string = '';
+    public get description(): string {
+        return this._description;
+    }
+    public set description(value: string) {
+        this._description = value;
+    }
+
     private _author: string = '';
     public get author(): string {
         return this._author;

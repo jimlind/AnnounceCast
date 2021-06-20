@@ -73,12 +73,19 @@ export class Bot {
 
     find(incomingMessage: IncomingMessage) {
         const searchTerm = encodeURIComponent(incomingMessage.arguments.join(' '));
-        this.podcastAppleApiProcessor.search(searchTerm, 4).then((podcastList) => {
-            podcastList.forEach((podcast) => {
-                const podcastMessage = this.outgoingMessageFactory.buildPodcastInfoMessage(podcast);
-                this._sendMessageToChannel(incomingMessage.channelId, podcastMessage);
+        this.podcastAppleApiProcessor
+            .search(searchTerm, 4)
+            .then((podcastList) => {
+                podcastList.forEach((podcast) => {
+                    const podcastMessage =
+                        this.outgoingMessageFactory.buildPodcastInfoMessage(podcast);
+                    this._sendMessageToChannel(incomingMessage.channelId, podcastMessage);
+                });
+            })
+            .catch(() => {
+                this.logger.info(`Unable to search on term ${searchTerm}`);
+                this._sendErrorToChannel(incomingMessage.channelId);
             });
-        });
     }
 
     follow(incomingMessage: IncomingMessage) {

@@ -7,7 +7,7 @@ import * as htmlparser2 from 'htmlparser2';
 import log4js from 'log4js';
 import { URL } from 'url';
 import { Config } from './models/config.js';
-
+import TurndownService from 'turndown';
 export class Container {
     container: awilix.AwilixContainer;
 
@@ -57,6 +57,7 @@ export class Container {
             },
         });
         const logger = log4js.getLogger();
+        const turndownService = new TurndownService();
 
         this.container.register({
             axios: awilix.asValue(axios),
@@ -66,6 +67,7 @@ export class Container {
             htmlParser2: awilix.asValue(htmlparser2),
             logger: awilix.asValue(logger),
             magicPrefix: awilix.asValue('?podcasts'),
+            turndownService: awilix.asValue(turndownService),
         });
     }
 
