@@ -1,10 +1,11 @@
 import { RESOLVER } from 'awilix';
-import { MessageEmbed } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { PodcastFeedRow } from '../../models/db/podcast-feed-row';
 import { Podcast } from '../../models/podcast';
 import { Following } from './messages/following';
 import { Help } from './messages/help';
 import { NewEpisode } from './messages/new-episode';
+import { PodcastInfo } from './messages/podcast-info';
 
 export class OutgoingMessageFactory {
     static [RESOLVER] = {}; // So Awilix autoloads the class
@@ -13,11 +14,18 @@ export class OutgoingMessageFactory {
     following: Following;
     help: Help;
     newEpisode: NewEpisode;
+    podcastInfo: PodcastInfo;
 
-    constructor(following: Following, help: Help, newEpisode: NewEpisode) {
+    constructor(
+        following: Following,
+        help: Help,
+        newEpisode: NewEpisode,
+        podcastInfo: PodcastInfo,
+    ) {
         this.following = following;
         this.help = help;
         this.newEpisode = newEpisode;
+        this.podcastInfo = podcastInfo;
     }
 
     buildFollowedMessage(podcast: Podcast, rowList: PodcastFeedRow[]): MessageEmbed {
@@ -48,6 +56,10 @@ export class OutgoingMessageFactory {
 
     buildNewEpisodeMessage(podcast: Podcast): MessageEmbed {
         return this.newEpisode.build(this._buildBaseMessage(), podcast);
+    }
+
+    buildPodcastInfoMessage(podcast: Podcast): MessageEmbed {
+        return this.podcastInfo.build(this._buildBaseMessage(), podcast);
     }
 
     _buildBaseMessage(): MessageEmbed {

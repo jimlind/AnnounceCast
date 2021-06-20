@@ -1,40 +1,40 @@
 import { RESOLVER } from 'awilix';
-import { AxiosInstance } from 'axios';
 import { MessageEmbed } from 'discord.js';
 import { Logger } from 'log4js';
 import { IncomingMessage } from '../models/incoming-message';
-import { Podcast } from '../models/podcast.js';
 import { PodcastEpisode } from '../models/podcast-episode';
+import { Podcast } from '../models/podcast.js';
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage';
 import { DiscordDataStorage } from './discord/discord-data-storage';
 import { DiscordMessageSender } from './discord/discord-message-sender';
 import { OutgoingMessageFactory } from './outgoing-message/outgoing-message-factory';
+import { PodcastAppleAPIProcessor } from './podcast/podcast-apple-api-processor';
 import { PodcastRssProcessor } from './podcast/podcast-rss-processor';
 
 export class Bot {
     static [RESOLVER] = {};
 
-    axios: AxiosInstance;
     discordMessageSender: DiscordMessageSender;
     discordDataStorage: DiscordDataStorage;
     outgoingMessageFactory: OutgoingMessageFactory;
+    podcastAppleApiProcessor: PodcastAppleAPIProcessor;
     podcastDataStorage: PodcastDataStorage;
     podcastRssProcessor: PodcastRssProcessor;
     logger: Logger;
 
     constructor(
-        axios: AxiosInstance,
         discordMessageSender: DiscordMessageSender,
         discordDataStorage: DiscordDataStorage,
         outgoingMessageFactory: OutgoingMessageFactory,
+        podcastAppleApiProcessor: PodcastAppleAPIProcessor,
         podcastDataStorage: PodcastDataStorage,
         podcastRssProcessor: PodcastRssProcessor,
         logger: Logger,
     ) {
-        this.axios = axios;
         this.discordMessageSender = discordMessageSender;
         this.discordDataStorage = discordDataStorage;
         this.outgoingMessageFactory = outgoingMessageFactory;
+        this.podcastAppleApiProcessor = podcastAppleApiProcessor;
         this.podcastDataStorage = podcastDataStorage;
         this.podcastRssProcessor = podcastRssProcessor;
         this.logger = logger;
@@ -71,25 +71,19 @@ export class Bot {
         }
     }
 
-    // TODO: Something with this
-    find(message: IncomingMessage) {
-        const searchTerm = encodeURIComponent(message.arguments.join(' '));
-        const url = `https://itunes.apple.com/search?term=${searchTerm}&country=US&media=podcast&attribute=titleTerm&limit=4`;
-        this.axios.get(url).then((response: any) => {
-            const data = response.data;
-            data.results.forEach((result: any) => {
-                console.log(result.collectionName);
-                console.log(result.artistName);
-                console.log(result.collectionViewUrl);
-                console.log(result.feedUrl);
-                console.log(result.artworkUrl600);
+    find(incomingMessage: IncomingMessage) {
+        const searchTerm = encodeURIComponent(incomingMessage.arguments.join(' '));
+        this.podcastAppleApiProcessor.search(searchTerm, 4).then((podcastList) => {
+            podcastList.forEach((podcast) => {
+                const podcastMessage = this.outgoingMessageFactory.buildPodcastInfoMessage(podcast);
+                this._sendMessageToChannel(incomingMessage.channelId, podcastMessage);
             });
         });
     }
 
     follow(incomingMessage: IncomingMessage) {
         const channelId = incomingMessage.channelId;
-        // TODO: If it isn't a URL use the find
+        // TODO: If it isn't a URL use the podcastAppleApiProcessor
         incomingMessage.arguments.forEach((feedUrl: string) => {
             this.podcastRssProcessor
                 .process(feedUrl, 0)

@@ -42,6 +42,10 @@ export class Help {
             "> Set the bot's custom prefix with the string <value> argument.",
         );
         message.addField(
+            `${prefix}find <search terms>`,
+            '> Displays up to 4 podcasts matching the <search terms>',
+        );
+        message.addField(
             `${prefix}following`,
             '> Display the podcasts (ids and names) followed in this channel.',
         );
