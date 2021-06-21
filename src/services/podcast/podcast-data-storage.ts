@@ -1,21 +1,18 @@
 import { RESOLVER } from 'awilix';
 import bettersqlite3 from 'better-sqlite3';
+import { CacheDictionary } from '../../models/cache-dictionary.js';
 import { PodcastFeedRow } from '../../models/db/podcast-feed-row.js';
 import { Podcast } from '../../models/podcast.js';
-
-type Dictionary = {
-    [key: string]: any;
-};
 
 export class PodcastDataStorage {
     static [RESOLVER] = {};
 
     db: bettersqlite3.Database;
-    postedCache: Dictionary;
+    postedCache: CacheDictionary;
 
     constructor(betterSqlite3: typeof bettersqlite3) {
         this.db = betterSqlite3('./db/podcasts.db');
-        this.postedCache = {};
+        this.postedCache = new CacheDictionary('');
 
         this.setup();
     }
@@ -43,7 +40,10 @@ export class PodcastDataStorage {
     }
 
     addFeed(podcast: Podcast, channelId: string) {
-        this.postedCache[podcast.feed] = this.postedCache[podcast.feed] || null;
+        // Add the feed to the posted cache because that's what the loop gets data from
+        // Copying existing data over is easier than seeing if it exists and only inserting if it exists
+        this.postedCache.set(podcast.feed, this.getPostedFromUrl(podcast.feed));
+
         this.db
             .prepare(
                 'INSERT OR IGNORE INTO feeds (id, url, title) VALUES (lower(hex(randomblob(3))), ?, ?)',
@@ -110,7 +110,7 @@ export class PodcastDataStorage {
 
     updatePostedData(url: string, guid: string) {
         // Update the local cache
-        this.postedCache[url] = guid;
+        this.postedCache.set(url, guid);
 
         const feedId = this.db.prepare('SELECT id FROM feeds WHERE url = ?').pluck().get(url);
         this.db.prepare('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)').run(feedId, guid);
@@ -122,7 +122,7 @@ export class PodcastDataStorage {
     }
 
     getPostedFromUrl(url: string): string {
-        return this.postedCache[url] || '';
+        return this.postedCache.get(url);
     }
 
     close() {

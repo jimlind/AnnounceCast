@@ -1,20 +1,16 @@
 import { RESOLVER } from 'awilix';
 import bettersqlite3 from 'better-sqlite3';
-
-//TODO: Make this a real data type instead of this local thing
-type Dictionary = {
-    [key: string]: any;
-};
+import { CacheDictionary } from '../../models/cache-dictionary.js';
 
 export class DiscordDataStorage {
     static [RESOLVER] = {};
 
     db: bettersqlite3.Database;
-    prefixCache: Dictionary;
+    prefixCache: CacheDictionary;
 
     constructor(betterSqlite3: typeof bettersqlite3) {
         this.db = betterSqlite3('./db/servers.db');
-        this.prefixCache = {};
+        this.prefixCache = new CacheDictionary('!');
 
         this.setup();
     }
@@ -36,11 +32,11 @@ export class DiscordDataStorage {
     }
 
     getPrefix(guildId: string): string {
-        return this.prefixCache[guildId] || '!';
+        return this.prefixCache.get(guildId);
     }
 
     setPrefix(guildId: string, prefix: string) {
-        this.prefixCache[guildId] = prefix;
+        this.prefixCache.set(guildId, prefix);
         this.db
             .prepare('REPLACE INTO prefixes (guild_id, prefix) VALUES (?, ?)')
             .run(guildId, prefix);
