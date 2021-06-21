@@ -2,7 +2,6 @@ import { RESOLVER } from 'awilix';
 import { MessageEmbed } from 'discord.js';
 import { Logger } from 'log4js';
 import { IncomingMessage } from '../models/incoming-message';
-import { PodcastEpisode } from '../models/podcast-episode';
 import { Podcast } from '../models/podcast.js';
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage';
 import { DiscordDataStorage } from './discord/discord-data-storage';
@@ -220,14 +219,6 @@ export class Bot {
         });
     }
 
-    // TODO: Maybe this should live somewhere else.
-    podcastHasLatestEpisode(podcast: Podcast): boolean {
-        const guid = this.podcastDataStorage.getPostedFromUrl(podcast.feed);
-        return podcast.episodeList.reduce((accumulator: boolean, current: PodcastEpisode) => {
-            return accumulator || current.guid == guid;
-        }, false);
-    }
-
     _sendInadequatePermissionsMessage(incomingMessage: IncomingMessage) {
         const string = 'Only users with Manage Server permissions can perform that action.';
         this.discordMessageSender.sendString(incomingMessage.channelId, string);
@@ -238,7 +229,8 @@ export class Bot {
             this.discordMessageSender
                 .send(channelId, outgoingMessage)
                 .then(() => {
-                    const data = { title: outgoingMessage.title, channelId };
+                    const memory = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + 'MB';
+                    const data = { title: outgoingMessage.title, channelId, memory };
                     this.logger.info(`Message Send Success: ${JSON.stringify(data)}`);
                 })
                 .catch((error: string) => {

@@ -1,4 +1,3 @@
-import { rejects } from 'assert';
 import { RESOLVER } from 'awilix';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { Podcast } from '../../models/podcast.js';

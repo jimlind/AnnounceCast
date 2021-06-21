@@ -11,6 +11,7 @@ import { DiscordConnection } from './services/discord/discord-connection.js';
 import { DiscordDataStorage } from './services/discord/discord-data-storage.js';
 import { DiscordMessageListener } from './services/discord/discord-message-listener.js';
 import { PodcastDataStorage } from './services/podcast/podcast-data-storage.js';
+import { PodcastHelpers } from './services/podcast/podcast-helpers.js';
 import { PodcastRssProcessor } from './services/podcast/podcast-rss-processor.js';
 
 // Initialize the container
@@ -52,39 +53,36 @@ container.register().then(() => {
                 if (threadRunning) return;
 
                 const feeds = data.getPostedFeeds();
-                const used = process.memoryUsage().heapUsed / 1024 / 1024;
-
-                logger.debug(`Running on ${feeds.length} Feeds [${used} MB]`);
-                // TODO: If there are zero feeds this doesn't work at all.
-
                 const processor = container.resolve<PodcastRssProcessor>('podcastRssProcessor');
                 const bot = container.resolve<Bot>('bot');
 
                 let feedCount = 1; // Adjust for length index-zero
                 feeds.forEach((feedUrl: string) => {
+                    // If we have entered the forEach loop stop later processes from doing the same
+                    threadRunning = true;
+
                     processor
                         .process(feedUrl, 1)
                         .then((podcast: Podcast) => {
                             // Exit early if the podcast is already latest
-                            if (bot.podcastHasLatestEpisode(podcast)) {
+                            const helpers = container.resolve<PodcastHelpers>('podcastHelpers');
+                            if (helpers.podcastHasLatestEpisode(podcast)) {
                                 return;
                             }
                             // Write podcast to a channel list
                             bot.sendNewEpisodeAnnouncement(podcast);
                         })
                         .catch((error: string) => {
-                            logger.error(`Problem Processing Feeds [${error}]`);
+                            logger.error(`Problem Processing Feed [${error}]`);
                         })
                         .finally(() => {
-                            // Allow the thread to start again
-                            // Incrementing coung in the finally means no matter what it increments
+                            // Allow the thread to start again after all feeds have completed
+                            // Incrementing count in the finally means no matter what it increments
                             if (feedCount++ === feeds.length) {
                                 threadRunning = false;
                             }
                         });
                 });
-
-                threadRunning = true;
             }, processRestInterval);
 
             // Clean up when process is told to end
