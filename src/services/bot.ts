@@ -4,6 +4,8 @@ import { Logger } from 'log4js';
 import { IncomingMessage } from '../models/incoming-message';
 import { Podcast } from '../models/podcast.js';
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage';
+import { AudioPlayPodcast } from './audio/audio-play-podcast';
+import { AudioVoiceChannel } from './audio/audio-voice-channel';
 import { DiscordDataStorage } from './discord/discord-data-storage';
 import { DiscordMessageSender } from './discord/discord-message-sender';
 import { OutgoingMessageFactory } from './outgoing-message/outgoing-message-factory';
@@ -13,6 +15,8 @@ import { PodcastRssProcessor } from './podcast/podcast-rss-processor';
 export class Bot {
     static [RESOLVER] = {};
 
+    audioPlayPodcast: AudioPlayPodcast;
+    audioVoiceChannel: AudioVoiceChannel;
     discordMessageSender: DiscordMessageSender;
     discordDataStorage: DiscordDataStorage;
     outgoingMessageFactory: OutgoingMessageFactory;
@@ -22,6 +26,8 @@ export class Bot {
     logger: Logger;
 
     constructor(
+        audioPlayPodcast: AudioPlayPodcast,
+        audioVoiceChannel: AudioVoiceChannel,
         discordMessageSender: DiscordMessageSender,
         discordDataStorage: DiscordDataStorage,
         outgoingMessageFactory: OutgoingMessageFactory,
@@ -30,6 +36,8 @@ export class Bot {
         podcastRssProcessor: PodcastRssProcessor,
         logger: Logger,
     ) {
+        this.audioPlayPodcast = audioPlayPodcast;
+        this.audioVoiceChannel = audioVoiceChannel;
         this.discordMessageSender = discordMessageSender;
         this.discordDataStorage = discordDataStorage;
         this.outgoingMessageFactory = outgoingMessageFactory;
@@ -126,67 +134,21 @@ export class Bot {
         this._sendMessageToChannel(incomingMessage.channelId, outgoingMessage);
     }
 
-    // TODO: This is a mess.
-    play(message: IncomingMessage) {
-        if (!message.voiceChannel) {
-            this.discordMessageSender.sendString(
-                message.channelId,
-                'You must also be in a voice channel to play a podcast.',
-            );
-            return;
-        }
+    play(incomingMessage: IncomingMessage) {
+        this.audioVoiceChannel
+            .join(incomingMessage)
+            .then((voiceConnection) => {
+                const feedId = incomingMessage.arguments[0];
+                const feedUrl = this.podcastDataStorage.getFeedByFeedId(feedId).url;
+                console.log(feedId, feedUrl);
+                console.log(this.podcastDataStorage.getFeedByFeedId(feedId));
 
-        // const user = discordMessage.client.user || '';
-        // if (voiceChannel && voiceChannel.permissionsFor(user)?.has('SPEAK')) {
-
-        // TODO: Can this Voice Channel be on a different server?
-        const voiceChannel = message.voiceChannel;
-        const voiceChannelName = voiceChannel.name;
-
-        const feedUrl = this.podcastDataStorage.getFeedByFeedId(message.arguments[0]).url;
-        this.podcastRssProcessor
-            .process(feedUrl, 0)
-            .then((podcast: any) => {
-                voiceChannel
-                    .join()
-                    .then((connection) => {
-                        this.logger.debug(`[play] Attempting to play ${podcast.showTitle}`);
-                        connection
-                            .play(podcast.showAudio)
-                            .on('start', () => {
-                                this.logger.debug(`[play] Started playing ${podcast.showTitle}`);
-                                this.discordMessageSender.sendString(
-                                    message.channelId,
-                                    `Podcast has started playing in ${voiceChannelName}`,
-                                );
-                            })
-                            .on('finish', () => {
-                                this.logger.debug(`[play] Completed playing ${podcast.showTitle}`);
-                                voiceChannel.leave();
-                            })
-                            .on('error', (error) => {
-                                this.logger.error(`[play] Unable to Play Podcast [${error}]`);
-                                this.discordMessageSender.sendString(
-                                    message.channelId,
-                                    `Error trying to play the podcast in ${voiceChannelName}`,
-                                );
-                            });
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                        this.logger.error(`[play] Unable to Join Voice Channel`);
-                        this.discordMessageSender.sendString(
-                            message.channelId,
-                            `Bot was unable to join ${voiceChannelName} to play podcast`,
-                        );
-                    });
+                this.podcastRssProcessor.process(feedUrl, 1).then((podcast) => {
+                    this.audioPlayPodcast.play(podcast, voiceConnection, incomingMessage.channelId);
+                });
             })
-            .catch(() => {
-                this.logger.error(`[play] Unable to Process Podcast`);
-                this.discordMessageSender.sendString(
-                    message.channelId,
-                    `There was a problem with the selected podcast feed.`,
-                );
+            .catch((message) => {
+                this.discordMessageSender.sendString(incomingMessage.channelId, message);
             });
     }
 
