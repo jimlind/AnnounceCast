@@ -224,6 +224,8 @@ export class Bot {
         this.discordMessageSender.sendString(incomingMessage.channelId, string);
     }
 
+    // This only resolves, it never rejects.
+    // If a messages doesn't send in a channel there's a log, but I'm not going to try and notify the channel
     _sendMessageToChannel(channelId: string, outgoingMessage: MessageEmbed): Promise<void> {
         return new Promise((resolve) => {
             this.discordMessageSender

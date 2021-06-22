@@ -15,4 +15,10 @@ export class CacheDictionary {
     get(key: string): string {
         return this.data[key] || this.defaultValue;
     }
+    getAllKeys(): string[] {
+        return Object.keys(this.data);
+    }
+    count(): number {
+        return this.getAllKeys().length;
+    }
 }

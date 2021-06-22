@@ -23,12 +23,13 @@ export class DiscordDataStorage {
     }
 
     cachePrefixesDataLocally() {
-        this.prefixCache = this.db
+        this.db
             .prepare('SELECT guild_id, prefix FROM prefixes')
             .all()
-            .reduce((accumulator, current) => {
-                return { ...accumulator, [current.guild_id]: current.prefix };
-            }, {});
+            // TODO: This happens async so problematic
+            .forEach((row) => {
+                this.prefixCache.set(row.guild_id || '', row.prefix || '');
+            });
     }
 
     getPrefix(guildId: string): string {

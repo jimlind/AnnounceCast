@@ -31,12 +31,13 @@ export class PodcastDataStorage {
     }
 
     cachePostedDataLocally() {
-        this.postedCache = this.db
+        this.db
             .prepare('SELECT f.url, p.guid FROM feeds f LEFT JOIN posted p ON f.id = p.feed_id')
             .all()
-            .reduce((accumulator, current) => {
-                return { ...accumulator, [current.url]: current.guid };
-            }, {});
+            // TODO: This happens async so problematic
+            .forEach((row) => {
+                this.postedCache.set(row.url || '', row.guild || '');
+            });
     }
 
     addFeed(podcast: Podcast, channelId: string) {
@@ -66,7 +67,7 @@ export class PodcastDataStorage {
     }
 
     getFeedCount(): number {
-        return Object.keys(this.postedCache).length;
+        return this.postedCache.count();
     }
 
     getFeedsByChannelId(channelId: string): PodcastFeedRow[] {
@@ -105,7 +106,7 @@ export class PodcastDataStorage {
     }
 
     getPostedFeeds(): Array<string> {
-        return Object.keys(this.postedCache);
+        return this.postedCache.getAllKeys();
     }
 
     updatePostedData(url: string, guid: string) {
