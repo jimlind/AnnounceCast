@@ -37,7 +37,7 @@ export class PodcastDataStorage {
         // Dumb loop so it is simple and synchronous
         for (var x = 0; x < allRows.length; x++) {
             const row = allRows[x];
-            this.postedCache.set(row.url || '', row.guild || '');
+            this.postedCache.set(row.url || '', row.guid || '');
         }
     }
 
