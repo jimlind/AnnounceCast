@@ -57,10 +57,10 @@ export class PodcastRssProcessor {
             podcastEpisode.explicit = boolean(this._getTextByTag(item, ['itunes:explicit']));
 
             const enclosure = domUtils.getElementsByTagName('enclosure', item, true, 1);
-            podcastEpisode.audio = domUtils.getAttributeValue(enclosure[0], 'url') || '';
+            podcastEpisode.audio = domUtils.getAttributeValue(enclosure[0] || [], 'url') || '';
 
             const image = domUtils.getElementsByTagName('itunes:image', item, true, 1);
-            podcastEpisode.image = domUtils.getAttributeValue(image[0], 'href') || '';
+            podcastEpisode.image = domUtils.getAttributeValue(image[0] || [], 'href') || '';
 
             const description = domUtils.getElementsByTagName('description', item, true, 1);
             const descriptionDocument = this.htmlParser2.parseDocument(
