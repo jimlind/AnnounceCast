@@ -23,13 +23,11 @@ export class DiscordDataStorage {
     }
 
     cachePrefixesDataLocally() {
-        this.db
-            .prepare('SELECT guild_id, prefix FROM prefixes')
-            .all()
-            // TODO: This happens async so problematic
-            .forEach((row) => {
-                this.prefixCache.set(row.guild_id || '', row.prefix || '');
-            });
+        const allRows = this.db.prepare('SELECT guild_id, prefix FROM prefixes').all();
+        for (var x = 0; x < allRows.length; x++) {
+            const row = allRows[x];
+            this.prefixCache.set(row.guild_id || '', row.prefix || '');
+        }
     }
 
     getPrefix(guildId: string): string {

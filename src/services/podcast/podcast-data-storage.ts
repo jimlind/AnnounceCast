@@ -31,13 +31,14 @@ export class PodcastDataStorage {
     }
 
     cachePostedDataLocally() {
-        this.db
+        const allRows = this.db
             .prepare('SELECT f.url, p.guid FROM feeds f LEFT JOIN posted p ON f.id = p.feed_id')
-            .all()
-            // TODO: This happens async so problematic
-            .forEach((row) => {
-                this.postedCache.set(row.url || '', row.guild || '');
-            });
+            .all();
+        // Dumb loop so it is simple and synchronous
+        for (var x = 0; x < allRows.length; x++) {
+            const row = allRows[x];
+            this.postedCache.set(row.url || '', row.guild || '');
+        }
     }
 
     addFeed(podcast: Podcast, channelId: string) {
