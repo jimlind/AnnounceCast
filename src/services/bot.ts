@@ -187,18 +187,21 @@ export class Bot {
     }
 
     _parseFollowArgumentsToPodcasts(followArguments: string[]): Promise<Podcast[]> {
-        return new Promise((resolve) => {
-            const promises = followArguments.map((followArgument: string) => {
-                // TODO: If it isn't a URL use the podcastAppleApiProcessor
-                // Add the extra catch so Promises.all will try everything
-                return this.podcastRssProcessor.process(followArgument, 0).catch((e) => e);
+        // If the arguments start with an http process as feeds otherwise process as show titles
+        if (followArguments[0].startsWith('http')) {
+            return new Promise((resolve) => {
+                const promises = followArguments.map((followArgument: string) => {
+                    // Add the extra catch so Promises.all will try everything
+                    return this.podcastRssProcessor.process(followArgument, 0).catch((e) => e);
+                });
+                const isPromise = (item: any): item is Promise<Podcast> => item instanceof Promise;
+                Promise.all(promises.filter(isPromise)).then((data) => {
+                    return resolve(data);
+                });
             });
-
-            Promise.all(promises).then((data) => {
-                console.log(data);
-                return resolve(data);
-            });
-        });
+        } else {
+            return this.podcastAppleApiProcessor.search(followArguments.join(' '), 1);
+        }
     }
 
     _sendInadequatePermissionsMessage(incomingMessage: IncomingMessage) {
