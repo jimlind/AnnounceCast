@@ -76,17 +76,16 @@ export class PodcastRssProcessor {
         return podcast;
     }
 
-    _parseDurationText(duration: string): string {
+    _parseDurationText(duration: string): number {
         if (!duration.includes(':')) {
-            return duration;
+            return parseInt(duration);
         }
 
-        const partialDuration = duration.split(':');
-        return (
-            parseInt(partialDuration[0]) * 60 * 60 +
-            parseInt(partialDuration[1]) * 60 +
-            parseInt(partialDuration[2])
-        ).toString();
+        const pieces = duration.split(':').map((x) => parseInt(x));
+        const piecesReversed = pieces.reverse();
+        return piecesReversed.reduce((accumulator, current, index) => {
+            return accumulator + current * Math.pow(60, index);
+        }, 0);
     }
 
     _getTextByTag(node: Node | Node[], tagList: string[]): string {

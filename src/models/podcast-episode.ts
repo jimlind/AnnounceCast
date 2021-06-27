@@ -65,12 +65,15 @@ export class PodcastEpisode {
         this._description = value;
     }
 
-    private _duration: string = '';
-    public get duration(): string {
-        return prettyMilliseconds(parseInt(this._duration) * 1000);
+    private _duration: number = 0;
+    public get duration(): number {
+        return this._duration;
     }
-    public set duration(value: string) {
+    public set duration(value: number) {
         this._duration = value;
+    }
+    public get durationFormatted(): string {
+        return prettyMilliseconds(this._duration * 1000);
     }
 
     private _explicit: boolean = false;

@@ -29,7 +29,7 @@ export class NewEpisode {
         episodeText += podcastEpisode.number ? `E${podcastEpisode.number}` : '';
         footerData.push(episodeText);
 
-        footerData.push(podcastEpisode.duration);
+        footerData.push(podcastEpisode.durationFormatted);
         footerData.push(podcastEpisode.explicit ? 'Parental Advisory - Explicit Content' : '');
 
         return footerData.filter(Boolean).join(' | ');
