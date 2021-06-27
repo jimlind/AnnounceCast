@@ -98,9 +98,9 @@ export class PodcastDataStorage {
         const data = this.db.prepare('SELECT id, url, title FROM feeds WHERE id = ?').get(feedId);
 
         const podcastFeedRow = new PodcastFeedRow();
-        podcastFeedRow.id = data.id;
-        podcastFeedRow.url = data.url;
-        podcastFeedRow.title = data.title;
+        podcastFeedRow.id = data?.id || '';
+        podcastFeedRow.url = data?.url || '';
+        podcastFeedRow.title = data?.title || '';
 
         return podcastFeedRow;
     }

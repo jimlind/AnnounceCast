@@ -97,28 +97,29 @@ export class Bot {
 
     follow(incomingMessage: IncomingMessage) {
         const channelId = incomingMessage.channelId;
-        // TODO: If it isn't a URL use the podcastAppleApiProcessor
-        incomingMessage.arguments.forEach((feedUrl: string) => {
-            this.podcastRssProcessor
-                .process(feedUrl, 0)
-                .then((podcast: Podcast) => {
+
+        this._parseFollowArgumentsToPodcasts(incomingMessage.arguments)
+            .then((podcasts: Podcast[]) => {
+                podcasts.forEach((podcast) => {
                     this.podcastDataStorage.addFeed(podcast, channelId);
                     const followedMessage = this.outgoingMessageFactory.buildFollowedMessage(
                         podcast,
                         this.podcastDataStorage.getFeedsByChannelId(channelId),
                     );
                     this._sendMessageToChannel(channelId, followedMessage);
-                })
-                .catch(() => {
-                    this.logger.info(`Unable to Follow Podcast ${feedUrl}`);
-                    this._sendErrorToChannel(channelId);
                 });
-        });
+            })
+            .catch(() => {
+                const message = `Error following Podcasts: ${incomingMessage.arguments.join(' ')}`;
+                this.logger.info(message);
+                this._sendErrorToChannel(channelId);
+            });
     }
 
     unfollow(incomingMessage: IncomingMessage) {
         incomingMessage.arguments.forEach((feedId: string) => {
             const feed = this.podcastDataStorage.getFeedByFeedId(feedId);
+            // TODO: If feedrow doesn't have stuff, don't try to remove it.
             this.podcastDataStorage.removeFeed(feedId, incomingMessage.channelId);
             const unfollowedMessage = this.outgoingMessageFactory.buildUnfollowedMessage(
                 feed.title,
@@ -140,8 +141,6 @@ export class Bot {
             .then((voiceConnection) => {
                 const feedId = incomingMessage.arguments[0];
                 const feedUrl = this.podcastDataStorage.getFeedByFeedId(feedId).url;
-                console.log(feedId, feedUrl);
-                console.log(this.podcastDataStorage.getFeedByFeedId(feedId));
 
                 this.podcastRssProcessor.process(feedUrl, 1).then((podcast) => {
                     this.audioPlayPodcast.play(podcast, voiceConnection, incomingMessage.channelId);
@@ -177,6 +176,21 @@ export class Bot {
                     podcast.feed,
                     podcast.getFirstEpisode().guid,
                 );
+            });
+        });
+    }
+
+    _parseFollowArgumentsToPodcasts(followArguments: string[]): Promise<Podcast[]> {
+        return new Promise((resolve) => {
+            const promises = followArguments.map((followArgument: string) => {
+                // TODO: If it isn't a URL use the podcastAppleApiProcessor
+                // Add the extra catch so Promises.all will try everything
+                return this.podcastRssProcessor.process(followArgument, 0).catch((e) => e);
+            });
+
+            Promise.all(promises).then((data) => {
+                console.log(data);
+                return resolve(data);
             });
         });
     }
