@@ -117,15 +117,21 @@ export class Bot {
     }
 
     unfollow(incomingMessage: IncomingMessage) {
+        const channelId = incomingMessage.channelId;
         incomingMessage.arguments.forEach((feedId: string) => {
             const feed = this.podcastDataStorage.getFeedByFeedId(feedId);
-            // TODO: If feedrow doesn't have stuff, don't try to remove it.
-            this.podcastDataStorage.removeFeed(feedId, incomingMessage.channelId);
+            if (!feed) {
+                const message = "Use the ID in the 'following' command menu to unfollow a podcast.";
+                this.discordMessageSender.sendString(channelId, message);
+                return;
+            }
+
+            this.podcastDataStorage.removeFeed(feedId, channelId);
             const unfollowedMessage = this.outgoingMessageFactory.buildUnfollowedMessage(
                 feed.title,
-                this.podcastDataStorage.getFeedsByChannelId(incomingMessage.channelId),
+                this.podcastDataStorage.getFeedsByChannelId(channelId),
             );
-            this._sendMessageToChannel(incomingMessage.channelId, unfollowedMessage);
+            this._sendMessageToChannel(channelId, unfollowedMessage);
         });
     }
 
@@ -140,7 +146,7 @@ export class Bot {
             .join(incomingMessage)
             .then((voiceConnection) => {
                 const feedId = incomingMessage.arguments[0];
-                const feedUrl = this.podcastDataStorage.getFeedByFeedId(feedId).url;
+                const feedUrl = this.podcastDataStorage.getFeedByFeedId(feedId)?.url || '';
 
                 this.podcastRssProcessor.process(feedUrl, 1).then((podcast) => {
                     this.audioPlayPodcast.play(podcast, voiceConnection, incomingMessage.channelId);
@@ -227,7 +233,7 @@ export class Bot {
 
     _sendErrorToChannel(channelId: string) {
         const message =
-            'Something went wrong. Check the bot has all the proper permissions and that the podcasts you are following are not corrupted.';
+            "Something went wrong. Check the bot's permissions, your inputs, and look for curropted podcast feeds.";
         this.discordMessageSender.sendString(channelId, message);
     }
 }
