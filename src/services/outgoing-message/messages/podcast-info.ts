@@ -1,14 +1,14 @@
 import { RESOLVER } from 'awilix';
 import { MessageEmbed } from 'discord.js';
 import { Podcast } from '../../../models/podcast';
-import TurndownService from 'turndown';
+import { OutgoingMessageHelpers } from '../outgoing-message-helpers';
 
 export class PodcastInfo {
     static [RESOLVER] = {}; // So Awilix autoloads the class
 
-    turndownService: TurndownService;
-    constructor(turndownService: TurndownService) {
-        this.turndownService = turndownService;
+    outgoingMessageHelpers: OutgoingMessageHelpers;
+    constructor(outgoingMessageHelpers: OutgoingMessageHelpers) {
+        this.outgoingMessageHelpers = outgoingMessageHelpers;
     }
 
     build(message: MessageEmbed, podcast: Podcast): MessageEmbed {
@@ -21,12 +21,12 @@ export class PodcastInfo {
     }
 
     _getDescription(podcast: Podcast): string {
-        const descriptionWithHtmlBreaks = podcast.description.replace(/[\r\n]+/g, '<br>');
-        const descriptionMarkdown = this.turndownService.turndown(descriptionWithHtmlBreaks);
-        const descriptionMarkdownWithSingleNewLine = descriptionMarkdown.replace(/^\s*\n/gm, '');
+        const compressedDescription = this.outgoingMessageHelpers.compressPodcastDescription(
+            podcast.description,
+        );
 
         return (
-            descriptionMarkdownWithSingleNewLine +
+            compressedDescription +
             '\n\n' +
             `Show Feed URL: ${podcast.feed}` +
             '\n' +
