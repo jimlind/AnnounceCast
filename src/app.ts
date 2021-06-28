@@ -52,6 +52,7 @@ container.register().then(() => {
             interval = setInterval(() => {
                 if (threadRunning) return;
 
+                // TODO: Make this scale properly
                 const feeds = data.getPostedFeeds();
                 const processor = container.resolve<PodcastRssProcessor>('podcastRssProcessor');
                 const bot = container.resolve<Bot>('bot');

@@ -10,6 +10,7 @@ import { PodcastInfo } from './messages/podcast-info';
 
 export class OutgoingMessageFactory {
     static [RESOLVER] = {}; // So Awilix autoloads the class
+    // TODO: Create a new color and new icon for this bot.
     MESSAGE_COLOR = 0x7e4ea3;
 
     followed: Followed;
