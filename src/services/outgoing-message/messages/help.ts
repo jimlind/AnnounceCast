@@ -50,8 +50,8 @@ export class Help {
             '> Display the podcasts (ids and names) followed in this channel.',
         );
         message.addField(
-            `${prefix}follow <url> 🔒`,
-            '> Follow a podcast in this channel with the feed URL <url> argument.',
+            `${prefix}follow <url|search tems> 🔒`,
+            '> Follow a podcast in this channel with the feed URL <url> argument or follow the first podcast matching the search terms',
         );
         message.addField(
             `${prefix}unfollow <id> 🔒`,

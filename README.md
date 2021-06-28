@@ -23,9 +23,9 @@ Discord Podcasts Announcement Bot
 
 > Display the podcasts (ids and names) followed in this channel.
 
-#### <prefix>follow <url>
+#### <prefix>follow <url|search terms>
 
-> Follow a podcast in this channel with the feed URL <url> argument.
+> Follow a podcast in this channel with the feed URL <url> argument or follow the first podcast matching the search terms
 
 #### <prefix>unfollow <id>
 
