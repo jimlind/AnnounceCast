@@ -22,17 +22,27 @@ export class PodcastRssProcessor {
             this.axios
                 .get(feedUrl)
                 .then((response: AxiosResponse) => {
-                    return resolve(this._parseRSS(feedUrl, episodeCount, response.data));
+                    const parsedData = this._parseRSS(feedUrl, episodeCount, response.data);
+                    if (!(parsedData instanceof Podcast)) {
+                        return reject(`Failed to parse feed. [${feedUrl}]`);
+                    }
+
+                    return resolve(parsedData);
                 })
                 .catch(() => {
-                    return reject(`Failed to download or parse feed. [${feedUrl}]`);
+                    return reject(`Failed to download feed. [${feedUrl}]`);
                 });
         });
     }
 
-    _parseRSS(feedUrl: string, episodeCount: number, responseText: string): Podcast {
+    _parseRSS(feedUrl: string, episodeCount: number, responseText: string): Podcast | null {
         const domUtils = this.htmlParser2.DomUtils;
         const document = this.htmlParser2.parseDocument(responseText, { xmlMode: true });
+
+        const rssElement = domUtils.getElementsByTagName('rss', document);
+        if (!rssElement.length) {
+            return null;
+        }
 
         const podcast = new Podcast();
         podcast.title = this._getTextByTag(document, ['title']);

@@ -126,14 +126,6 @@ export class PodcastDataStorage {
         this.cachePostedDataLocally();
     }
 
-    deleteBadDataByFeedUrl(feedUrl: string) {
-        const feedId = this.db.prepare('SELECT id FROM feeds WHERE url = ?').pluck().get(feedUrl);
-
-        this.db.prepare('DELETE FROM posted WHERE feed_id = ?').run(feedId);
-        this.db.prepare('DELETE FROM channels WHERE feed_id = ?').run(feedId);
-        this.db.prepare('DELETE FROM feeds WHERE id = ?').run(feedId);
-    }
-
     getPostedFromUrl(url: string): string {
         return this.postedCache.get(url);
     }

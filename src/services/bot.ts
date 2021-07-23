@@ -189,14 +189,19 @@ export class Bot {
     _parseFollowArgumentsToPodcasts(followArguments: string[]): Promise<Podcast[]> {
         // If the arguments start with an http process as feeds otherwise process as show titles
         if (followArguments[0].startsWith('http')) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const promises = followArguments.map((followArgument: string) => {
                     // Add the extra catch so Promises.all will try everything
-                    return this.podcastRssProcessor.process(followArgument, 0).catch((e) => e);
+                    return this.podcastRssProcessor.process(followArgument, 0).catch(() => false);
                 });
                 const isPromise = (item: any): item is Promise<Podcast> => item instanceof Promise;
                 Promise.all(promises.filter(isPromise)).then((data) => {
-                    return resolve(data);
+                    const podcastList = data.filter(Boolean);
+                    if (podcastList.length) {
+                        return resolve(podcastList);
+                    } else {
+                        return reject();
+                    }
                 });
             });
         } else {

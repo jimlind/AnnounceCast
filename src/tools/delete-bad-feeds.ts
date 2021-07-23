@@ -1,4 +1,5 @@
 import { Container } from '../container.js';
+import bettersqlite3 from 'better-sqlite3';
 import { Podcast } from '../models/podcast.js';
 import { DiscordConnection } from '../services/discord/discord-connection.js';
 import { DiscordDataStorage } from '../services/discord/discord-data-storage.js';
@@ -9,6 +10,9 @@ const container: Container = new Container();
 container.register().then(() => {
     const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
     const feedUrlList = data.getPostedFeeds();
+
+    const bs = container.resolve<typeof bettersqlite3>('betterSqlite3');
+    const db = bs('./db/podcasts.db');
 
     const promiseList = feedUrlList.map((url) =>
         container
@@ -23,7 +27,7 @@ container.register().then(() => {
                     console.log(`✅ ${result.title} -- ${result.feed}`);
                 } else if (typeof result === 'string') {
                     console.log(`❌ ${result}`);
-                    deleteBadDataByUrl(result);
+                    //deleteBadDataByUrl(db, result);
                 }
             });
         })
@@ -35,6 +39,14 @@ container.register().then(() => {
         });
 });
 
-function deleteBadDataByUrl(result: string) {
-    container.resolve<PodcastDataStorage>('podcastDataStorage').deleteBadDataByFeedUrl(result);
+function deleteBadDataByUrl(db: any, feedUrl: string) {
+    const feedIdList = db
+        .prepare('SELECT id FROM feeds WHERE url = ? OR url is null')
+        .pluck()
+        .all(feedUrl);
+    const params = feedIdList.map(() => '?').join(',');
+
+    db.prepare(`DELETE FROM posted WHERE feed_id IN (${params})`).run(feedIdList);
+    db.prepare(`DELETE FROM channels WHERE feed_id IN (${params})`).run(feedIdList);
+    db.prepare(`DELETE FROM feeds WHERE id IN (${params})`).run(feedIdList);
 }
