@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { AxiosInstance } from 'axios';
 import { Client as DiscordClient } from 'discord.js';
 import { Logger } from 'log4js';
 import onExit from 'signal-exit';
@@ -49,8 +50,30 @@ container.register().then(() => {
 
             // Open the database connection
             const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
+            const startTime = Date.now();
             interval = setInterval(() => {
                 if (threadRunning) return;
+
+                // Kill the process if 12 hours have passed
+                if (Date.now() > startTime + 12 * 60 * 60000) {
+                    container.resolve<Logger>('logger').info('12 Hour Reset');
+                    return process.exit();
+                }
+
+                // Kill the process if Anchor can't be contacted
+                container
+                    .resolve<AxiosInstance>('axios')
+                    .get('https://anchor.fm/')
+                    .then((response) => {
+                        if (response.status != 200) {
+                            container.resolve<Logger>('logger').info('Anchor site bad response');
+                            return process.exit();
+                        }
+                    })
+                    .catch(() => {
+                        container.resolve<Logger>('logger').info('Anchor site fetch failure');
+                        return process.exit();
+                    });
 
                 // TODO: Make this scale properly
                 const feeds = data.getPostedFeeds();
