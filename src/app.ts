@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { AxiosInstance } from 'axios';
 import { Client as DiscordClient } from 'discord.js';
 import { Logger } from 'log4js';
 import onExit from 'signal-exit';
@@ -45,13 +44,12 @@ container.register().then(() => {
 
             // Keeps track of if an active diary entry thread is running
             let threadRunning: boolean = false;
-            let interval: NodeJS.Timeout;
             const processRestInterval: number = 60000; // Give it up to 60 seconds to rest
 
             // Open the database connection
             const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
             const startTime = Date.now();
-            interval = setInterval(() => {
+            const interval = setInterval(() => {
                 if (threadRunning) return;
 
                 // Kill the process if 12 hours have passed
@@ -60,57 +58,42 @@ container.register().then(() => {
                     return process.exit();
                 }
 
-                // Kill the process if Anchor can't be contacted
-                container
-                    .resolve<AxiosInstance>('axios')
-                    .get('https://anchor.fm/')
-                    .then((response) => {
-                        if (response.status != 200) {
-                            container.resolve<Logger>('logger').info('Anchor site bad response');
-                            return process.exit();
-                        }
-                    })
-                    .catch(() => {
-                        container.resolve<Logger>('logger').info('Anchor site fetch failure');
-                        return process.exit();
-                    });
+                // Indicate that processing has started
+                threadRunning = true;
 
-                // TODO: Make this scale properly
+                // TODO: Make this scale properly, this currently gets all the feeds
                 const feeds = data.getPostedFeeds();
                 const processor = container.resolve<PodcastRssProcessor>('podcastRssProcessor');
+                const helpers = container.resolve<PodcastHelpers>('podcastHelpers');
                 const bot = container.resolve<Bot>('bot');
 
-                let feedCount = 1; // Adjust for length index-zero
-                feeds.forEach((feedUrl: string) => {
-                    // If we have entered the forEach loop stop later processes from doing the same
-                    threadRunning = true;
+                // Create list of feed processing promises with noop failures
+                const entryPromiseList = feeds
+                    .map((feedUrl) => processor.process(feedUrl, 1))
+                    .map((p) => p.catch(() => null));
 
-                    processor
-                        .process(feedUrl, 1)
-                        .then((podcast: Podcast) => {
-                            // Exit early if the podcast is already latest
-                            const helpers = container.resolve<PodcastHelpers>('podcastHelpers');
-                            if (helpers.podcastHasLatestEpisode(podcast)) {
-                                return;
-                            }
-                            // Write podcast to a channel list
-                            bot.sendNewEpisodeAnnouncement(podcast);
-                        })
-                        .catch((error: string) => {
-                            logger.error(`Problem Processing Feed [${error}]`);
-                        })
-                        .finally(() => {
-                            // Allow the thread to start again after all feeds have completed
-                            // Incrementing count in the finally means no matter what it increments
-                            if (feedCount++ === feeds.length) {
-                                threadRunning = false;
-                            }
-                        });
-                });
+                Promise.all(entryPromiseList)
+                    .then((results) => {
+                        // Filter out invalid results and podcasts without new episodes
+                        const podcasts = results
+                            .filter((result): result is Podcast => !!result)
+                            .filter((podcast) => !helpers.podcastHasLatestEpisode(podcast));
+
+                        // Create list of announcement promises with noop failures
+                        const announcePromiseList = podcasts
+                            .map((podcast) => bot.sendNewEpisodeAnnouncement(podcast))
+                            .filter((result): result is Promise<void> => !!result);
+
+                        return Promise.all(announcePromiseList);
+                    })
+                    .then(() => {
+                        threadRunning = false;
+                    });
             }, processRestInterval);
 
             // Clean up when process is told to end
             onExit((code: any, signal: any) => {
+                clearInterval(interval);
                 discordClient.destroy();
                 container.resolve<DiscordDataStorage>('discordDataStorage').close();
                 container.resolve<PodcastDataStorage>('podcastDataStorage').close();

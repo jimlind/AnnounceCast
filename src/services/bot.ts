@@ -172,17 +172,16 @@ export class Bot {
         }
     }
 
-    sendNewEpisodeAnnouncement(podcast: Podcast) {
+    sendNewEpisodeAnnouncement(podcast: Podcast): Promise<void> {
         const outgoingMessage = this.outgoingMessageFactory.buildNewEpisodeMessage(podcast);
-
         const channelList = this.podcastDataStorage.getChannelsByFeedUrl(podcast.feed);
-        channelList.forEach((channelId: string) => {
-            this._sendMessageToChannel(channelId, outgoingMessage).then(() => {
-                this.podcastDataStorage.updatePostedData(
-                    podcast.feed,
-                    podcast.getFirstEpisode().guid,
-                );
-            });
+
+        const promiseList = channelList
+            .map((channelId) => this._sendMessageToChannel(channelId, outgoingMessage))
+            .map((p) => p.catch(() => null));
+
+        return Promise.all(promiseList).then(() => {
+            this.podcastDataStorage.updatePostedData(podcast.feed, podcast.getFirstEpisode().guid);
         });
     }
 
