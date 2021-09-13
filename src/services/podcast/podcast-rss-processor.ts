@@ -1,6 +1,5 @@
 import { RESOLVER } from 'awilix';
 import { AxiosInstance, AxiosResponse } from 'axios';
-import { boolean } from 'boolean';
 import { Node } from 'domhandler';
 import * as htmlparser2 from 'htmlparser2';
 import { PodcastEpisode } from '../../models/podcast-episode.js';
@@ -64,7 +63,8 @@ export class PodcastRssProcessor {
             podcastEpisode.duration = this._parseDurationText(
                 this._getTextByTag(item, ['itunes:duration']),
             );
-            podcastEpisode.explicit = boolean(this._getTextByTag(item, ['itunes:explicit']));
+            podcastEpisode.explicit =
+                this._getTextByTag(item, ['itunes:explicit']).toUpperCase() == 'YES';
 
             const enclosure = domUtils.getElementsByTagName('enclosure', item, true, 1);
             podcastEpisode.audio = domUtils.getAttributeValue(enclosure[0] || [], 'url') || '';
