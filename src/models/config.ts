@@ -22,4 +22,12 @@ export class Config {
     public set discordBotToken(value: string) {
         this._discordBotToken = value;
     }
+
+    private _discordClientId: string = '';
+    public get discordClientId(): string {
+        return this._discordClientId;
+    }
+    public set discordClientId(value: string) {
+        this._discordClientId = value;
+    }
 }
