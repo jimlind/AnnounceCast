@@ -15,7 +15,7 @@ import { PodcastHelpers } from './services/podcast/podcast-helpers.js';
 import { PodcastRssProcessor } from './services/podcast/podcast-rss-processor.js';
 
 // Initialize the container
-const container: Container = new Container();
+const container: Container = new Container(process.argv[2] || '');
 container.register().then(() => {
     // Catch a couple special use cases for now
     switch (process.argv[3]) {

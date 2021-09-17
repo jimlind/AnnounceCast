@@ -6,7 +6,7 @@ import { DiscordDataStorage } from '../services/discord/discord-data-storage.js'
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage.js';
 import { PodcastRssProcessor } from '../services/podcast/podcast-rss-processor.js';
 
-const container: Container = new Container();
+const container: Container = new Container('dev');
 container.register().then(() => {
     const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
     const feedUrlList = data.getPostedFeeds();
