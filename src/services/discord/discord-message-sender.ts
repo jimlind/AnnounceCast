@@ -26,7 +26,7 @@ export class DiscordMessageSender {
                 }
 
                 channel
-                    .send(message)
+                    .send({ embeds: [message] })
                     .then(() => {
                         return resolve('Successfully Sent Message');
                     })
