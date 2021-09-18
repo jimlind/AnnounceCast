@@ -5,20 +5,19 @@ import { Config } from '../models/config';
 import { DiscordConnection } from '../services/discord/discord-connection.js';
 import commandData from './data/command.json';
 
-const guildId = '795053930283139073';
-const container: Container = new Container('dev');
+const container: Container = new Container('prod');
 container.register().then(() => {
     const discordRest = container.resolve<typeof import('@discordjs/rest').REST>('discordRest');
     const config = container.resolve<Config>('config');
     const rest = new discordRest({ version: '9' }).setToken(config.discordBotToken);
     const commandRoute = container
         .resolve<typeof import('discord-api-types/v9').Routes>('discordRoutes')
-        .applicationGuildCommands(config.discordClientId, guildId);
+        .applicationCommands(config.discordClientId);
 
     rest.put(commandRoute, { body: commandData })
         .then((commandList) => {
             if (Array.isArray(commandList)) {
-                console.log(`✅  Set ${commandList.length} dev Application Commands`);
+                console.log(`✅  Set ${commandList.length} prod Application Commands`);
             } else {
                 console.log('❌ Set dev Application Commands but incorrect return type');
             }

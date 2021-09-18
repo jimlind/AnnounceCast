@@ -1,0 +1,67 @@
+[
+    { "name": "help", "description": "Replies with a some helpful information and links" },
+    {
+        "name": "find",
+        "description": "Replies with up to 4 podcasts matching the search keyword(s)",
+        "options": [
+            {
+                "name": "keywords",
+                "description": "Keyword(s) used to find podcasts",
+                "type": 3,
+                "required": true
+            }
+        ]
+    },
+    {
+        "name": "following",
+        "description": "Replies with the list of all podcasts (Ids & Names) followed in this channel"
+    },
+    {
+        "name": "follow",
+        "description": "Follow a podcast in this channel matching the search keyword(s)",
+        "options": [
+            {
+                "name": "keywords",
+                "description": "Keyword(s) used to find podcast to follow",
+                "type": 3,
+                "required": true
+            }
+        ]
+    },
+    {
+        "name": "follow-rss",
+        "description": "Follow a podcast in this channel using an RSS feed",
+        "options": [
+            {
+                "name": "feed",
+                "description": "RSS feed used to identified podcast to follow",
+                "type": 3,
+                "required": true
+            }
+        ]
+    },
+    {
+        "name": "unfollow",
+        "description": "Unfollow a podcast in this channel using the Podcast Id",
+        "options": [
+            {
+                "name": "id",
+                "description": "Podcast Id used to identified podcast to unfollow",
+                "type": 3,
+                "required": true
+            }
+        ]
+    },
+    {
+        "name": "play",
+        "description": "Play the most recent episode of a podcast using the Podcast Id",
+        "options": [
+            {
+                "name": "id",
+                "description": "Podcast Id used to identified podcast to play",
+                "type": 3,
+                "required": true
+            }
+        ]
+    }
+]
