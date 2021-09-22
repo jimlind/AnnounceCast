@@ -21,17 +21,21 @@
         "dev": "npm run build && node dist/app.js dev"
     },
     "dependencies": {
-        "@discordjs/opus": "^0.5.3",
+        "@discordjs/rest": "^0.1.0-canary.0",
+        "@discordjs/voice": "^0.6.0",
         "awilix": "^5.0.1",
         "axios": "^0.21.4",
         "better-sqlite3": "^7.4.3",
-        "discord.js": "^12.5.3",
+        "discord-api-types": "^0.23.1",
+        "discord.js": "^13.1.0",
         "dotenv": "^10.0.0",
         "htmlparser2": "^7.1.2",
         "log4js": "^6.3.0",
+        "node-fetch": "^3.0.0",
         "normalize-url": "^7.0.2",
         "pretty-ms": "^7.0.1",
         "signal-exit": "^3.0.3",
+        "sodium": "^3.0.2",
         "turndown": "^7.1.1"
     },
     "devDependencies": {
