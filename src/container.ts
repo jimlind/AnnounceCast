@@ -1,17 +1,20 @@
+import { REST as DiscordRest } from '@discordjs/rest';
 import awilix from 'awilix';
 import axios from 'axios';
 import bettersqlite3 from 'better-sqlite3';
-import { Client as DiscordClient } from 'discord.js';
+import { Routes as DiscordRoutes } from 'discord-api-types/v8';
+import { Client as DiscordClient, Intents as DiscordIntents } from 'discord.js';
 import { config as configDotenv } from 'dotenv';
 import * as htmlparser2 from 'htmlparser2';
 import log4js from 'log4js';
+import TurndownService from 'turndown';
 import { URL } from 'url';
 import { Config } from './models/config.js';
-import TurndownService from 'turndown';
+
 export class Container {
     container: awilix.AwilixContainer;
 
-    constructor() {
+    constructor(environmentValue: string = '') {
         this.container = awilix.createContainer();
 
         // Create config model
@@ -20,23 +23,29 @@ export class Container {
         configModel.appName = process.env.npm_package_name || '';
         configModel.appVersion = process.env.npm_package_version || '';
 
-        switch (process.argv[2]) {
+        switch (environmentValue) {
             case 'dev':
                 configModel.discordBotToken = process.env.DISCORD_BOT_TOKEN_DEV || '';
+                configModel.discordClientId = process.env.DISCORD_CLIENT_ID_DEV || '';
                 break;
             default:
                 configModel.discordBotToken = process.env.DISCORD_BOT_TOKEN_PROD || '';
+                configModel.discordClientId = process.env.DISCORD_CLIENT_ID_PROD || '';
                 break;
         }
 
         // Create Discord client
-        const client = new DiscordClient({
+        const discordClient = new DiscordClient({
+            intents: [DiscordIntents.FLAGS.GUILDS, DiscordIntents.FLAGS.GUILD_VOICE_STATES],
             presence: {
                 status: 'online',
-                activity: {
-                    name: '`?podcasts` command',
-                    type: 'LISTENING',
-                },
+                activities: [
+                    {
+                        name: 'Slash Commands',
+                        type: 'LISTENING',
+                        url: 'https://github.com/jimlind/discord.podcasts',
+                    },
+                ],
             },
         });
 
@@ -63,7 +72,9 @@ export class Container {
             axios: awilix.asValue(axios),
             betterSqlite3: awilix.asValue(bettersqlite3),
             config: awilix.asValue(configModel),
-            discordClient: awilix.asValue(client),
+            discordClient: awilix.asValue(discordClient),
+            discordRest: awilix.asValue(DiscordRest),
+            discordRoutes: awilix.asValue(DiscordRoutes),
             htmlParser2: awilix.asValue(htmlparser2),
             logger: awilix.asValue(logger),
             magicPrefix: awilix.asValue('?podcasts'),
