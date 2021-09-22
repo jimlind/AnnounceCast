@@ -42,7 +42,8 @@ Discord Podcasts Announcement Bot
 
 ### Authorize the Bot for Your Server
 
-https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=278528&scope=bot
+PRODUCTION
+https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=280576&scope=bot%20applications.commands
 
 ### Some Great Podcast URLs to Experiment With
 
@@ -84,3 +85,8 @@ sudo cp ./docs/discordpodcasts.service /lib/systemd/system/discordpodcasts.servi
 sudo systemctl daemon-reload
 sudo systemctl start discordpodcasts
 ```
+
+TODO:
+Handle bad searches more gracefully.
+ex: /follow MTCML
+ex: /follow Oyun Planı
