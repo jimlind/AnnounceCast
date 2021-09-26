@@ -1,5 +1,11 @@
 import { RESOLVER } from 'awilix';
-import { MessageEmbed } from 'discord.js';
+import {
+    CommandInteraction,
+    GuildMember,
+    Interaction,
+    MessageEmbed,
+    VoiceChannel,
+} from 'discord.js';
 import { Logger } from 'log4js';
 import { IncomingMessage } from '../models/incoming-message';
 import { Podcast } from '../models/podcast.js';
@@ -47,13 +53,39 @@ export class Bot {
         this.logger = logger;
     }
 
+    actOnCommandInteraction(commandInteraction: CommandInteraction) {
+        switch (commandInteraction.commandName) {
+            case 'find':
+                commandInteraction.editReply('find');
+                break;
+            case 'following':
+                this.following(commandInteraction);
+                break;
+            case 'follow':
+                commandInteraction.editReply('follow');
+                break;
+            case 'follow-rss':
+                commandInteraction.editReply('follow-rss');
+                break;
+            case 'unfollow':
+                commandInteraction.editReply('unfollow');
+                break;
+            case 'play':
+                this.play(commandInteraction);
+                break;
+            default:
+                commandInteraction.editReply('help');
+                break;
+        }
+    }
+
     actOnUserMessage(incomingMessage: IncomingMessage) {
         switch (incomingMessage.command) {
             case 'find':
                 this.find(incomingMessage);
                 break;
             case 'following':
-                this.following(incomingMessage);
+                //this.following(incomingMessage);
                 break;
             case 'follow':
                 if (incomingMessage.fromServerManager) {
@@ -70,7 +102,7 @@ export class Bot {
                 }
                 break;
             case 'play':
-                this.play(incomingMessage);
+                //this.play(incomingMessage);
                 break;
             default:
                 this.system(incomingMessage);
@@ -135,25 +167,34 @@ export class Bot {
         });
     }
 
-    following(incomingMessage: IncomingMessage) {
-        const feedList = this.podcastDataStorage.getFeedsByChannelId(incomingMessage.channelId);
+    following(commandInteraction: CommandInteraction) {
+        const feedList = this.podcastDataStorage.getFeedsByChannelId(commandInteraction.channelId);
         const outgoingMessage = this.outgoingMessageFactory.buildFollowingMessage(feedList);
-        this._sendMessageToChannel(incomingMessage.channelId, outgoingMessage);
+        commandInteraction.editReply({ embeds: [outgoingMessage] });
     }
 
-    play(incomingMessage: IncomingMessage) {
-        this.audioVoiceChannel
-            .join(incomingMessage)
-            .then((voiceConnection) => {
-                const feedId = incomingMessage.arguments[0];
-                const feedUrl = this.podcastDataStorage.getFeedByFeedId(feedId)?.url || '';
+    play(commandInteraction: CommandInteraction) {
+        const member = commandInteraction.member;
+        if (!(member instanceof GuildMember && member?.voice.channel)) {
+            return commandInteraction.editReply('You must be in voice chat to start audio playing');
+        }
 
+        this.audioVoiceChannel
+            .join(member?.voice.channel)
+            .then((voiceConnection) => {
+                const feedId = commandInteraction.options.getString('id');
+                const feedUrl = this.podcastDataStorage.getFeedByFeedId(feedId || '')?.url || '';
                 this.podcastRssProcessor.process(feedUrl, 1).then((podcast) => {
-                    this.audioPlayPodcast.play(podcast, voiceConnection, incomingMessage.channelId);
+                    const episode = podcast.getFirstEpisode();
+                    const message = `Playing ${episode.title} from ${podcast.title}`;
+
+                    this.audioPlayPodcast.play(episode, voiceConnection);
+                    return commandInteraction.editReply(message);
                 });
             })
-            .catch((message) => {
-                this.discordMessageSender.sendString(incomingMessage.channelId, message);
+            .catch((error) => {
+                const message = 'Something went wrong. Check podcast data and voice permissions.';
+                return commandInteraction.editReply(message);
             });
     }
 

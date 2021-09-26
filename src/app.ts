@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Client as DiscordClient } from 'discord.js';
+import { Client as DiscordClient, CommandInteraction, Interaction } from 'discord.js';
 import { Logger } from 'log4js';
 import onExit from 'signal-exit';
 import { Container } from './container.js';
@@ -9,6 +9,7 @@ import { Podcast } from './models/podcast.js';
 import { Bot } from './services/bot.js';
 import { DiscordConnection } from './services/discord/discord-connection.js';
 import { DiscordDataStorage } from './services/discord/discord-data-storage.js';
+import { DiscordInteractionListener } from './services/discord/discord-interaction-listener';
 import { DiscordMessageListener } from './services/discord/discord-message-listener.js';
 import { PodcastDataStorage } from './services/podcast/podcast-data-storage.js';
 import { PodcastHelpers } from './services/podcast/podcast-helpers.js';
@@ -42,6 +43,13 @@ container.register().then(() => {
                     bot.actOnUserMessage(incomingMessage);
                 });
 
+            // Listen for discord interactions and respond
+            container
+                .resolve<DiscordInteractionListener>('discordInteractionListener')
+                .onInteraction((commandInteraction: CommandInteraction) => {
+                    bot.actOnCommandInteraction(commandInteraction);
+                });
+
             // Keeps track of if an active diary entry thread is running
             let threadRunning: boolean = false;
             const processRestInterval: number = 60000; // Give it up to 60 seconds to rest
@@ -50,13 +58,13 @@ container.register().then(() => {
             const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
             const startTime = Date.now();
             const interval = setInterval(() => {
-                if (threadRunning) return;
-
-                // Kill the process if 12 hours have passed
+                // Kill the process if 12 hours have passed regardless of thread status
                 if (Date.now() > startTime + 12 * 60 * 60000) {
                     container.resolve<Logger>('logger').info('12 Hour Reset');
                     return process.exit();
                 }
+
+                if (threadRunning) return;
 
                 // Indicate that processing has started
                 threadRunning = true;
