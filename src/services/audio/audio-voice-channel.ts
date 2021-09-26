@@ -1,6 +1,6 @@
+import { joinVoiceChannel, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { RESOLVER } from 'awilix';
-import { VoiceConnection } from 'discord.js';
-import { IncomingMessage } from '../../models/incoming-message.js';
+import { StageChannel, VoiceChannel } from 'discord.js';
 import { DiscordConnection } from '../discord/discord-connection.js';
 
 export class AudioVoiceChannel {
@@ -11,32 +11,25 @@ export class AudioVoiceChannel {
         this.discordConnection = discordConnection;
     }
 
-    join(incomingMessage: IncomingMessage): Promise<VoiceConnection> {
+    join(channel: VoiceChannel | StageChannel): Promise<VoiceConnection> {
         return new Promise((resolve, reject) => {
-            // Make sure user is in a voice channel
-            if (!incomingMessage.voiceChannel) {
-                return reject('You must also be in a voice channel to play a podcast.');
-            }
-
             // Make sure the bot has permissions to the voice channel
-            const botUser = this.discordConnection.getClient().user || '';
-            const botPermissions = incomingMessage.voiceChannel.permissionsFor(botUser);
-            if (!botPermissions?.has(['VIEW_CHANNEL', 'SPEAK'])) {
-                return reject('Bot must have permissions in a voice channel to play a podcast.');
+            const user = this.discordConnection.getClient().user || '';
+            const permissions = channel.permissionsFor(user);
+            if (!permissions?.has(['VIEW_CHANNEL', 'SPEAK'])) {
+                return reject();
             }
 
-            // TODO: Can this Voice Channel be on a different server?
-            // If the user is on a voice channel in one guild can the bot override the voice channel of another
-
-            // Attempt to join the voice channel
-            incomingMessage.voiceChannel
-                .join()
-                .then((voiceConnection) => {
-                    return resolve(voiceConnection);
-                })
-                .catch(() => {
-                    return reject('Bot unable to join voice channel.');
-                });
+            const voiceConnection = joinVoiceChannel({
+                channelId: channel.id,
+                guildId: channel.guild.id,
+                adapterCreator: channel.guild.voiceAdapterCreator,
+            });
+            voiceConnection.on(VoiceConnectionStatus.Ready, () => {
+                return resolve(voiceConnection);
+            });
         });
     }
+
+    createDiscordJSAdapter() {}
 }
