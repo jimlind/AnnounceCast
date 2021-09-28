@@ -21,8 +21,9 @@ export class PodcastAppleAPIProcessor {
 
     search(searchTerm: string, podcastCount: number): Promise<Podcast[]> {
         return new Promise((resolve, reject) => {
-            const url = `https://itunes.apple.com/search?term=${searchTerm}&country=US&media=podcast&attribute=titleTerm&limit=${podcastCount}`;
-            this.axios.get(url).then((response: AxiosResponse) => {
+            const uri = `https://itunes.apple.com/search?term=${searchTerm}&country=US&media=podcast&attribute=titleTerm&limit=${podcastCount}`;
+            const encodedUri = encodeURI(uri);
+            this.axios.get(encodedUri).then((response: AxiosResponse) => {
                 // Yuck. Type guard functions are ugly.
                 const isPromise = (item: any): item is Promise<any> => item instanceof Promise;
                 const promiseList: Promise<any>[] = response.data.results
