@@ -69,7 +69,8 @@ export class Bot {
                 this.follow(commandInteraction);
                 break;
             case 'follow-rss':
-                commandInteraction.editReply('follow-rss');
+                this.followRss(commandInteraction);
+                //commandInteraction.editReply('follow-rss');
                 break;
             case 'unfollow':
                 this.unfollow(commandInteraction);
@@ -140,19 +141,23 @@ export class Bot {
         this.podcastAppleApiProcessor
             .search(searchKeywords, 1)
             .then((podcastList) => {
-                if (podcastList.length !== 1) {
-                    return this._sendErrorToChannel(commandInteraction);
-                }
-
-                this.podcastDataStorage.addFeed(podcastList[0], commandInteraction.channelId);
-                const message = this.outgoingMessageFactory.buildFollowedMessage(
-                    podcastList[0],
-                    this.podcastDataStorage.getFeedsByChannelId(commandInteraction.channelId),
-                );
-                commandInteraction.editReply({ embeds: [message] });
+                this._followPodcastList(commandInteraction, podcastList);
             })
             .catch(() => {
                 this.logger.info(`Unable to follow on term ${searchKeywords}`);
+                return this._sendErrorToChannel(commandInteraction);
+            });
+    }
+
+    followRss(commandInteraction: CommandInteraction) {
+        const feedUrl = commandInteraction.options.getString('feed') || '';
+        this.podcastRssProcessor
+            .process(feedUrl, 0)
+            .then((podcast) => {
+                this._followPodcastList(commandInteraction, [podcast]);
+            })
+            .catch(() => {
+                this.logger.info(`Unable to follow on feed ${feedUrl}`);
                 return this._sendErrorToChannel(commandInteraction);
             });
     }
@@ -211,7 +216,7 @@ export class Bot {
                 if (message.fromServerManager) {
                     this.discordDataStorage.setPrefix(message.guildId, message.arguments[1] || '!');
                 } else {
-                    this._sendInadequatePermissionsMessage(message);
+                    //this._sendInadequatePermissionsMessage(message);
                 }
             default:
                 const helpMessage = this.outgoingMessageFactory.buildHelpMessage(message.guildId);
@@ -306,5 +311,18 @@ export class Bot {
         const message =
             "Something went wrong. Check the bot's permissions, your input, and the podcast data.";
         return commandInteraction.editReply(message);
+    }
+
+    _followPodcastList(commandInteraction: CommandInteraction, podcastList: Podcast[]) {
+        if (podcastList.length !== 1) {
+            return this._sendErrorToChannel(commandInteraction);
+        }
+
+        this.podcastDataStorage.addFeed(podcastList[0], commandInteraction.channelId);
+        const message = this.outgoingMessageFactory.buildFollowedMessage(
+            podcastList[0],
+            this.podcastDataStorage.getFeedsByChannelId(commandInteraction.channelId),
+        );
+        commandInteraction.editReply({ embeds: [message] });
     }
 }
