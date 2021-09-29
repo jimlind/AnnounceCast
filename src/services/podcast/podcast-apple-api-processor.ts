@@ -20,8 +20,9 @@ export class PodcastAppleAPIProcessor {
     }
 
     search(searchTerm: string, podcastCount: number): Promise<Podcast[]> {
+        const count = podcastCount < 10 ? 10 : podcastCount; // Too few requested and this fails oddly
         return new Promise((resolve, reject) => {
-            const uri = `https://itunes.apple.com/search?term=${searchTerm}&country=US&media=podcast&attribute=titleTerm&limit=${podcastCount}`;
+            const uri = `https://itunes.apple.com/search?term=${searchTerm}&country=US&media=podcast&attribute=titleTerm&limit=${count}`;
             const encodedUri = encodeURI(uri);
             this.axios.get(encodedUri).then((response: AxiosResponse) => {
                 // Yuck. Type guard functions are ugly.
@@ -40,7 +41,7 @@ export class PodcastAppleAPIProcessor {
                     .then((results) => {
                         // Yuck. Type guard functions are ugly.
                         const isPodcast = (item: any): item is Podcast => item instanceof Podcast;
-                        return resolve(results.filter(isPodcast));
+                        return resolve(results.filter(isPodcast).slice(0, podcastCount));
                     })
                     .catch(reject);
             });
