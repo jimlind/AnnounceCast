@@ -72,7 +72,7 @@ export class Bot {
                 commandInteraction.editReply('follow-rss');
                 break;
             case 'unfollow':
-                commandInteraction.editReply('unfollow');
+                this.unfollow(commandInteraction);
                 break;
             case 'play':
                 this.play(commandInteraction);
@@ -157,23 +157,20 @@ export class Bot {
             });
     }
 
-    unfollow(incomingMessage: IncomingMessage) {
-        const channelId = incomingMessage.channelId;
-        incomingMessage.arguments.forEach((feedId: string) => {
-            const feed = this.podcastDataStorage.getFeedByFeedId(feedId);
-            if (!feed) {
-                const message = "Use the ID in the 'following' command menu to unfollow a podcast.";
-                this.discordMessageSender.sendString(channelId, message);
-                return;
-            }
+    unfollow(commandInteraction: CommandInteraction) {
+        const feedId = commandInteraction.options.getString('id') || '';
+        const feed = this.podcastDataStorage.getFeedByFeedId(feedId);
+        if (!feed) {
+            return this._sendErrorToChannel(commandInteraction);
+        }
 
-            this.podcastDataStorage.removeFeed(feedId, channelId);
-            const unfollowedMessage = this.outgoingMessageFactory.buildUnfollowedMessage(
-                feed.title,
-                this.podcastDataStorage.getFeedsByChannelId(channelId),
-            );
-            this._sendMessageToChannel(channelId, unfollowedMessage);
-        });
+        const channelId = commandInteraction.channelId;
+        this.podcastDataStorage.removeFeed(feedId, channelId);
+        const message = this.outgoingMessageFactory.buildUnfollowedMessage(
+            feed.title,
+            this.podcastDataStorage.getFeedsByChannelId(channelId),
+        );
+        commandInteraction.editReply({ embeds: [message] });
     }
 
     following(commandInteraction: CommandInteraction) {
