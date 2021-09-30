@@ -1,16 +1,14 @@
 #!/usr/bin/env node
 
-import { Client as DiscordClient, CommandInteraction, Interaction } from 'discord.js';
+import { Client as DiscordClient, CommandInteraction } from 'discord.js';
 import { Logger } from 'log4js';
 import onExit from 'signal-exit';
 import { Container } from './container.js';
-import { IncomingMessage } from './models/incoming-message.js';
 import { Podcast } from './models/podcast.js';
 import { Bot } from './services/bot.js';
 import { DiscordConnection } from './services/discord/discord-connection.js';
 import { DiscordDataStorage } from './services/discord/discord-data-storage.js';
 import { DiscordInteractionListener } from './services/discord/discord-interaction-listener';
-import { DiscordMessageListener } from './services/discord/discord-message-listener.js';
 import { PodcastDataStorage } from './services/podcast/podcast-data-storage.js';
 import { PodcastHelpers } from './services/podcast/podcast-helpers.js';
 import { PodcastRssProcessor } from './services/podcast/podcast-rss-processor.js';
@@ -35,15 +33,8 @@ container.register().then(() => {
             const logger = container.resolve<Logger>('logger');
             logger.debug(`Discord Client Logged In on ${serverCount} Servers`);
 
-            // Get a Discord message listener to capture input
-            const bot = container.resolve<Bot>('bot');
-            container
-                .resolve<DiscordMessageListener>('discordMessageListener')
-                .onMessage((incomingMessage: IncomingMessage) => {
-                    bot.actOnUserMessage(incomingMessage);
-                });
-
             // Listen for discord interactions and respond
+            const bot = container.resolve<Bot>('bot');
             container
                 .resolve<DiscordInteractionListener>('discordInteractionListener')
                 .onInteraction((commandInteraction: CommandInteraction) => {

@@ -7,12 +7,10 @@ import {
     VoiceChannel,
 } from 'discord.js';
 import { Logger } from 'log4js';
-import { IncomingMessage } from '../models/incoming-message';
 import { Podcast } from '../models/podcast.js';
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage';
 import { AudioPlayPodcast } from './audio/audio-play-podcast';
 import { AudioVoiceChannel } from './audio/audio-voice-channel';
-import { DiscordDataStorage } from './discord/discord-data-storage';
 import { DiscordMessageSender } from './discord/discord-message-sender';
 import { OutgoingMessageFactory } from './outgoing-message/outgoing-message-factory';
 import { PodcastAppleAPIProcessor } from './podcast/podcast-apple-api-processor';
@@ -24,7 +22,6 @@ export class Bot {
     audioPlayPodcast: AudioPlayPodcast;
     audioVoiceChannel: AudioVoiceChannel;
     discordMessageSender: DiscordMessageSender;
-    discordDataStorage: DiscordDataStorage;
     outgoingMessageFactory: OutgoingMessageFactory;
     podcastAppleApiProcessor: PodcastAppleAPIProcessor;
     podcastDataStorage: PodcastDataStorage;
@@ -35,7 +32,6 @@ export class Bot {
         audioPlayPodcast: AudioPlayPodcast,
         audioVoiceChannel: AudioVoiceChannel,
         discordMessageSender: DiscordMessageSender,
-        discordDataStorage: DiscordDataStorage,
         outgoingMessageFactory: OutgoingMessageFactory,
         podcastAppleApiProcessor: PodcastAppleAPIProcessor,
         podcastDataStorage: PodcastDataStorage,
@@ -45,7 +41,6 @@ export class Bot {
         this.audioPlayPodcast = audioPlayPodcast;
         this.audioVoiceChannel = audioVoiceChannel;
         this.discordMessageSender = discordMessageSender;
-        this.discordDataStorage = discordDataStorage;
         this.outgoingMessageFactory = outgoingMessageFactory;
         this.podcastAppleApiProcessor = podcastAppleApiProcessor;
         this.podcastDataStorage = podcastDataStorage;
@@ -70,7 +65,6 @@ export class Bot {
                 break;
             case 'follow-rss':
                 this.followRss(commandInteraction);
-                //commandInteraction.editReply('follow-rss');
                 break;
             case 'unfollow':
                 this.unfollow(commandInteraction);
@@ -79,38 +73,7 @@ export class Bot {
                 this.play(commandInteraction);
                 break;
             default:
-                commandInteraction.editReply('help');
-                break;
-        }
-    }
-
-    actOnUserMessage(incomingMessage: IncomingMessage) {
-        switch (incomingMessage.command) {
-            case 'find':
-                //this.find(incomingMessage);
-                break;
-            case 'following':
-                //this.following(incomingMessage);
-                break;
-            case 'follow':
-                // if (incomingMessage.fromServerManager) {
-                //     this.follow(incomingMessage);
-                // } else {
-                //     this._sendInadequatePermissionsMessage(incomingMessage);
-                // }
-                break;
-            case 'unfollow':
-            // if (incomingMessage.fromServerManager) {
-            //     this.unfollow(incomingMessage);
-            // } else {
-            //     this._sendInadequatePermissionsMessage(incomingMessage);
-            // }
-            // break;
-            case 'play':
-                //this.play(incomingMessage);
-                break;
-            default:
-                this.system(incomingMessage);
+                this.help(commandInteraction);
                 break;
         }
     }
@@ -210,19 +173,9 @@ export class Bot {
         );
     }
 
-    system(message: IncomingMessage) {
-        switch (message.arguments[0]) {
-            case 'prefix':
-                if (message.fromServerManager) {
-                    this.discordDataStorage.setPrefix(message.guildId, message.arguments[1] || '!');
-                } else {
-                    //this._sendInadequatePermissionsMessage(message);
-                }
-            default:
-                const helpMessage = this.outgoingMessageFactory.buildHelpMessage(message.guildId);
-                this.discordMessageSender.send(message.channelId, helpMessage);
-                break;
-        }
+    help(commandInteraction: CommandInteraction) {
+        const message = this.outgoingMessageFactory.buildHelpMessage();
+        return commandInteraction.editReply({ embeds: [message] });
     }
 
     sendNewEpisodeAnnouncement(podcast: Podcast): Promise<void> {
@@ -236,29 +189,6 @@ export class Bot {
         return Promise.all(promiseList).then(() => {
             this.podcastDataStorage.updatePostedData(podcast.feed, podcast.getFirstEpisode().guid);
         });
-    }
-
-    _parseFollowArgumentsToPodcasts(followArguments: string[]): Promise<Podcast[]> {
-        // If the arguments start with an http process as feeds otherwise process as show titles
-        if (followArguments[0].startsWith('http')) {
-            return new Promise((resolve, reject) => {
-                const promises = followArguments.map((followArgument: string) => {
-                    // Add the extra catch so Promises.all will try everything
-                    return this.podcastRssProcessor.process(followArgument, 0).catch(() => false);
-                });
-                const isPromise = (item: any): item is Promise<Podcast> => item instanceof Promise;
-                Promise.all(promises.filter(isPromise)).then((data) => {
-                    const podcastList = data.filter(Boolean);
-                    if (podcastList.length) {
-                        return resolve(podcastList);
-                    } else {
-                        return reject();
-                    }
-                });
-            });
-        } else {
-            return this.podcastAppleApiProcessor.search(followArguments.join(' '), 1);
-        }
     }
 
     _isRestrictedCommand(commandInteraction: CommandInteraction) {
