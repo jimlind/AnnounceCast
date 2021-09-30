@@ -50,10 +50,11 @@ container.register().then(() => {
             const interval = setInterval(() => {
                 // Kill the process if 12 hours have passed regardless of thread status
                 if (Date.now() > startTime + 12 * 60 * 60000) {
-                    container.resolve<Logger>('logger').info('12 Hour Reset');
+                    logger.info('12 Hour Reset');
                     return process.exit();
                 }
 
+                // Skip the loop if the thread is still running
                 if (threadRunning) return;
 
                 // Indicate that processing has started
@@ -84,7 +85,7 @@ container.register().then(() => {
 
                         return Promise.all(announcePromiseList);
                     })
-                    .then(() => {
+                    .finally(() => {
                         threadRunning = false;
                     });
             }, processRestInterval);

@@ -1,7 +1,7 @@
 {
     "name": "AnnounceCast",
     "description": "Podcast New Release Announcement Bot",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "private": false,
     "license": "AGPL-3.0",
     "author": "Jim Lind",
@@ -40,6 +40,7 @@
     },
     "devDependencies": {
         "@types/better-sqlite3": "^5.4.1",
+        "@types/glob": "^7.1.4",
         "@types/node": "^15.0.2",
         "@types/signal-exit": "^3.0.0",
         "@types/sqlite3": "^3.1.7",
