@@ -52,8 +52,8 @@ export class OutgoingMessageFactory {
         return this.following.build(this._buildBaseMessage(), rowList);
     }
 
-    buildHelpMessage(guildId: string): MessageEmbed {
-        return this.help.build(this._buildBaseMessage(), guildId);
+    buildHelpMessage(): MessageEmbed {
+        return this.help.build(this._buildBaseMessage());
     }
 
     buildNewEpisodeMessage(podcast: Podcast): MessageEmbed {
