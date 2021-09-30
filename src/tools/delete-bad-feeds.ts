@@ -2,7 +2,6 @@ import { Container } from '../container.js';
 import bettersqlite3 from 'better-sqlite3';
 import { Podcast } from '../models/podcast.js';
 import { DiscordConnection } from '../services/discord/discord-connection.js';
-import { DiscordDataStorage } from '../services/discord/discord-data-storage.js';
 import { PodcastDataStorage } from '../services/podcast/podcast-data-storage.js';
 import { PodcastRssProcessor } from '../services/podcast/podcast-rss-processor.js';
 
@@ -33,7 +32,6 @@ container.register().then(() => {
         })
         .finally(() => {
             // Close everything down.
-            container.resolve<DiscordDataStorage>('discordDataStorage').close();
             container.resolve<PodcastDataStorage>('podcastDataStorage').close();
             container.resolve<DiscordConnection>('discordConnection').getClient().destroy();
         });
