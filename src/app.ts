@@ -7,7 +7,6 @@ import { Container } from './container.js';
 import { Podcast } from './models/podcast.js';
 import { Bot } from './services/bot.js';
 import { DiscordConnection } from './services/discord/discord-connection.js';
-import { DiscordDataStorage } from './services/discord/discord-data-storage.js';
 import { DiscordInteractionListener } from './services/discord/discord-interaction-listener';
 import { PodcastDataStorage } from './services/podcast/podcast-data-storage.js';
 import { PodcastHelpers } from './services/podcast/podcast-helpers.js';
@@ -94,7 +93,6 @@ container.register().then(() => {
             onExit((code: any, signal: any) => {
                 clearInterval(interval);
                 discordClient.destroy();
-                container.resolve<DiscordDataStorage>('discordDataStorage').close();
                 container.resolve<PodcastDataStorage>('podcastDataStorage').close();
                 logger.debug(`Program Terminated ${code}:${signal}`);
             });
