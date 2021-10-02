@@ -55,7 +55,10 @@ container.register().then(() => {
                 }
 
                 // Skip the loop if the thread is still running
-                if (threadRunning) return;
+                if (threadRunning) {
+                    logger.info('Thread is running so skipping.');
+                    return;
+                }
 
                 // Indicate that processing has started
                 threadRunning = true;
@@ -71,6 +74,8 @@ container.register().then(() => {
                     .map((feedUrl) => processor.process(feedUrl, 1))
                     .map((p) => p.catch(() => null));
 
+                logger.info(`Created ${entryPromiseList.length} feed promises to check.`);
+
                 Promise.all(entryPromiseList)
                     .then((results) => {
                         // Filter out invalid results and podcasts without new episodes
@@ -78,14 +83,19 @@ container.register().then(() => {
                             .filter((result): result is Podcast => !!result)
                             .filter((podcast) => !helpers.podcastHasLatestEpisode(podcast));
 
+                        logger.info(`Found ${podcasts.length} podcasts to announce.`);
+
                         // Create list of announcement promises with noop failures
                         const announcePromiseList = podcasts
                             .map((podcast) => bot.sendNewEpisodeAnnouncement(podcast))
                             .filter((result): result is Promise<void> => !!result);
 
+                        logger.info(`Created ${announcePromiseList.length} announcement messages.`);
+
                         return Promise.all(announcePromiseList);
                     })
                     .finally(() => {
+                        logger.info('Thread has completed.');
                         threadRunning = false;
                     });
             }, processRestInterval);
