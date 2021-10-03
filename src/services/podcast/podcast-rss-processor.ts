@@ -1,5 +1,5 @@
 import { RESOLVER } from 'awilix';
-import { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { Node } from 'domhandler';
 import * as htmlparser2 from 'htmlparser2';
 import { PodcastEpisode } from '../../models/podcast-episode.js';
@@ -17,21 +17,19 @@ export class PodcastRssProcessor {
     }
 
     process(feedUrl: string, episodeCount: number): Promise<Podcast> {
-        return new Promise((resolve, reject) => {
-            this.axios
-                .get(feedUrl)
-                .then((response: AxiosResponse) => {
-                    const parsedData = this._parseRSS(feedUrl, episodeCount, response.data);
-                    if (!(parsedData instanceof Podcast)) {
-                        return reject(`Failed to parse feed. [${feedUrl}]`);
-                    }
+        const cancelTokenSource = axios.CancelToken.source();
+        const timeoutId = setTimeout(() => cancelTokenSource.cancel(), 60000); // 1 minute
 
-                    return resolve(parsedData);
-                })
-                .catch(() => {
-                    return reject(`Failed to download feed. [${feedUrl}]`);
-                });
-        });
+        return this.axios
+            .get(feedUrl, { cancelToken: cancelTokenSource.token })
+            .then((response) => {
+                clearTimeout(timeoutId); // Clear the 1 minutes timeout
+                const parsedData = this._parseRSS(feedUrl, episodeCount, response.data);
+                if (!(parsedData instanceof Podcast)) {
+                    throw 'Unable to parse feed.';
+                }
+                return parsedData;
+            });
     }
 
     _parseRSS(feedUrl: string, episodeCount: number, responseText: string): Podcast | null {
