@@ -163,14 +163,16 @@ export class Bot {
             return commandInteraction.editReply('You must be in voice chat to start audio playing');
         }
 
-        return Promise.all([getPodcast(), getVoiceConnection(member?.voice.channel)]).then(
-            ([podcast, voiceConnection]) => {
+        return Promise.all([getPodcast(), getVoiceConnection(member?.voice.channel)])
+            .then(([podcast, voiceConnection]) => {
                 const episode = podcast.getFirstEpisode();
                 const message = `Playing ${episode.title} from ${podcast.title}`;
                 this.audioPlayPodcast.play(episode, voiceConnection);
                 return commandInteraction.editReply(message);
-            },
-        );
+            })
+            .catch(() => {
+                return this._sendErrorToChannel(commandInteraction);
+            });
     }
 
     help(commandInteraction: CommandInteraction) {
