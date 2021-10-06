@@ -48,15 +48,14 @@ container.register().then(() => {
             const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
             const startTime = Date.now();
             const interval = setInterval(() => {
-                // Kill the process if 12 hours have passed regardless of thread status
-                if (Date.now() > startTime + 12 * 60 * 60000) {
+                // Kill the process if 24 hours have passed regardless of thread status
+                if (Date.now() > startTime + 24 * 60 * 60000) {
                     logger.info('12 Hour Reset');
                     return process.exit();
                 }
 
                 // Skip the loop if the thread is still running
                 if (threadRunning) {
-                    logger.info('Thread is running so skipping.');
                     return;
                 }
 
@@ -74,8 +73,6 @@ container.register().then(() => {
                     .map((feedUrl) => processor.process(feedUrl, 1))
                     .map((p) => p.catch(() => null));
 
-                logger.info(`Created ${entryPromiseList.length} feed promises to check.`);
-
                 Promise.all(entryPromiseList)
                     .then((results) => {
                         // Filter out invalid results and podcasts without new episodes
@@ -83,19 +80,14 @@ container.register().then(() => {
                             .filter((result): result is Podcast => !!result)
                             .filter((podcast) => !helpers.podcastHasLatestEpisode(podcast));
 
-                        logger.info(`Found ${podcasts.length} podcasts to announce.`);
-
                         // Create list of announcement promises with noop failures
                         const announcePromiseList = podcasts
                             .map((podcast) => bot.sendNewEpisodeAnnouncement(podcast))
                             .filter((result): result is Promise<void> => !!result);
 
-                        logger.info(`Created ${announcePromiseList.length} announcement messages.`);
-
                         return Promise.all(announcePromiseList);
                     })
-                    .finally(() => {
-                        logger.info('Thread has completed.');
+                    .then(() => {
                         threadRunning = false;
                     });
             }, processRestInterval);
