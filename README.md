@@ -1,42 +1,42 @@
-# discord.podcasts
+# AnnounceCast
 
-Discord Podcasts Announcement Bot
+A simple Discord Podcasts announcement bot.
+Follows some Podcasts on your server and lets you know when new episodes drop.
 
 ---
 
 ## Commands
 
-#### ?podcasts
+#### /help
 
-> Display the help message.
+> View the help message.
 
-#### ?podcasts prefix <value>
+#### /find <keywords>
 
-> Set the bot's custom prefix with the string <value> argument.
-> If you don't use this the server will default to `!` as your prefix.
+> Replies with up to 4 podcasts matching the search keyword(s)
 
-#### <prefix>find <search terms>
+#### /following
 
-> Displays up to 4 podcasts matching the <search terms>.
+> Replies with the list of all podcasts (Ids & Names) followed in this channel
 
-#### <prefix>following
+#### /follow <keywords> 🔒
 
-> Display the podcasts (ids and names) followed in this channel.
+> Follow a podcast in this channel matching the search keyword(s)
 
-#### <prefix>follow <url|search terms>
+#### /follow-rss <feed> 🔒
 
-> Follow a podcast in this channel with the feed URL <url> argument or follow the first podcast matching the search terms
+> Follow a podcast in this channel using an RSS feed
 
-#### <prefix>unfollow <id>
+#### /unfollow <id> 🔒
 
-> Unfollow a podcast with the podcast id <id> argument.
+> Unfollow a podcast in this channel using the Podcast Id
 
-#### <prefix>play <id>
+#### /play <id>
 
-> Play the most recent episode of a podcast with the podcast id <id> argument.
+> Play the most recent episode of a podcast using the Podcast Id
 > This command requires the issuer to be in a voice channel that the bot has permission to join and speak in.
 
----
+The 🔒 commands are only available to users with Manage Server permissions.
 
 ## Use the Hosted Version of the Bot
 
@@ -45,7 +45,7 @@ Discord Podcasts Announcement Bot
 PRODUCTION
 https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=280576&scope=bot%20applications.commands
 
-### Some Great Podcast URLs to Experiment With
+### Some Great Podcasts to Experiment With
 
 ```
 70mm             |  https://anchor.fm/s/12d1fabc/podcast/rss
@@ -57,36 +57,40 @@ Lost Light       |  https://anchor.fm/s/3ae14da0/podcast/rss
 Will Run For...  |  https://anchor.fm/s/23694498/podcast/rss
 ```
 
+### Color Codes
+
+AnnounceCast Green is #7ab87a if you want to match a role color for the bot.
+
 ---
 
 ## Host Your Own Version of the Bot
 
 ### Setup
 
-Create a .env file at your project root with your bot token
+Create a .env file at your project root with some basic bot information.
 
 ```
 DISCORD_BOT_TOKEN_PROD=ABC.123.XZY.098
+DISCORD_CLIENT_ID_PROD=12345678
 ```
 
-### System Software Installs
+### Node Dependency
+
+Built and tested in Node.js 16.
+Other versions will likely work.
+
+### Additional Software Dependencies in Debian Buster
 
 ```shell
-apt-get install sqlite3
-apt-get install python3 --no-install-recommends
+apt-get install autoconf automake build-essential libtool python3 --no-install-recommends
 apt-get install ffmpeg --no-install-recommends
-apt-get install build-essential --no-install-recommends
+apt-get install sqlite3 --no-install-recommends
 ```
 
-### Service Software Installs
+### Install and run as systemd daemon
 
 ```shell
 sudo cp ./docs/discordpodcasts.service /lib/systemd/system/discordpodcasts.service
 sudo systemctl daemon-reload
 sudo systemctl start discordpodcasts
 ```
-
-TODO:
-Handle bad searches more gracefully.
-ex: /follow MTCML
-ex: /follow Oyun Planı
