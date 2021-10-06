@@ -25,13 +25,18 @@ export class AudioVoiceChannel {
                 return reject();
             }
 
-            const voiceConnection = joinVoiceChannel({
+            const existingVoiceConnection = getVoiceConnection(channel?.guild.id || '');
+            if (existingVoiceConnection instanceof VoiceConnection) {
+                resolve(existingVoiceConnection);
+            }
+
+            const newVoiceConnection = joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guild.id,
                 adapterCreator: channel.guild.voiceAdapterCreator,
             });
-            voiceConnection.on(VoiceConnectionStatus.Ready, () => {
-                return resolve(voiceConnection);
+            newVoiceConnection.on(VoiceConnectionStatus.Ready, () => {
+                return resolve(newVoiceConnection);
             });
         });
     }
