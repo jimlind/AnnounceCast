@@ -171,6 +171,7 @@ export class Bot {
                 return commandInteraction.editReply(message);
             })
             .catch(() => {
+                this.audioVoiceChannel.leave(member?.voice.channel);
                 return this._sendErrorToChannel(commandInteraction);
             });
     }

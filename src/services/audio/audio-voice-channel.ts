@@ -1,4 +1,9 @@
-import { joinVoiceChannel, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
+import {
+    getVoiceConnection,
+    joinVoiceChannel,
+    VoiceConnection,
+    VoiceConnectionStatus,
+} from '@discordjs/voice';
 import { RESOLVER } from 'awilix';
 import { StageChannel, VoiceChannel } from 'discord.js';
 import { DiscordConnection } from '../discord/discord-connection.js';
@@ -29,6 +34,11 @@ export class AudioVoiceChannel {
                 return resolve(voiceConnection);
             });
         });
+    }
+
+    leave(channel: VoiceChannel | StageChannel | null) {
+        const voiceConnection = getVoiceConnection(channel?.guild.id || '');
+        voiceConnection?.destroy();
     }
 
     createDiscordJSAdapter() {}
