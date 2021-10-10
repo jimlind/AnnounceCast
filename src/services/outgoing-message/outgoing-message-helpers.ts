@@ -19,10 +19,19 @@ export class OutgoingMessageHelpers {
     }
 
     compressPodcastDescription(podcastDescription: string): string {
-        const descriptionWithHtmlBreaks = podcastDescription.replace(/[\r\n]+/g, '<br>');
-        const descriptionMarkdown = this.turndownService.turndown(descriptionWithHtmlBreaks);
-        const descriptionMarkdownWithSingleNewLine = descriptionMarkdown.replace(/^\s*\n/gm, '');
+        const markdown = this._convertTextToMarkdown(podcastDescription);
+        // Consolidate multiple new lines by replacing duplicate whitespace characters with empty string
+        return markdown.replace(/^\s*\n/gm, '');
+    }
 
-        return descriptionMarkdownWithSingleNewLine;
+    compressEpisodeDescription(episodeDescription: string): string {
+        const markdown = this._convertTextToMarkdown(episodeDescription);
+        // Match all text up to the next new line
+        return markdown.match(/[^\n\r]*/)?.shift() || '';
+    }
+
+    _convertTextToMarkdown(input: string): string {
+        const stringWithOnlyHtmlBreaks = input.trim().replace(/[\r\n]+/g, '<br>');
+        return this.turndownService.turndown(stringWithOnlyHtmlBreaks);
     }
 }

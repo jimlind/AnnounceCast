@@ -55,6 +55,7 @@ export class PodcastRssProcessor {
 
             podcastEpisode.guid = this._getTextByTag(item, ['guid']);
             podcastEpisode.title = this._getTextByTag(item, ['title']);
+            podcastEpisode.description = this._getTextByTag(item, ['description']);
             podcastEpisode.number = this._getTextByTag(item, ['itunes:episode']);
             podcastEpisode.season = this._getTextByTag(item, ['itunes:season']);
             podcastEpisode.link = this._getTextByTag(item, ['link']);
@@ -69,14 +70,6 @@ export class PodcastRssProcessor {
 
             const image = domUtils.getElementsByTagName('itunes:image', item, true, 1);
             podcastEpisode.image = domUtils.getAttributeValue(image[0] || [], 'href') || '';
-
-            const description = domUtils.getElementsByTagName('description', item, true, 1);
-            const descriptionDocument = this.htmlParser2.parseDocument(
-                domUtils.getText(description),
-            );
-            // Get the text from the first paragraph tag
-            const paragraphs = domUtils.getElementsByTagName('p', descriptionDocument, true, 1);
-            podcastEpisode.description = domUtils.getText(paragraphs);
 
             return podcastEpisode;
         });

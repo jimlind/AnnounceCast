@@ -2,9 +2,15 @@ import { RESOLVER } from 'awilix';
 import { MessageEmbed } from 'discord.js';
 import { Podcast } from '../../../models/podcast';
 import { PodcastEpisode } from '../../../models/podcast-episode';
+import { OutgoingMessageHelpers } from '../outgoing-message-helpers';
 
 export class NewEpisode {
     static [RESOLVER] = {}; // So Awilix autoloads the class
+
+    outgoingMessageHelpers: OutgoingMessageHelpers;
+    constructor(outgoingMessageHelpers: OutgoingMessageHelpers) {
+        this.outgoingMessageHelpers = outgoingMessageHelpers;
+    }
 
     build(message: MessageEmbed, podcast: Podcast): MessageEmbed {
         const podcastEpisode = podcast.getFirstEpisode();
@@ -12,7 +18,9 @@ export class NewEpisode {
         message.setAuthor(podcast.title, podcast.image, podcast.link);
         message.setTitle(podcastEpisode.title);
         message.setURL(podcastEpisode.link);
-        message.setDescription(podcastEpisode.description);
+        message.setDescription(
+            this.outgoingMessageHelpers.compressEpisodeDescription(podcastEpisode.description),
+        );
         message.setImage(podcastEpisode.image || podcast.image);
 
         message.setFooter(this._footerText(podcastEpisode));
