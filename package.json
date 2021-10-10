@@ -7,7 +7,7 @@
     "author": "Jim Lind",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jimlind/discord.podcasts"
+        "url": "https://github.com/jimlind/AnnounceCast"
     },
     "engines": {
         "node": ">=16"
