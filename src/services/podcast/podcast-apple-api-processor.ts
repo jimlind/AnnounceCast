@@ -35,7 +35,8 @@ export class PodcastAppleAPIProcessor {
                         }
                         return this.podcastRssProcessor.process(result.feedUrl, 0);
                     })
-                    .filter(isPromise);
+                    .filter(isPromise)
+                    .map((p: Promise<Podcast>) => p.catch(() => false)); // So `all` command below doesn't fail.
 
                 Promise.all(promiseList)
                     .then((results) => {
