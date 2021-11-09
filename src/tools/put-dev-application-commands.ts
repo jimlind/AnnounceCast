@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
+import { readFileSync } from 'fs';
 import { Container } from '../container.js';
 import { Config } from '../models/config';
 import { DiscordConnection } from '../services/discord/discord-connection.js';
-import commandData from './data/command.json';
 
 const guildId = '795053930283139073';
 const container: Container = new Container('dev');
@@ -14,6 +14,9 @@ container.register().then(() => {
     const commandRoute = container
         .resolve<typeof import('discord-api-types/v9').Routes>('discordRoutes')
         .applicationGuildCommands(config.discordClientId, guildId);
+
+    const commandBuffer = readFileSync(new URL('./data/command.json', import.meta.url));
+    const commandData = JSON.parse(commandBuffer.toString());
 
     rest.put(commandRoute, { body: commandData })
         .then((commandList) => {
