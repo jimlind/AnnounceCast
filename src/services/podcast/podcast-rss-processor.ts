@@ -78,6 +78,10 @@ export class PodcastRssProcessor {
     }
 
     _parseDurationText(duration: string): number {
+        if (!duration) {
+            return 0;
+        }
+
         if (!duration.includes(':')) {
             return parseInt(duration);
         }

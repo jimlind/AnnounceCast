@@ -73,6 +73,10 @@ export class PodcastEpisode {
         this._duration = value;
     }
     public get durationFormatted(): string {
+        if (!this._duration) {
+            return '';
+        }
+
         return prettyMilliseconds(this._duration * 1000);
     }
 
