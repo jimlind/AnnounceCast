@@ -50,7 +50,7 @@ container.register().then(() => {
             const interval = setInterval(() => {
                 // Kill the process if 24 hours have passed regardless of thread status
                 if (Date.now() > startTime + 24 * 60 * 60000) {
-                    logger.info('12 Hour Reset');
+                    logger.info('24 Hour Reset');
                     return process.exit();
                 }
 
