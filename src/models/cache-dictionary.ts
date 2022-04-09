@@ -10,9 +10,11 @@ export class CacheDictionary {
 
     private data: DictionaryData = {};
 
-    add(key: string, value: string) {
+    add(key: string, value: string): string[] {
         const result = [...this.get(key), value].slice(this.limit * -1);
         this.data[key] = result;
+
+        return result;
     }
 
     get(key: string): string[] {
