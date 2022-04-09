@@ -1,23 +1,28 @@
 type DictionaryData = {
-    [key: string]: string;
+    [key: string]: string[];
 };
 
 export class CacheDictionary {
-    defaultValue: string;
-    constructor(defaultValue: string) {
-        this.defaultValue = defaultValue;
+    limit: number;
+    constructor(limit: number) {
+        this.limit = limit;
     }
 
     private data: DictionaryData = {};
-    set(key: string, value: string) {
-        this.data[key] = value;
+
+    add(key: string, value: string) {
+        const result = [...this.get(key), value].slice(this.limit * -1);
+        this.data[key] = result;
     }
-    get(key: string): string {
-        return this.data[key] || this.defaultValue;
+
+    get(key: string): string[] {
+        return this.data[key] || [];
     }
+
     getAllKeys(): string[] {
         return Object.keys(this.data);
     }
+
     count(): number {
         return this.getAllKeys().length;
     }

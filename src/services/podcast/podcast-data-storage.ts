@@ -12,7 +12,7 @@ export class PodcastDataStorage {
 
     constructor(betterSqlite3: typeof bettersqlite3) {
         this.db = betterSqlite3('./db/podcasts.db');
-        this.postedCache = new CacheDictionary('');
+        this.postedCache = new CacheDictionary(5);
 
         this.setup();
     }
@@ -34,28 +34,37 @@ export class PodcastDataStorage {
         const allRows = this.db
             .prepare('SELECT f.url, p.guid FROM feeds f LEFT JOIN posted p ON f.id = p.feed_id')
             .all();
+
         // Dumb loop so it is simple and synchronous
         for (var x = 0; x < allRows.length; x++) {
             const row = allRows[x];
-            this.postedCache.set(row.url || '', row.guid || '');
+            const url = row.url || '';
+            const guidList = (row.guid || '').split(',').filter(Boolean);
+            for (var y = 0; y < guidList.length; y++) {
+                this.postedCache.add(url, guidList[y]);
+            }
         }
     }
 
     addFeed(podcast: Podcast, channelId: string) {
         // Add the feed to the posted cache because that's what the loop gets data from
         // Copying existing data over is easier than seeing if it exists and only inserting if it exists
-        this.postedCache.set(podcast.feed, this.getPostedFromUrl(podcast.feed));
+        this.getPostedFromUrl(podcast.feed).forEach((guid) => {
+            this.postedCache.add(podcast.feed, guid);
+        });
 
         this.db
             .prepare(
                 'INSERT OR IGNORE INTO feeds (id, url, title) VALUES (lower(hex(randomblob(3))), ?, ?)',
             )
             .run(podcast.feed, podcast.title);
+
         const feedId =
             this.db
                 .prepare('SELECT id FROM feeds WHERE url = ? LIMIT 1')
                 .pluck()
                 .get(podcast.feed) || '';
+
         this.db
             .prepare('INSERT OR IGNORE INTO channels (feed_id, channel_id) VALUES (?, ?)')
             .run(feedId, channelId);
@@ -115,7 +124,7 @@ export class PodcastDataStorage {
 
     updatePostedData(url: string, guid: string) {
         // Update the local cache
-        this.postedCache.set(url, guid);
+        this.postedCache.add(url, guid);
 
         const feedId = this.db.prepare('SELECT id FROM feeds WHERE url = ?').pluck().get(url);
         this.db.prepare('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)').run(feedId, guid);
@@ -126,7 +135,7 @@ export class PodcastDataStorage {
         this.cachePostedDataLocally();
     }
 
-    getPostedFromUrl(url: string): string {
+    getPostedFromUrl(url: string): string[] {
         return this.postedCache.get(url);
     }
 

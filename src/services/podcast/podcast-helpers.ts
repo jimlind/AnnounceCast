@@ -13,9 +13,9 @@ export class PodcastHelpers {
     }
 
     podcastHasLatestEpisode(podcast: Podcast): boolean {
-        const guid = this.podcastDataStorage.getPostedFromUrl(podcast.feed);
+        const guidList = this.podcastDataStorage.getPostedFromUrl(podcast.feed);
         return podcast.episodeList.reduce((accumulator: boolean, current: PodcastEpisode) => {
-            return accumulator || current.guid == guid;
+            return accumulator || guidList.includes(current.guid);
         }, false);
     }
 }
