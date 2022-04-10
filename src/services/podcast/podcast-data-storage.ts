@@ -6,6 +6,7 @@ import { Podcast } from '../../models/podcast.js';
 
 export class PodcastDataStorage {
     static [RESOLVER] = {};
+    static GUID_LIST_SEPERATOR = '■■■■■■■■■■';
 
     db: bettersqlite3.Database;
     postedCache: CacheDictionary;
@@ -39,7 +40,9 @@ export class PodcastDataStorage {
         for (var x = 0; x < allRows.length; x++) {
             const row = allRows[x];
             const url = row.url || '';
-            const guidList = (row.guid || '').split(',').filter(Boolean);
+            const guidList = (row.guid || '')
+                .split(PodcastDataStorage.GUID_LIST_SEPERATOR)
+                .filter(Boolean);
             for (var y = 0; y < guidList.length; y++) {
                 this.postedCache.add(url, guidList[y]);
             }
@@ -123,11 +126,14 @@ export class PodcastDataStorage {
     }
 
     updatePostedData(url: string, guid: string) {
-        // Update the local cache
-        this.postedCache.add(url, guid);
+        // Update the local cache and create string representation of cache data
+        const guidList = this.postedCache.add(url, guid);
+        const guidListString = guidList.join(PodcastDataStorage.GUID_LIST_SEPERATOR);
 
         const feedId = this.db.prepare('SELECT id FROM feeds WHERE url = ?').pluck().get(url);
-        this.db.prepare('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)').run(feedId, guid);
+        this.db
+            .prepare('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)')
+            .run(feedId, guidListString);
     }
 
     resetPostedData() {
