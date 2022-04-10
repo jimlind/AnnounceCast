@@ -15,7 +15,7 @@ export class PodcastInfo {
         message.setTitle(podcast.title);
         message.setThumbnail(podcast.image);
         message.setDescription(this._getDescription(podcast));
-        message.setFooter(`Credit: ${podcast.author}`);
+        message.setFooter({ text: `Credit: ${podcast.author}` });
 
         return message;
     }

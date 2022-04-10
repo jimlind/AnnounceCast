@@ -15,7 +15,7 @@ export class NewEpisode {
     build(message: MessageEmbed, podcast: Podcast): MessageEmbed {
         const podcastEpisode = podcast.getFirstEpisode();
 
-        message.setAuthor(podcast.title, podcast.image, podcast.link);
+        message.setAuthor({ name: podcast.title, iconURL: podcast.image, url: podcast.link });
         message.setTitle(podcastEpisode.title);
         message.setURL(podcastEpisode.link);
         message.setDescription(
@@ -23,7 +23,7 @@ export class NewEpisode {
         );
         message.setImage(podcastEpisode.image || podcast.image);
 
-        message.setFooter(this._footerText(podcastEpisode));
+        message.setFooter({ text: this._footerText(podcastEpisode) });
 
         return message;
     }

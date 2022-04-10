@@ -53,9 +53,9 @@ export class Help {
             '/play <id>',
             '> Play the most recent episode of a podcast using the Podcast Id',
         );
-        message.setFooter(
-            'The 🔒 commands are only available to users with Manage Server permissions.',
-        );
+        message.setFooter({
+            text: 'The 🔒 commands are only available to users with Manage Server permissions.',
+        });
 
         return message;
     }
