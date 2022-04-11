@@ -40,9 +40,7 @@ export class PodcastDataStorage {
         for (var x = 0; x < allRows.length; x++) {
             const row = allRows[x];
             const url = row.url || '';
-            const guidList = (row.guid || '')
-                .split(PodcastDataStorage.GUID_LIST_SEPERATOR)
-                .filter(Boolean);
+            const guidList = (row.guid || '').split(PodcastDataStorage.GUID_LIST_SEPERATOR);
             for (var y = 0; y < guidList.length; y++) {
                 this.postedCache.add(url, guidList[y]);
             }
