@@ -48,11 +48,7 @@ export class PodcastDataStorage {
     }
 
     addFeed(podcast: Podcast, channelId: string) {
-        // Add the feed to the posted cache because that's what the loop gets data from
-        // Copying existing data over is easier than seeing if it exists and only inserting if it exists
-        this.getPostedFromUrl(podcast.feed).forEach((guid) => {
-            this.postedCache.add(podcast.feed, guid);
-        });
+        this.postedCache.add(podcast.feed);
 
         this.db
             .prepare(
