@@ -8,24 +8,26 @@ container.register().then(() => {
     const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
     const feedUrlList = data.getPostedFeeds();
 
-    const promiseList = feedUrlList.map((url) =>
-        container
-            .resolve<PodcastRssProcessor>('podcastRssProcessor')
-            .process(url, 5)
-            .catch(() => url),
-    );
-
-    Promise.all(promiseList).then((resultList) => {
-        const feedGuidList = resultList
-            .filter((p): p is Podcast => {
-                return p instanceof Podcast;
-            })
-            .forEach((result) => {
-                const guidList = result.episodeList.reverse().map((podcast) => podcast.guid);
-                processData(data, result.feed, guidList);
-            });
-    });
+    for (var x = 0; x < feedUrlList.length; x++) {
+        processFeed(data, feedUrlList[x]);
+    }
 });
+
+function processFeed(data: PodcastDataStorage, feedUrl: string) {
+    const podcastPromise = container
+        .resolve<PodcastRssProcessor>('podcastRssProcessor')
+        .process(feedUrl, 5)
+        .catch(() => feedUrl);
+
+    podcastPromise.then((result) => {
+        if (!(result instanceof Podcast)) {
+            return;
+        }
+
+        const guidList = result.episodeList.reverse().map((podcast) => podcast.guid);
+        processData(data, result.feed, guidList);
+    });
+}
 
 function processData(data: PodcastDataStorage, feedUrl: string, guidList: string[]) {
     const storedGuidList = data.getPostedFromUrl(feedUrl);
