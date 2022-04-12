@@ -9,7 +9,7 @@ db/podcasts.db
 db/servers.db
 
 # Application Log File
-log/application.log
+log/application.log*
 
 # Transpiled Application
 dist
