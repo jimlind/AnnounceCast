@@ -36,7 +36,11 @@ export class Podcast {
 
     private _link: string = '';
     public get link(): string {
-        return normalizeUrl(this._link);
+        try {
+            return normalizeUrl(this._link);
+        } catch {
+            return '';
+        }
     }
     public set link(value: string) {
         this._link = value;

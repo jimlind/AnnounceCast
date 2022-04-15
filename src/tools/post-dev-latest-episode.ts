@@ -11,7 +11,6 @@ container.register().then(() => {
         .resolve<PodcastRssProcessor>('podcastRssProcessor')
         .process(feedUrl, 1)
         .then((podcast) => {
-            console.log(podcast);
             return container.resolve<Bot>('bot').sendNewEpisodeAnnouncement(podcast);
         })
         .then(() => {
