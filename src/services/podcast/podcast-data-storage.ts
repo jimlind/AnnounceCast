@@ -33,7 +33,9 @@ export class PodcastDataStorage {
 
     cachePostedDataLocally() {
         const allRows = this.db
-            .prepare('SELECT f.url, p.guid FROM feeds f LEFT JOIN posted p ON f.id = p.feed_id')
+            .prepare(
+                'SELECT f.url, p.guid FROM feeds f LEFT JOIN posted p ON f.id = p.feed_id LIMIT 50',
+            )
             .all();
 
         // Dumb loop so it is simple and synchronous
