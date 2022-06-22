@@ -30,4 +30,9 @@ export class Config {
     public set discordClientId(value: string) {
         this._discordClientId = value;
     }
+
+    private _feedPaginationLength: number = 10;
+    public get feedPaginationLength(): number {
+        return this._feedPaginationLength;
+    }
 }

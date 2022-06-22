@@ -4,6 +4,7 @@ import { Client as DiscordClient, CommandInteraction } from 'discord.js';
 import { Logger } from 'log4js';
 import onExit from 'signal-exit';
 import { Container } from './container.js';
+import { Config } from './models/config.js';
 import { Podcast } from './models/podcast.js';
 import { Bot } from './services/bot.js';
 import { DiscordConnection } from './services/discord/discord-connection.js';
@@ -42,7 +43,12 @@ container.register().then(() => {
 
             // Keeps track of if an active diary entry thread is running
             let threadRunning: boolean = false;
-            const processRestInterval: number = 60000; // Give it up to 60 seconds to rest
+            const processRestInterval: number = 10000; // Give it up to 10 second to rest
+
+            // Keeps track of the feed pagination that keeps memory from overflowing
+            let feedIndex: number = 0;
+            const feedPaginationLength =
+                container.resolve<Config>('config').feedPaginationLength - 1;
 
             // Open the database connection
             const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
@@ -62,8 +68,16 @@ container.register().then(() => {
                 // Indicate that processing has started
                 threadRunning = true;
 
-                // TODO: Make this scale properly, this currently gets all the feeds
-                const feeds = data.getPostedFeeds();
+                // Get some feeds but if the list is empty reset the index
+                const feeds = data
+                    .getPostedFeeds()
+                    .slice(feedIndex, feedIndex + feedPaginationLength);
+
+                console.log(feeds);
+
+                // Set the index for the next run (reset if the feeds length is zero)
+                feedIndex = feeds.length && feedIndex + feeds.length;
+
                 const processor = container.resolve<PodcastRssProcessor>('podcastRssProcessor');
                 const helpers = container.resolve<PodcastHelpers>('podcastHelpers');
                 const bot = container.resolve<Bot>('bot');
