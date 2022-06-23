@@ -73,8 +73,6 @@ container.register().then(() => {
                     .getPostedFeeds()
                     .slice(feedIndex, feedIndex + feedPaginationLength);
 
-                console.log(feeds);
-
                 // Set the index for the next run (reset if the feeds length is zero)
                 feedIndex = feeds.length && feedIndex + feeds.length;
 
