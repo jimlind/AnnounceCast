@@ -186,8 +186,8 @@ export class Bot {
         const channelList = this.podcastDataStorage.getChannelsByFeedUrl(podcast.feed);
 
         const promiseList = channelList
-            .map((channelId) => this._sendMessageToChannel(channelId, outgoingMessage))
-            .map((p) => p.catch(() => null));
+            .map((channelId : any) => this._sendMessageToChannel(channelId, outgoingMessage))
+            .map((p : any) => p.catch(() => null));
 
         return Promise.all(promiseList).then(() => {
             this.podcastDataStorage.updatePostedData(podcast.feed, podcast.getFirstEpisode().guid);
