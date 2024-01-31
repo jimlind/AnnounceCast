@@ -17,7 +17,7 @@
     "scripts": {
         "clean": "rm -rf dist",
         "build": "npm run clean && tsc",
-        "start": "npm run build && node --optimize_for_size dist/app.js",
+        "start": "npm run build && node dist/app.js",
         "dev": "npm run build && node dist/app.js dev"
     },
     "dependencies": {
@@ -25,7 +25,7 @@
         "@discordjs/voice": "^0.8.0",
         "awilix": "^7.0.3",
         "axios": "^0.27.2",
-        "better-sqlite3": "^7.5.3",
+        "better-sqlite3": "^9.3.0",
         "discord-api-types": "^0.30.0",
         "discord.js": "^13.6.0",
         "dotenv": "^16.0.1",
@@ -39,7 +39,7 @@
         "turndown": "^7.1.1"
     },
     "devDependencies": {
-        "@types/better-sqlite3": "^7.5.0",
+        "@types/better-sqlite3": "^7.6.9",
         "@types/node": "^17.0.23",
         "@types/signal-exit": "^3.0.1",
         "@types/turndown": "^5.0.1",
