@@ -83,7 +83,7 @@ export class PodcastDataStorage {
                 'SELECT id, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title',
             )
             .all(channelId)
-            .map((dataRow: { id: string; title: string; }) => {
+            .map((dataRow: any) => {
                 const row = new PodcastFeedRow();
                 row.id = dataRow.id || '';
                 row.title = dataRow.title || '';
@@ -91,7 +91,7 @@ export class PodcastDataStorage {
             });
     }
 
-    getChannelsByFeedUrl(feedUrl: string): Array<string> {
+    getChannelsByFeedUrl(feedUrl: string): any {
         return this.db
             .prepare(
                 'SELECT channel_id FROM channels c INNER JOIN feeds f ON c.feed_id = f.id WHERE f.url = ?',
@@ -101,7 +101,7 @@ export class PodcastDataStorage {
     }
 
     getFeedByFeedId(feedId: string): PodcastFeedRow | null {
-        const data = this.db.prepare('SELECT id, url, title FROM feeds WHERE id = ?').get(feedId);
+        const data : any = this.db.prepare('SELECT id, url, title FROM feeds WHERE id = ?').get(feedId);
 
         if (!data) {
             return null;
