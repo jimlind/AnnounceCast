@@ -38,8 +38,8 @@ export class PodcastDataStorage {
 
         // Dumb loop so it is simple and synchronous
         for (var x = 0; x < allRows.length; x++) {
-            const row = allRows[x];
-            const url = row.url || '';
+            const row : any = allRows[x];
+            const url : any = row.url || '';
             const guidList = (row.guid || '').split(PodcastDataStorage.GUID_LIST_SEPERATOR);
             for (var y = 0; y < guidList.length; y++) {
                 this.postedCache.add(url, guidList[y]);
@@ -83,7 +83,7 @@ export class PodcastDataStorage {
                 'SELECT id, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title',
             )
             .all(channelId)
-            .map((dataRow) => {
+            .map((dataRow: { id: string; title: string; }) => {
                 const row = new PodcastFeedRow();
                 row.id = dataRow.id || '';
                 row.title = dataRow.title || '';
