@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 /**
- * Run this command in the terminal for prod or dev like this: 
- * >>> NODE_ENV=production node --loader ts-node/esm src/tools/app-command/delete-application-commands.ts 
+ * Run this command in the terminal for prod or dev like this:
+ * >>> NODE_ENV=production node --loader ts-node/esm src/tools/app-command/delete-application-commands.ts
  * >>> NODE_ENV=development node --loader ts-node/esm src/tools/app-command/delete-application-commands.ts
  */
 
@@ -16,7 +16,7 @@ try {
 }
 
 async function run(container: Container) {
-    await container.register();    
+    await container.register();
 
     const discordRest = container.resolve<import('discord.js').REST>('discordRest');
     const discordCommandRoutes = container.resolve<`/${string}`>('discordCommandRoutes');
