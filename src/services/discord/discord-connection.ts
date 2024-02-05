@@ -1,29 +1,28 @@
-import { RESOLVER } from 'awilix';
+interface DiscordConnectionInterface {
+    readonly config: typeof import('../../config.js').default;
+    readonly discordClient: import('discord.js').Client;
+    readonly discordEvents: typeof import('discord.js').Events;
+    readonly logger: import('log4js').Logger;
 
-export class DiscordConnection {
-    static [RESOLVER] = {};
+    getClient(): Promise<import('discord.js').Client>;
+}
 
-    config: typeof import('../../config.js').default;
-    discordClient: import('discord.js').Client;
-    discordEvents: typeof import('discord.js').Events;
-    logger: import('log4js').Logger;
-
-    connected: boolean = false;
-    locked: boolean = false;
+export default class DiscordConnection implements DiscordConnectionInterface {
+    private locked: boolean = false;
 
     constructor(
-        config: typeof import('../../config.js').default,
-        discordClient: import('discord.js').Client,
-        discordEvents: typeof import('discord.js').Events,
-        logger: import('log4js').Logger,
-    ) {
-        this.config = config;
-        this.discordClient = discordClient;
-        this.discordEvents = discordEvents;
-        this.logger = logger;
-    }
+        readonly config: typeof import('../../config.js').default,
+        readonly discordClient: import('discord.js').Client,
+        readonly discordEvents: typeof import('discord.js').Events,
+        readonly logger: import('log4js').Logger,
+    ) {}
 
-    async getClient(): Promise<import('discord.js').Client> {
+    async getClient(): Promise<import('discord.js').Client<true>> {
+        // If the client is ready return it
+        if (this.discordClient.isReady()) {
+            return this.discordClient;
+        }
+
         // If no token set reject the request
         if (!this.config.discord.botToken) {
             throw new Error('Error: No Discord Bot Token set');
@@ -34,22 +33,29 @@ export class DiscordConnection {
         if (this.locked) {
             throw new Error('Error: Can not make duplicate connection attempts');
         }
-
-        // If the client is connected return it
-        if (this.connected) {
-            return this.discordClient;
-        }
-
-        // Indicate the connecting process is active
+        // Lock it up
         this.locked = true;
 
+        // Event listener for when client is ready
         this.discordClient.once(this.discordEvents.ClientReady, (readyClient) => {
             this.logger.info(`Ready! Logged in as ${readyClient.user.tag}`);
-            this.connected = true;
             this.locked = false;
         });
 
+        // Start the login process that will make the client ready
         await this.discordClient.login(this.config.discord.botToken);
-        return this.discordClient;
+
+        // Connecting process is active so recursively wait
+        return new Promise((resolve) => {
+            const delay = 200; // Completely arbitrary timing choice
+            const getClient = () => {
+                if (this.discordClient.isReady()) {
+                    resolve(this.discordClient);
+                } else {
+                    setTimeout(getClient, delay);
+                }
+            };
+            setTimeout(getClient, delay);
+        });
     }
 }
