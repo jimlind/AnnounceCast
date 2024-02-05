@@ -1,62 +1,69 @@
-import { RESOLVER } from 'awilix';
-import { MessageEmbed } from 'discord.js';
-import { Config } from '../../../models/config';
-import { DiscordConnection } from '../../discord/discord-connection';
-import { PodcastDataStorage } from '../../podcast/podcast-data-storage';
+interface HelpInterface {
+    readonly config: typeof import('../../../config').default;
+    readonly discordEmbedBuilder: typeof import('discord.js').EmbedBuilder;
+    readonly discordConnection: import('../../discord/discord-connection').default;
+    readonly podcastDataStorage: import('../../podcast/podcast-data-storage').default;
 
-export class Help {
-    static [RESOLVER] = {}; // So Awilix autoloads the class
+    build(
+        embedBuilder: import('discord.js').EmbedBuilder,
+    ): Promise<import('discord.js').EmbedBuilder>;
+}
 
-    config: Config;
-    discordConnection: DiscordConnection;
-    podcastDataStorage: PodcastDataStorage;
+export default class Help implements HelpInterface {
     constructor(
-        config: Config,
-        discordConnection: DiscordConnection,
-        podcastDataStorage: PodcastDataStorage,
-    ) {
-        this.config = config;
-        this.discordConnection = discordConnection;
-        this.podcastDataStorage = podcastDataStorage;
-    }
+        readonly config: typeof import('../../../config').default,
+        readonly discordEmbedBuilder: typeof import('discord.js').EmbedBuilder,
+        readonly discordConnection: import('../../discord/discord-connection').default,
+        readonly podcastDataStorage: import('../../podcast/podcast-data-storage').default,
+    ) {}
 
-    build(message: MessageEmbed) {
+    async build(embedBuilder: import('discord.js').EmbedBuilder) {
+        const discordClient = await this.discordConnection.getClient();
+        const serverCount = discordClient.guilds.cache.size;
         const feedCount = this.podcastDataStorage.getFeedCount();
-        const serverCount = this.discordConnection.getClient().guilds.cache.size;
 
-        message.setTitle(`${this.config.appName} v${this.config.appVersion}`);
-        message.setURL('https://github.com/jimlind/discord.podcasts');
-        message.setDescription(`Tracking ${feedCount} podcasts on ${serverCount} servers.`);
-
-        message.addField('/help', '> View this help message.');
-        message.addField(
-            '/find <keywords>',
-            '> Replies with up to 4 podcasts matching the search keyword(s)',
+        embedBuilder.setTitle(`${this.config.app.name} v${this.config.app.version} Documentation`);
+        embedBuilder.setURL('https://jimlind.github.io/AnnounceCast/');
+        embedBuilder.setDescription(`Tracking ${feedCount} podcasts on ${serverCount} servers.`);
+        embedBuilder.addFields(
+            { name: '/help', value: 'View this help message' },
+            {
+                name: '/find <keywords>',
+                value: 'Replies with up to 4 podcasts matching the search keyword(s)',
+            },
+            {
+                name: '/following',
+                value: 'Replies with the list of all podcasts (Ids & Names) followed in this channel',
+            },
+            {
+                name: '/follow <keywords> 🔒',
+                value: 'Follow a podcast in this channel matching the search keyword(s)',
+            },
+            {
+                name: '/follow-rss <feed> 🔒',
+                value: 'Follow a podcast in this channel using an RSS feed',
+            },
+            {
+                name: '/unfollow <id> 🔒',
+                value: 'Unfollow a podcast in this channel using the Podcast Id',
+            },
         );
-        message.addField(
-            '/following',
-            '> Replies with the list of all podcasts (Ids & Names) followed in this channel',
+        embedBuilder.addFields(
+            {
+                name: ':clap: Patreon',
+                value: '[Support on Patreon](https://www.patreon.com/AnnounceCast)',
+                inline: true,
+            },
+            {
+                name: ':left_speech_bubble: Discord',
+                value: '[Join the Discord](https://discord.gg/sEjJTTjG3M)',
+                inline: true,
+            },
         );
-        message.addField(
-            '/follow <keywords> 🔒',
-            '> Follow a podcast in this channel matching the search keyword(s)',
-        );
-        message.addField(
-            '/follow-rss <feed> 🔒',
-            '> Follow a podcast in this channel using an RSS feed',
-        );
-        message.addField(
-            '/unfollow <id> 🔒',
-            '> Unfollow a podcast in this channel using the Podcast Id',
-        );
-        message.addField(
-            '/play <id>',
-            '> Play the most recent episode of a podcast using the Podcast Id',
-        );
-        message.setFooter({
-            text: 'The 🔒 commands are only available to users with Manage Server permissions.',
+        embedBuilder.setFooter({
+            text: 'The commands marked with 🔒 default to manager only visibility but permissions can be overridden by admins.',
         });
 
-        return message;
+        return embedBuilder;
     }
 }
