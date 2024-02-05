@@ -1,30 +1,25 @@
-import { RESOLVER } from 'awilix';
-import { GuildMember } from 'discord.js';
-import { DiscordConnection } from './discord-connection';
+interface DiscordInteractionListenerInterface {
+    readonly discordConnection: import('./discord-connection.js').default;
+    readonly discordEvents: typeof import('discord.js').Events;
 
-export class DiscordInteractionListener {
-    static [RESOLVER] = {}; // So Awilix autoloads the class
-    MESSAGE_ACTION_KEY = 'message';
+    startListeners(callback: Function): void;
+}
 
-    discordConnection: DiscordConnection;
+export default class DiscordInteractionListener implements DiscordInteractionListenerInterface {
+    constructor(
+        readonly discordConnection: import('./discord-connection').default,
+        readonly discordEvents: typeof import('discord.js').Events,
+    ) {}
 
-    constructor(discordConnection: DiscordConnection) {
-        this.discordConnection = discordConnection;
-    }
-
-    onInteraction(callback: Function) {
-        // Get connected client and listen for interactions
-        return this.discordConnection.getConnectedClient().then((client) => {
-            client.on('interactionCreate', (interaction) => {
-                // Ignore if not a command and not from a guild member
-                if (!interaction.isCommand()) return;
-                if (!(interaction.member instanceof GuildMember)) return;
-
-                // Immediatly set interaction status to defer reply (creates a ... status to edit)
-                return interaction.deferReply().then(() => {
-                    callback(interaction);
-                });
-            });
+    async startListeners(callback: Function) {
+        const discordClient = await this.discordConnection.getClient();
+        discordClient.on(this.discordEvents.InteractionCreate, async (interaction) => {
+            // Ignore if not an actual command
+            if (!interaction.isChatInputCommand()) return;
+            // Immediatly set interaction status to defer reply (creates a ... status to edit)
+            await interaction.deferReply();
+            // Call the method
+            callback(interaction);
         });
     }
 }
