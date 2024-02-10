@@ -1,7 +1,7 @@
 [
     { "name": "help", "description": "Replies with a some helpful information and links" },
     {
-        "name": "find",
+        "name": "search",
         "description": "Replies with up to 4 podcasts matching the search keyword(s)",
         "options": [
             {
@@ -11,10 +11,6 @@
                 "required": true
             }
         ]
-    },
-    {
-        "name": "following",
-        "description": "Replies with the list of all podcasts (Ids & Names) followed in this channel"
     },
     {
         "name": "follow",
@@ -53,15 +49,7 @@
         ]
     },
     {
-        "name": "play",
-        "description": "Play the most recent episode of a podcast using the Podcast Id",
-        "options": [
-            {
-                "name": "id",
-                "description": "Podcast Id used to identified podcast to play",
-                "type": 3,
-                "required": true
-            }
-        ]
+        "name": "following",
+        "description": "Replies with the list of all podcasts (Ids & Names) followed in this channel"
     }
 ]
