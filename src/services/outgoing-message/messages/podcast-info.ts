@@ -1,36 +1,34 @@
-import { RESOLVER } from 'awilix';
-import { MessageEmbed } from 'discord.js';
-import { Podcast } from '../../../models/podcast';
-import { OutgoingMessageHelpers } from '../outgoing-message-helpers';
+import { EmbedBuilder } from 'discord.js';
+import { Podcast } from 'podparse';
+import OutgoingMessageHelpers from '../outgoing-message-helpers';
 
-export class PodcastInfo {
-    static [RESOLVER] = {}; // So Awilix autoloads the class
+interface PodcastInfoInterface {
+    build(message: EmbedBuilder, podcast: Podcast): EmbedBuilder;
+}
 
-    outgoingMessageHelpers: OutgoingMessageHelpers;
-    constructor(outgoingMessageHelpers: OutgoingMessageHelpers) {
-        this.outgoingMessageHelpers = outgoingMessageHelpers;
-    }
+export default class PodcastInfo implements PodcastInfoInterface {
+    constructor(readonly outgoingMessageHelpers: OutgoingMessageHelpers) {}
 
-    build(message: MessageEmbed, podcast: Podcast): MessageEmbed {
-        message.setTitle(podcast.title);
-        message.setThumbnail(podcast.image);
-        message.setDescription(this._getDescription(podcast));
-        message.setFooter({ text: `Credit: ${podcast.author}` });
+    build(message: EmbedBuilder, podcast: Podcast): EmbedBuilder {
+        message.setTitle(podcast.meta.title);
+        message.setThumbnail(podcast.meta.image.url);
+        message.setDescription(this.getDescription(podcast));
+        message.setFooter({ text: `Credit: ${podcast.meta.author}` });
 
         return message;
     }
 
-    _getDescription(podcast: Podcast): string {
+    private getDescription(podcast: Podcast): string {
         const compressedDescription = this.outgoingMessageHelpers.compressPodcastDescription(
-            podcast.description,
+            podcast.meta.description,
         );
 
         return (
             compressedDescription +
             '\n\n' +
-            `Show Feed URL: ${podcast.feed}` +
+            `Show Feed URL: ${podcast.meta.importFeedUrl}` +
             '\n' +
-            `Show's Website: ${podcast.link}`
+            `Show's Website: ${podcast.meta.link}`
         );
     }
 }
