@@ -15,6 +15,7 @@
     {
         "name": "follow",
         "description": "Follow a podcast in this channel matching the search keyword(s)",
+        "default_member_permissions": 32,
         "options": [
             {
                 "name": "keywords",
@@ -27,6 +28,7 @@
     {
         "name": "follow-rss",
         "description": "Follow a podcast in this channel using an RSS feed",
+        "default_member_permissions": 32,
         "options": [
             {
                 "name": "feed",
@@ -39,6 +41,7 @@
     {
         "name": "unfollow",
         "description": "Unfollow a podcast in this channel using the Podcast Id",
+        "default_member_permissions": 32,
         "options": [
             {
                 "name": "id",
