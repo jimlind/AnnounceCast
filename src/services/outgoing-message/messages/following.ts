@@ -1,17 +1,15 @@
-import { RESOLVER } from 'awilix';
-import { MessageEmbed } from 'discord.js';
-import { PodcastFeedRow } from '../../../models/db/podcast-feed-row';
-import { OutgoingMessageHelpers } from '../outgoing-message-helpers';
+import { EmbedBuilder } from 'discord.js';
+import PodcastFeedRow from '../../../models/db/podcast-feed-row';
+import OutgoingMessageHelpers from '../outgoing-message-helpers';
 
-export class Following {
-    static [RESOLVER] = {}; // So Awilix autoloads the class
+interface FollowingInterface {
+    build(message: EmbedBuilder, rows: PodcastFeedRow[]): EmbedBuilder;
+}
 
-    outgoingMessageHelpers: OutgoingMessageHelpers;
-    constructor(outgoingMessageHelpers: OutgoingMessageHelpers) {
-        this.outgoingMessageHelpers = outgoingMessageHelpers;
-    }
+export default class Following implements FollowingInterface {
+    constructor(readonly outgoingMessageHelpers: OutgoingMessageHelpers) {}
 
-    build(message: MessageEmbed, rows: PodcastFeedRow[]): MessageEmbed {
+    build(message: EmbedBuilder, rows: PodcastFeedRow[]): EmbedBuilder {
         message.setTitle('Podcasts Followed in this Channel');
 
         const gridString = this.outgoingMessageHelpers.feedRowsToGridString(rows);
