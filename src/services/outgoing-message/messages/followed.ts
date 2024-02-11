@@ -1,27 +1,27 @@
-import { RESOLVER } from 'awilix';
-import { MessageEmbed } from 'discord.js';
-import { PodcastFeedRow } from '../../../models/db/podcast-feed-row';
-import { Podcast } from '../../../models/podcast';
-import { OutgoingMessageHelpers } from '../outgoing-message-helpers';
+import { EmbedBuilder } from 'discord.js';
+import { Podcast } from 'podparse';
+import PodcastFeedRow from '../../../models/db/podcast-feed-row';
+import OutgoingMessageHelpers from '../outgoing-message-helpers';
 
-export class Followed {
-    static [RESOLVER] = {}; // So Awilix autoloads the class
-    outgoingMessageHelpers: OutgoingMessageHelpers;
+interface FollowedInterface {
+    readonly outgoingMessageHelpers: OutgoingMessageHelpers;
 
-    constructor(outgoingMessageHelpers: OutgoingMessageHelpers) {
-        this.outgoingMessageHelpers = outgoingMessageHelpers;
-    }
+    build(embedBuilder: EmbedBuilder, podcast: Podcast, rows: PodcastFeedRow[]): EmbedBuilder;
+}
 
-    build(message: MessageEmbed, podcast: Podcast, rows: PodcastFeedRow[]): MessageEmbed {
-        message.setTitle('You are now following ' + podcast.title);
-        message.setThumbnail(podcast.image);
+export default class Followed {
+    constructor(readonly outgoingMessageHelpers: OutgoingMessageHelpers) {}
+
+    build(embedBuilder: EmbedBuilder, podcast: Podcast, rows: PodcastFeedRow[]): EmbedBuilder {
+        embedBuilder.setTitle('You are now following ' + podcast.meta.title);
+        embedBuilder.setThumbnail(podcast.meta.image.url);
 
         const compressedDescription = this.outgoingMessageHelpers.compressPodcastDescription(
-            podcast.description,
+            podcast.meta.description,
         );
         const gridString = this.outgoingMessageHelpers.feedRowsToGridString(rows);
-        message.setDescription(compressedDescription + '\n\n```\n' + gridString + '\n```');
+        embedBuilder.setDescription(compressedDescription + '\n\n```\n' + gridString + '\n```');
 
-        return message;
+        return embedBuilder;
     }
 }
