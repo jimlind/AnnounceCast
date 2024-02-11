@@ -1,6 +1,8 @@
+import getPodcastFromFeedFunction from 'podparse';
+
 interface PodcastAppleAPIProcessorInterface {
     readonly httpClient: import('../http-client').default;
-    readonly podparseParser: typeof import('podparse').default;
+    readonly getPodcastFromFeed: typeof getPodcastFromFeedFunction;
 
     search(searchTerm: string, podcastCount: number): Promise<import('podparse').Podcast[]>;
 }
@@ -8,7 +10,7 @@ interface PodcastAppleAPIProcessorInterface {
 export default class PodcastAppleAPIProcessor implements PodcastAppleAPIProcessorInterface {
     constructor(
         readonly httpClient: import('../http-client').default,
-        readonly podparseParser: typeof import('podparse').default,
+        readonly getPodcastFromFeed: typeof getPodcastFromFeedFunction,
     ) {}
 
     async search(searchTerm: string, podcastCount: number): Promise<import('podparse').Podcast[]> {
@@ -30,7 +32,7 @@ export default class PodcastAppleAPIProcessor implements PodcastAppleAPIProcesso
             }
 
             const response = await this.httpClient.get(result.feedUrl, 5000);
-            const podcast = this.podparseParser(response.data);
+            const podcast = this.getPodcastFromFeed(response.data);
             // meta.importFeedUrl is only officially supported in the SoundOn Namespace, but I find it super useful so I'm using it.
             podcast.meta.importFeedUrl = result.feedUrl;
             results.push(podcast);
