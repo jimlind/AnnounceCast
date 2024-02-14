@@ -17,7 +17,7 @@ export default class Help implements HelpInterface {
         readonly podcastDataStorage: import('../../podcast/podcast-data-storage').default,
     ) {}
 
-    async build(embedBuilder: import('discord.js').EmbedBuilder) {
+    public async build(embedBuilder: import('discord.js').EmbedBuilder) {
         const discordClient = await this.discordConnection.getClient();
         const serverCount = discordClient.guilds.cache.size;
         const feedCount = this.podcastDataStorage.getFeedCount();

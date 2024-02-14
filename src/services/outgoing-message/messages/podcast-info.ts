@@ -9,7 +9,7 @@ interface PodcastInfoInterface {
 export default class PodcastInfo implements PodcastInfoInterface {
     constructor(readonly outgoingMessageHelpers: OutgoingMessageHelpers) {}
 
-    build(message: EmbedBuilder, podcast: Podcast): EmbedBuilder {
+    public build(message: EmbedBuilder, podcast: Podcast): EmbedBuilder {
         message.setTitle(podcast.meta.title);
         message.setThumbnail(podcast.meta.image.url);
         message.setDescription(this.getDescription(podcast));

@@ -9,10 +9,14 @@ interface FollowedInterface {
     build(embedBuilder: EmbedBuilder, podcast: Podcast, rows: PodcastFeedRow[]): EmbedBuilder;
 }
 
-export default class Followed {
+export default class Followed implements FollowedInterface {
     constructor(readonly outgoingMessageHelpers: OutgoingMessageHelpers) {}
 
-    build(embedBuilder: EmbedBuilder, podcast: Podcast, rows: PodcastFeedRow[]): EmbedBuilder {
+    public build(
+        embedBuilder: EmbedBuilder,
+        podcast: Podcast,
+        rows: PodcastFeedRow[],
+    ): EmbedBuilder {
         embedBuilder.setTitle('You are now following ' + podcast.meta.title);
         embedBuilder.setThumbnail(podcast.meta.image.url);
 
