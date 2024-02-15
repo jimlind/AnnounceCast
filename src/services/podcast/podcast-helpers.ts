@@ -41,7 +41,9 @@ export default class PodcastHelpers implements PodcastHelpersInterface {
 
     public mostRecentPodcastEpisodeIsNew(podcast: Podcast): boolean {
         const mostRecentEpisode = this.getMostRecentPodcastEpisode(podcast);
-        const guidList = this.podcastDataStorage.getPostedFromUrl(podcast.meta.importFeedUrl || '');
+        const guidList = this.podcastDataStorage.getPostedByFeedUrl(
+            podcast.meta.importFeedUrl || '',
+        );
 
         return !guidList.includes(mostRecentEpisode.guid);
     }

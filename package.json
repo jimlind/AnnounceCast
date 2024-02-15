@@ -33,7 +33,7 @@
         "node-fetch": "^3.2.6",
         "normalize-url": "^7.0.3",
         "podparse": "^1.6.0",
-        "pretty-ms": "^7.0.1",
+        "pretty-ms": "^9.0.0",
         "signal-exit": "^3.0.7",
         "turndown": "^7.1.1"
     },
