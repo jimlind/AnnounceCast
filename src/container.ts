@@ -1,49 +1,45 @@
-import { REST as DiscordRest } from '@discordjs/rest';
 import awilix from 'awilix';
 import axios from 'axios';
 import bettersqlite3 from 'better-sqlite3';
-import { Routes as DiscordRoutes } from 'discord-api-types/v8';
-import { Client as DiscordClient, Intents as DiscordIntents } from 'discord.js';
-import { config as configDotenv } from 'dotenv';
-import * as htmlparser2 from 'htmlparser2';
+import {
+    ActivityType as DiscordActivityType,
+    Client as DiscordClient,
+    EmbedBuilder as DiscordEmbedBuilder,
+    Events as DiscordEvents,
+    GatewayIntentBits as DiscordGatewayIntentBits,
+    GuildMember as DiscordGuildMember,
+    REST as DiscordRest,
+    Routes as DiscordRoutes,
+} from 'discord.js';
 import log4js from 'log4js';
+import getPodcastFromFeed from 'podparse';
+import prettyMilliseconds from 'pretty-ms';
 import TurndownService from 'turndown';
 import { URL } from 'url';
-import { Config } from './models/config.js';
+import config from './config.js';
 
 export class Container {
     container: awilix.AwilixContainer;
 
-    constructor(environmentValue: string = '') {
+    constructor() {
         this.container = awilix.createContainer();
 
-        // Create config model
-        configDotenv();
-        const configModel: Config = new Config();
-        configModel.appName = process.env.npm_package_name || '';
-        configModel.appVersion = process.env.npm_package_version || '';
+        // Create Discord Rest
+        const discordRest = new DiscordRest().setToken(config.discord.botToken);
 
-        switch (environmentValue) {
-            case 'dev':
-                configModel.discordBotToken = process.env.DISCORD_BOT_TOKEN_DEV || '';
-                configModel.discordClientId = process.env.DISCORD_CLIENT_ID_DEV || '';
-                break;
-            default:
-                configModel.discordBotToken = process.env.DISCORD_BOT_TOKEN_PROD || '';
-                configModel.discordClientId = process.env.DISCORD_CLIENT_ID_PROD || '';
-                break;
-        }
+        // Create Discord Routes
+        const discordCommandRoutes = DiscordRoutes.applicationCommands(config.discord.clientId);
 
-        // Create Discord client
+        // Create Discord Client
         const discordClient = new DiscordClient({
-            intents: [DiscordIntents.FLAGS.GUILDS, DiscordIntents.FLAGS.GUILD_VOICE_STATES],
+            intents: [DiscordGatewayIntentBits.Guilds],
             presence: {
                 status: 'online',
                 activities: [
                     {
                         name: 'Slash Commands',
-                        type: 'LISTENING',
-                        url: 'https://github.com/jimlind/discord.podcasts',
+                        type: DiscordActivityType.Listening,
+                        url: 'https://jimlind.github.io/AnnounceCast/',
                     },
                 ],
             },
@@ -71,13 +67,16 @@ export class Container {
         this.container.register({
             axios: awilix.asValue(axios),
             betterSqlite3: awilix.asValue(bettersqlite3),
-            config: awilix.asValue(configModel),
+            config: awilix.asValue(config),
             discordClient: awilix.asValue(discordClient),
-            discordRest: awilix.asValue(DiscordRest),
-            discordRoutes: awilix.asValue(DiscordRoutes),
-            htmlParser2: awilix.asValue(htmlparser2),
+            discordCommandRoutes: awilix.asValue(discordCommandRoutes),
+            discordEmbedBuilder: awilix.asValue(DiscordEmbedBuilder),
+            discordEvents: awilix.asValue(DiscordEvents),
+            discordGuildMember: awilix.asValue(DiscordGuildMember),
+            discordRest: awilix.asValue(discordRest),
+            getPodcastFromFeed: awilix.asValue(getPodcastFromFeed),
             logger: awilix.asValue(logger),
-            magicPrefix: awilix.asValue('?podcasts'),
+            prettyMilliseconds: awilix.asValue(prettyMilliseconds),
             turndownService: awilix.asValue(turndownService),
         });
     }
