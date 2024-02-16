@@ -32,7 +32,8 @@ export default class PodcastHelpers implements PodcastHelpersInterface {
         podcast.episodes.sort((a, b) => {
             return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
         });
-        const mostRecentEpisode = podcast.episodes.shift();
+
+        const mostRecentEpisode = podcast?.episodes?.[0];
         if (!mostRecentEpisode) {
             throw new Error('Error finding most recent episode.');
         }
