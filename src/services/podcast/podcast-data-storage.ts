@@ -1,145 +1,161 @@
-import { RESOLVER } from 'awilix';
-import bettersqlite3 from 'better-sqlite3';
-import { CacheDictionary } from '../../models/cache-dictionary.js';
-import { PodcastFeedRow } from '../../models/db/podcast-feed-row.js';
-import { Podcast } from '../../models/podcast.js';
+import * as BetterSqlite3 from 'better-sqlite3';
+import { Episode, Podcast } from 'podparse';
+// This import specifically needs the js extension because the class is used instead of referenced as a type
+import PodcastFeedRow from '../../models/db/podcast-feed-row.js';
 
-export class PodcastDataStorage {
-    static [RESOLVER] = {};
-    static GUID_LIST_SEPERATOR = '■■■■■■■■■■';
+interface PodcastDataStorageInterface {
+    setup(): void;
+    addFeed(podcast: Podcast, channelId: string): void;
+    updatePostedData(url: string, episode: Episode): void;
+    removeFeed(feedId: string, channelId: string): void;
+    getFeedsByChannelId(channelId: string): PodcastFeedRow[];
+    getFeedUrlPage(pageNumber: number, pageSize: number): string[];
+    getFeedByFeedId(feedId: string): PodcastFeedRow | null;
+    getFeedCount(): number;
+    getPostedByFeedUrl(url: string): string;
+    getChannelsByFeedUrl(url: string): string[];
+    resetAllPostedData(): void;
+    close(): void;
+}
 
-    db: bettersqlite3.Database;
-    postedCache: CacheDictionary;
+export default class PodcastDataStorage implements PodcastDataStorageInterface {
+    private database: BetterSqlite3.Database;
+    readonly GUID_LIST_SEPERATOR = '■■■■■■■■■■';
 
-    constructor(betterSqlite3: typeof bettersqlite3) {
-        this.db = betterSqlite3('./db/podcasts.db');
-        this.postedCache = new CacheDictionary(5);
-
-        this.setup();
+    constructor(betterSqlite3: typeof BetterSqlite3.default) {
+        this.database = betterSqlite3('./db/podcasts.db');
     }
 
     setup() {
-        this.db.exec(
+        this.database.exec(
             'CREATE TABLE IF NOT EXISTS feeds (id TEXT PRIMARY KEY, url TEXT UNIQUE, title TEXT)',
         );
-        this.db.exec(
+        this.database.exec(
             'CREATE TABLE IF NOT EXISTS channels (feed_id TEXT, channel_id TEXT, UNIQUE(feed_id, channel_id))',
         );
-        this.db.exec(
+        this.database.exec(
             'CREATE TABLE IF NOT EXISTS posted (feed_id TEXT PRIMARY KEY UNIQUE, guid TEXT)',
         );
-        this.cachePostedDataLocally();
     }
 
-    cachePostedDataLocally() {
-        const allRows = this.db
-            .prepare('SELECT f.url, p.guid FROM feeds f LEFT JOIN posted p ON f.id = p.feed_id')
-            .all();
-
-        // Dumb loop so it is simple and synchronous
-        for (var x = 0; x < allRows.length; x++) {
-            const row : any = allRows[x];
-            const url : any = row.url || '';
-            const guidList = (row.guid || '').split(PodcastDataStorage.GUID_LIST_SEPERATOR);
-            for (var y = 0; y < guidList.length; y++) {
-                this.postedCache.add(url, guidList[y]);
-            }
-        }
-    }
-
-    addFeed(podcast: Podcast, channelId: string) {
-        this.postedCache.add(podcast.feed);
-
-        this.db
+    addFeed(podcast: Podcast, channelId: string): void {
+        this.database
             .prepare(
                 'INSERT OR IGNORE INTO feeds (id, url, title) VALUES (lower(hex(randomblob(3))), ?, ?)',
             )
-            .run(podcast.feed, podcast.title);
+            .run(podcast.meta.importFeedUrl, podcast.meta.title);
 
         const feedId =
-            this.db
+            this.database
                 .prepare('SELECT id FROM feeds WHERE url = ? LIMIT 1')
                 .pluck()
-                .get(podcast.feed) || '';
+                .get(podcast.meta.importFeedUrl) || '';
 
-        this.db
+        this.database
             .prepare('INSERT OR IGNORE INTO channels (feed_id, channel_id) VALUES (?, ?)')
             .run(feedId, channelId);
     }
 
-    removeFeed(feedId: string, channelId: string) {
-        this.db
+    updatePostedData(url: string, episode: Episode): void {
+        const feedId = String(
+            this.database.prepare('SELECT id FROM feeds WHERE url = ?').pluck().get(url) || '',
+        );
+        const guid = String(
+            this.database
+                .prepare('SELECT guid from posted WHERE feed_id = ?')
+                .pluck()
+                .get(feedId) || '',
+        );
+
+        if (!guid.includes(episode.guid)) {
+            const guidListString = guid
+                .split(this.GUID_LIST_SEPERATOR)
+                .concat([episode.guid])
+                .filter(Boolean)
+                .slice(-5)
+                .join(this.GUID_LIST_SEPERATOR);
+
+            this.database
+                .prepare('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)')
+                .run(feedId, guidListString);
+        }
+    }
+
+    removeFeed(feedId: string, channelId: string): void {
+        this.database
             .prepare('DELETE FROM channels WHERE feed_id = ? AND channel_id = ?')
             .run(feedId, channelId);
     }
 
-    getFeedCount(): number {
-        return this.postedCache.count();
-    }
-
     getFeedsByChannelId(channelId: string): PodcastFeedRow[] {
-        return this.db
+        return this.database
             .prepare(
                 'SELECT id, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title',
             )
             .all(channelId)
             .map((dataRow: any) => {
-                const row = new PodcastFeedRow();
-                row.id = dataRow.id || '';
-                row.title = dataRow.title || '';
-                return row;
+                return new PodcastFeedRow(dataRow.id || '', dataRow.title || '');
             });
     }
 
-    getChannelsByFeedUrl(feedUrl: string): any {
-        return this.db
-            .prepare(
-                'SELECT channel_id FROM channels c INNER JOIN feeds f ON c.feed_id = f.id WHERE f.url = ?',
-            )
+    getFeedUrlPage(pageNumber: number, pageSize: number): string[] {
+        const limit = pageSize;
+        const offset = (pageNumber - 1) * pageSize;
+
+        return this.database
+            .prepare('SELECT url FROM feeds LIMIT ? OFFSET ?')
             .pluck()
-            .all(feedUrl);
+            .all(limit, offset)
+            .map((input) => String(input));
     }
 
     getFeedByFeedId(feedId: string): PodcastFeedRow | null {
-        const data : any = this.db.prepare('SELECT id, url, title FROM feeds WHERE id = ?').get(feedId);
+        const data: any = this.database
+            .prepare('SELECT id, title FROM feeds WHERE id = ?')
+            .all(feedId);
 
         if (!data) {
             return null;
         }
 
-        const podcastFeedRow = new PodcastFeedRow();
-        podcastFeedRow.id = data?.id || '';
-        podcastFeedRow.url = data?.url || '';
-        podcastFeedRow.title = data?.title || '';
-
-        return podcastFeedRow;
+        return new PodcastFeedRow(data?.id || '', data?.title || '');
     }
 
-    getPostedFeeds(): Array<string> {
-        return this.postedCache.getAllKeys();
+    getFeedCount(): number {
+        const value = this.database.prepare('SELECT COUNT(id) AS SUM FROM feeds').pluck().get();
+        const countNumber = Number(value);
+        if (isNaN(countNumber)) {
+            return 0;
+        }
+        return countNumber;
     }
 
-    updatePostedData(url: string, guid: string) {
-        // Update the local cache and create string representation of cache data
-        const guidList = this.postedCache.add(url, guid);
-        const guidListString = guidList.join(PodcastDataStorage.GUID_LIST_SEPERATOR);
+    getPostedByFeedUrl(url: string): string {
+        const guid = this.database
+            .prepare(
+                'SELECT guid FROM posted INNER JOIN feeds ON posted.feed_id = feeds.id WHERE url = ?',
+            )
+            .pluck()
+            .get(url);
 
-        const feedId = this.db.prepare('SELECT id FROM feeds WHERE url = ?').pluck().get(url);
-        this.db
-            .prepare('REPLACE INTO posted (feed_id, guid) VALUES (?, ?)')
-            .run(feedId, guidListString);
+        return String(guid || '');
     }
 
-    resetPostedData() {
-        this.db.prepare("UPDATE posted SET guid = ''").run();
-        this.cachePostedDataLocally();
+    getChannelsByFeedUrl(url: string): string[] {
+        return this.database
+            .prepare(
+                'SELECT channel_id FROM channels c INNER JOIN feeds f ON c.feed_id = f.id WHERE f.url = ?',
+            )
+            .pluck()
+            .all(url)
+            .map(String);
     }
 
-    getPostedFromUrl(url: string): string[] {
-        return this.postedCache.get(url);
+    resetAllPostedData() {
+        this.database.prepare("UPDATE posted SET guid = ''").run();
     }
 
     close() {
-        this.db.close();
+        this.database.close();
     }
 }
