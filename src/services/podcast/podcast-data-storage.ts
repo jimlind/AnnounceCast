@@ -106,7 +106,7 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
             .prepare('SELECT url FROM feeds LIMIT ? OFFSET ?')
             .pluck()
             .all(limit, offset)
-            .map((input) => String(input));
+            .map(String);
     }
 
     getFeedByFeedId(feedId: string): PodcastFeedRow | null {
