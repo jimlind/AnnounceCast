@@ -1,7 +1,7 @@
 {
     "name": "announcecast",
     "description": "AnnounceCast - Podcast New Release Announcement Bot for Discord",
-    "version": "2.0.0-alpha.4",
+    "version": "2.0.0-alpha.5",
     "private": false,
     "license": "AGPL-3.0",
     "author": "Jim Lind",
@@ -27,7 +27,6 @@
         "discord.js": "^14.14.1",
         "dotenv": "^16.4.5",
         "log4js": "^6.9.1",
-        "normalize-url": "^7.0.3",
         "podparse": "^1.6.0",
         "pretty-ms": "^9.0.0",
         "signal-exit": "^3.0.7",
@@ -35,7 +34,7 @@
     },
     "devDependencies": {
         "@types/better-sqlite3": "^7.6.9",
-        "@types/node": "^20.11.19",
+        "@types/node": "^20.11.24",
         "@types/signal-exit": "^3.0.4",
         "@types/turndown": "^5.0.4",
         "prettier": "^3.2.5",
