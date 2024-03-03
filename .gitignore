@@ -17,3 +17,6 @@ dist
 
 # MacOS System Files
 .DS_Store
+
+# Maintenance Output
+src/tools/maintenance/output/*

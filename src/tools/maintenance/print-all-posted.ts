@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 /**
  * Run this command in the terminal for against the local database like this:
- * >>> node --loader ts-node/esm src/tools/maintenance/print-all-feeds.ts
+ * >>> node --loader ts-node/esm src/tools/maintenance/print-all-posted.ts
  */
 
 import bettersqlite3 from 'better-sqlite3';
@@ -20,7 +20,7 @@ async function run(container: Container) {
     const betterSqlite3 = container.resolve<typeof bettersqlite3>('betterSqlite3');
     const database = betterSqlite3('./db/podcasts.db');
 
-    const rows = database.prepare('SELECT title, url FROM feeds').all();
+    const rows = database.prepare('SELECT feed_id, guid FROM posted').all();
     console.table(rows);
     writeToFile(rows);
 
@@ -28,15 +28,15 @@ async function run(container: Container) {
 }
 
 function writeToFile(rows: any[]) {
-    const outputFile = './src/tools/maintenance/output/all-feeds.csv';
-    const outputData = ['"title","url"'];
+    const outputFile = './src/tools/maintenance/output/all-posted.csv';
+    const outputData = ['"feed_id","guid"'];
 
     for (const row of rows) {
         const object = Object(row);
-        const title = String(object.title).replace('"', '""');
-        const url = String(object.url).replace('"', '""');
+        const feedId = String(object.feed_id).replace('"', '""');
+        const guidList = String(object.guid).replace('"', '""');
 
-        outputData.push(`"${title}","${url}"`);
+        outputData.push(`"${feedId}","${guidList}"`);
     }
 
     fs.writeFileSync(outputFile, outputData.join('\n'), 'utf-8');
