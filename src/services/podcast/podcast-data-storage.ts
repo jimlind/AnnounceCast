@@ -14,7 +14,6 @@ interface PodcastDataStorageInterface {
     getFeedCount(): number;
     getPostedByFeedUrl(url: string): string;
     getChannelsByFeedUrl(url: string): string[];
-    resetAllPostedData(): void;
     close(): void;
 }
 
@@ -149,10 +148,6 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
             .pluck()
             .all(url)
             .map(String);
-    }
-
-    resetAllPostedData() {
-        this.database.prepare("UPDATE posted SET guid = ''").run();
     }
 
     close() {
