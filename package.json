@@ -26,16 +26,15 @@
         "better-sqlite3": "^9.4.3",
         "discord.js": "^14.14.1",
         "dotenv": "^16.4.5",
+        "exit-hook": "^4.0.0",
         "log4js": "^6.9.1",
         "podparse": "^1.6.0",
         "pretty-ms": "^9.0.0",
-        "signal-exit": "^4.1.0",
         "turndown": "^7.1.2"
     },
     "devDependencies": {
         "@types/better-sqlite3": "^7.6.9",
         "@types/node": "^20.11.25",
-        "@types/signal-exit": "^3.0.4",
         "@types/turndown": "^5.0.4",
         "prettier": "^3.2.5",
         "prettier-plugin-organize-imports": "^3.2.4",

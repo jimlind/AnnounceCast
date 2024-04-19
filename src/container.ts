@@ -11,6 +11,7 @@ import {
     REST as DiscordRest,
     Routes as DiscordRoutes,
 } from 'discord.js';
+import exitHook from 'exit-hook';
 import log4js from 'log4js';
 import getPodcastFromFeed from 'podparse';
 import prettyMilliseconds from 'pretty-ms';
@@ -74,6 +75,7 @@ export class Container {
             discordEvents: awilix.asValue(DiscordEvents),
             discordGuildMember: awilix.asValue(DiscordGuildMember),
             discordRest: awilix.asValue(discordRest),
+            exitHook: awilix.asValue(exitHook),
             getPodcastFromFeed: awilix.asValue(getPodcastFromFeed),
             logger: awilix.asValue(logger),
             prettyMilliseconds: awilix.asValue(prettyMilliseconds),
