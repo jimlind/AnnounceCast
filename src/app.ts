@@ -1,115 +1,90 @@
-#!/usr/bin/env node
-
-import { Client as DiscordClient, CommandInteraction } from 'discord.js';
+import exitHook from 'exit-hook';
 import { Logger } from 'log4js';
-import onExit from 'signal-exit';
 import { Container } from './container.js';
-import { Config } from './models/config.js';
-import { Podcast } from './models/podcast.js';
-import { Bot } from './services/bot.js';
-import { DiscordConnection } from './services/discord/discord-connection.js';
-import { DiscordInteractionListener } from './services/discord/discord-interaction-listener';
-import { PodcastDataStorage } from './services/podcast/podcast-data-storage.js';
-import { PodcastHelpers } from './services/podcast/podcast-helpers.js';
-import { PodcastRssProcessor } from './services/podcast/podcast-rss-processor.js';
+import Bot from './services/bot.js';
+import DiscordConnection from './services/discord/discord-connection.js';
+import DiscordInteractionListener from './services/discord/discord-interaction-listener.js';
+import PodcastDataStorage from './services/podcast/podcast-data-storage.js';
+import PodcastHelpers from './services/podcast/podcast-helpers.js';
 
-// Initialize the container
-const container: Container = new Container(process.argv[2] || '');
-container.register().then(() => {
-    // Catch a couple special use cases for now
-    switch (process.argv[3]) {
-        case 'reset-guids':
-            container.resolve<PodcastDataStorage>('podcastDataStorage').resetPostedData();
-            break;
-    }
+const processRestInterval = 10000;
+const feedPageLength = 20;
 
-    // Get a Discord connection to use in the primary loop
-    container
-        .resolve<DiscordConnection>('discordConnection')
-        .getConnectedClient()
-        .then((discordClient: DiscordClient) => {
-            // Log a message on successful connection
-            const serverCount: Number = discordClient.guilds.cache.size;
-            const logger = container.resolve<Logger>('logger');
-            logger.debug(`Discord Client Logged In on ${serverCount} Servers`);
+try {
+    const container = new Container();
+    run(container);
+} catch (error) {
+    console.log('❌ Unable to run Application');
+    console.log(error);
+}
 
-            // Listen for discord interactions and respond
-            const bot = container.resolve<Bot>('bot');
-            container
-                .resolve<DiscordInteractionListener>('discordInteractionListener')
-                .onInteraction((commandInteraction: CommandInteraction) => {
-                    bot.actOnCommandInteraction(commandInteraction);
-                });
+async function run(container: Container) {
+    await container.register();
+    const discordConnection = container.resolve<DiscordConnection>('discordConnection');
+    const discordClient = await discordConnection.getClient();
 
-            // Keeps track of if an active diary entry thread is running
-            let threadRunning: boolean = false;
-            const processRestInterval: number = 10000; // Give it up to 10 second to rest
+    // Setup cleanup for when the application exits
+    const exitHookFunction = container.resolve<typeof exitHook>('exitHook');
+    exitHookFunction((signal) => {
+        console.log(`Program Terminated: ${signal}`);
+        discordClient.destroy();
+        container.resolve<PodcastDataStorage>('podcastDataStorage').close();
+    });
 
-            // Keeps track of the feed pagination that keeps memory from overflowing
-            let feedIndex: number = 0;
-            const feedPaginationLength =
-                container.resolve<Config>('config').feedPaginationLength - 1;
+    // Log number of servers in use
+    const serverCount: Number = discordClient.guilds.cache.size;
+    const logger = container.resolve<Logger>('logger');
+    logger.info(`Discord Client Logged In on ${serverCount} Servers`);
 
-            // Open the database connection
-            const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
-            const startTime = Date.now();
-            const interval = setInterval(() => {
-                // Kill the process if 24 hours have passed regardless of thread status
-                if (Date.now() > startTime + 24 * 60 * 60000) {
-                    logger.info('24 Hour Reset');
-                    return process.exit();
-                }
+    // Listen for discord interactions and respond
+    const discordInteractionListener = container.resolve<DiscordInteractionListener>(
+        'discordInteractionListener',
+    );
+    const bot = container.resolve<Bot>('bot');
+    discordInteractionListener.startListeners(bot.receiveInteraction.bind(bot));
 
-                // Skip the loop if the thread is still running
-                if (threadRunning) {
-                    return;
-                }
+    // Open the database connection
+    const data = container.resolve<PodcastDataStorage>('podcastDataStorage');
+    const startTime = Date.now();
+    let feedPage = 1;
+    const getNewFeeds = async () => {
+        // Kill the process if 24 hours have passed from starting
+        if (Date.now() > startTime + 24 * 60 * 60000) {
+            logger.info('24 Hour Reset');
+            return process.exit();
+        }
 
-                // Indicate that processing has started
-                threadRunning = true;
+        // Get some feeds and reset or increment index as neccesary.
+        const feedUrlList = data.getFeedUrlPage(feedPage, feedPageLength);
+        if (feedUrlList.length === 0) {
+            // Don't exit early here, nothing will happen because the list is empty.
+            feedPage = 1;
+        } else {
+            feedPage++;
+        }
 
-                // Get some feeds but if the list is empty reset the index
-                const feeds = data
-                    .getPostedFeeds()
-                    .slice(feedIndex, feedIndex + feedPaginationLength);
+        // Get the helpers setup
+        const podcastHelpers = container.resolve<PodcastHelpers>('podcastHelpers');
 
-                // Set the index for the next run (reset if the feeds length is zero)
-                feedIndex = feeds.length && feedIndex + feeds.length;
+        // Fetch podcast data for page of feeds
+        const podcastsList = [];
+        for (const feedUrl of feedUrlList) {
+            try {
+                const podcast = await podcastHelpers.getPodcastFromUrl(feedUrl);
+                podcastsList.push(podcast);
+            } catch (error) {}
+        }
 
-                const processor = container.resolve<PodcastRssProcessor>('podcastRssProcessor');
-                const helpers = container.resolve<PodcastHelpers>('podcastHelpers');
-                const bot = container.resolve<Bot>('bot');
+        // Post most recent podcast
+        for (const podcast of podcastsList) {
+            // Send some episode information if there is a new episode
+            if (podcastHelpers.mostRecentPodcastEpisodeIsNew(podcast)) {
+                await bot.sendMostRecentPodcastEpisode(podcast);
+            }
+        }
 
-                // Create list of feed processing promises with noop failures
-                const entryPromiseList = feeds
-                    .map((feedUrl) => processor.process(feedUrl, 1))
-                    .map((p) => p.catch(() => null));
-
-                Promise.all(entryPromiseList)
-                    .then((results) => {
-                        // Filter out invalid results and podcasts without new episodes
-                        const podcasts = results
-                            .filter((result): result is Podcast => !!result)
-                            .filter((podcast) => !helpers.podcastHasLatestEpisode(podcast));
-
-                        // Create list of announcement promises with noop failures
-                        const announcePromiseList = podcasts
-                            .map((podcast) => bot.sendNewEpisodeAnnouncement(podcast))
-                            .filter((result): result is Promise<void> => !!result);
-
-                        return Promise.all(announcePromiseList);
-                    })
-                    .then(() => {
-                        threadRunning = false;
-                    });
-            }, processRestInterval);
-
-            // Clean up when process is told to end
-            onExit((code: any, signal: any) => {
-                clearInterval(interval);
-                discordClient.destroy();
-                container.resolve<PodcastDataStorage>('podcastDataStorage').close();
-                logger.debug(`Program Terminated ${code}:${signal}`);
-            });
-        });
-});
+        // Kick off the process again
+        setTimeout(getNewFeeds, processRestInterval);
+    };
+    setTimeout(getNewFeeds, processRestInterval);
+}
