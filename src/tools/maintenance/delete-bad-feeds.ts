@@ -1,6 +1,5 @@
-#!/usr/bin/env ts-node
 /**
- * Run this command in the terminal for against the local database like this:
+ * Run this command in the terminal against the local database like this:
  * >>> node --loader ts-node/esm src/tools/maintenance/delete-bad-feeds.ts
  */
 

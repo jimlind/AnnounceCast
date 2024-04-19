@@ -1,4 +1,3 @@
-#!/usr/bin/env ts-node
 /**
  * Run this command in the terminal to update the local database like this:
  * >>> node --loader ts-node/esm src/tools/maintenance/add-feed.ts

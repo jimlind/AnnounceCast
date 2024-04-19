@@ -1,4 +1,3 @@
-#!/usr/bin/env ts-node
 /**
  * Run this command in the terminal for prod or dev like this:
  * >>> NODE_ENV=production node --loader ts-node/esm src/tools/app-command/put-application-commands.ts
