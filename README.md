@@ -1,7 +1,9 @@
 # AnnounceCast
 
-A simple Discord Podcasts announcement bot.
-Follows some Podcasts on your server and lets you know when new episodes drop.
+A simple Discord Podcasts announcement bot.  
+Follows some Podcasts on your server and lets you know when new episodes drop.  
+
+![Run NPM Tests](https://github.com/jimlind/AnnounceCast/actions/workflows/run-npm-tests.yml/badge.svg)
 
 ---
 
