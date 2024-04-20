@@ -1,8 +1,8 @@
 import { EmbedBuilder } from 'discord.js';
 import { Episode, Podcast } from 'podparse';
 import prettyMillisecondsFunction from 'pretty-ms';
-import PodcastHelpers from '../../podcast/podcast-helpers';
-import OutgoingMessageHelpers from '../outgoing-message-helpers';
+import PodcastHelpers from '../../podcast/podcast-helpers.js';
+import OutgoingMessageHelpers from '../outgoing-message-helpers.js';
 
 interface EpisodeInfoInterface {
     readonly prettyMilliseconds: typeof prettyMillisecondsFunction;

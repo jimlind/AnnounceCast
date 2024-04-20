@@ -1,7 +1,7 @@
-import PodcastHelpers from './podcast-helpers';
+import PodcastHelpers from './podcast-helpers.js';
 
 interface PodcastAppleAPIProcessorInterface {
-    readonly httpClient: import('../http-client').default;
+    readonly httpClient: import('../http-client.js').default;
     readonly podcastHelpers: PodcastHelpers;
 
     search(searchTerm: string, podcastCount: number): Promise<import('podparse').Podcast[]>;
@@ -9,7 +9,7 @@ interface PodcastAppleAPIProcessorInterface {
 
 export default class PodcastAppleAPIProcessor implements PodcastAppleAPIProcessorInterface {
     constructor(
-        readonly httpClient: import('../http-client').default,
+        readonly httpClient: import('../http-client.js').default,
         readonly podcastHelpers: PodcastHelpers,
     ) {}
 

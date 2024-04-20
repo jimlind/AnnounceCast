@@ -7,7 +7,7 @@ interface DiscordInteractionListenerInterface {
 
 export default class DiscordInteractionListener implements DiscordInteractionListenerInterface {
     constructor(
-        readonly discordConnection: import('./discord-connection').default,
+        readonly discordConnection: import('./discord-connection.js').default,
         readonly discordEvents: typeof import('discord.js').Events,
     ) {}
 

@@ -1,5 +1,5 @@
 import TurndownService from 'turndown';
-import PodcastFeedRow from '../../models/db/podcast-feed-row';
+import PodcastFeedRow from '../../models/db/podcast-feed-row.js';
 
 interface OutgoingMessageHelpersInterface {
     turndownService: TurndownService;

@@ -1,12 +1,12 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, Events } from 'discord.js';
 import { Podcast } from 'podparse';
-import DiscordConnection from './discord/discord-connection';
-import DiscordMessageSender from './discord/discord-message-sender';
-import HttpClient from './http-client';
-import OutgoingMessageFactory from './outgoing-message/outgoing-message-factory';
-import PodcastAppleAPIProcessor from './podcast/podcast-apple-api-processor';
-import PodcastDataStorage from './podcast/podcast-data-storage';
-import PodcastHelpers from './podcast/podcast-helpers';
+import DiscordConnection from './discord/discord-connection.js';
+import DiscordMessageSender from './discord/discord-message-sender.js';
+import HttpClient from './http-client.js';
+import OutgoingMessageFactory from './outgoing-message/outgoing-message-factory.js';
+import PodcastAppleAPIProcessor from './podcast/podcast-apple-api-processor.js';
+import PodcastDataStorage from './podcast/podcast-data-storage.js';
+import PodcastHelpers from './podcast/podcast-helpers.js';
 
 interface BotInterface {
     readonly discordConnection: DiscordConnection;

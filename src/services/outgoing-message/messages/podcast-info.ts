@@ -1,6 +1,6 @@
 import { EmbedBuilder } from 'discord.js';
 import { Podcast } from 'podparse';
-import OutgoingMessageHelpers from '../outgoing-message-helpers';
+import OutgoingMessageHelpers from '../outgoing-message-helpers.js';
 
 interface PodcastInfoInterface {
     build(message: EmbedBuilder, podcast: Podcast): EmbedBuilder;

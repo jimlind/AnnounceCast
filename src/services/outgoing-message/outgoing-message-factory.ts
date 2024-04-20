@@ -1,11 +1,11 @@
 import { EmbedBuilder } from 'discord.js';
 import { Podcast } from 'podparse';
-import PodcastFeedRow from '../../models/db/podcast-feed-row';
-import EpisodeInfo from './messages/episode-info';
-import Followed from './messages/followed';
-import Following from './messages/following';
-import Help from './messages/help';
-import PodcastInfo from './messages/podcast-info';
+import PodcastFeedRow from '../../models/db/podcast-feed-row.js';
+import EpisodeInfo from './messages/episode-info.js';
+import Followed from './messages/followed.js';
+import Following from './messages/following.js';
+import Help from './messages/help.js';
+import PodcastInfo from './messages/podcast-info.js';
 
 interface OutgoingMessageFactoryInterface {
     readonly discordEmbedBuilder: typeof EmbedBuilder;

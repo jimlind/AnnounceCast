@@ -1,6 +1,6 @@
 import { EmbedBuilder } from 'discord.js';
-import PodcastFeedRow from '../../../models/db/podcast-feed-row';
-import OutgoingMessageHelpers from '../outgoing-message-helpers';
+import PodcastFeedRow from '../../../models/db/podcast-feed-row.js';
+import OutgoingMessageHelpers from '../outgoing-message-helpers.js';
 
 interface FollowingInterface {
     readonly outgoingMessageHelpers: OutgoingMessageHelpers;
