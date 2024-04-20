@@ -21,7 +21,7 @@ export default class PodcastHelpers implements PodcastHelpersInterface {
 
     public async getPodcastFromUrl(feedUrl: string): Promise<Podcast> {
         const response = await this.httpClient.get(feedUrl, 5000);
-        const podcast = getPodcastFromFeedFunction(response?.data || '');
+        const podcast = this.getPodcastFromFeed(response?.data || '');
         // meta.importFeedUrl is only officially supported in the SoundOn Namespace, but I find it super useful so I'm using it.
         podcast.meta.importFeedUrl = feedUrl;
 
