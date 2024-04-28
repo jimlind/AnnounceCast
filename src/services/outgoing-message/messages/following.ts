@@ -15,6 +15,8 @@ export default class Following implements FollowingInterface {
         message.setTitle('Podcasts Followed in this Channel');
 
         const gridString = this.outgoingMessageHelpers.feedRowsToGridString(rows);
+        // TODO: This could error out if the gridString is too big
+        // For now we can asssume that most bot users won't have enough podcasts followed that it will cause any problems
         message.setDescription('```\n' + gridString + '\n```');
 
         return message;
