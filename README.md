@@ -10,40 +10,30 @@ Follows some Podcasts on your server and lets you know when new episodes drop.
 
 ---
 
-## Commands
+## [Using the Bot](https://jimlind.github.io/AnnounceCast/)
 
-#### /help
+It is likely that you just want to figure out how to use the bot on your server. The can find [that documentationt here](https://jimlind.github.io/AnnounceCast/).
 
-> View the help message.
+## [Developing the Bot]
 
-#### /find <keywords>
+### Setup
 
-> Replies with up to 4 podcasts matching the search keyword(s)
+Built and tested in Node.js 20 LTS. Other versions will likely work.
 
-#### /following
+#### Create Config Files
 
-> Replies with the list of all podcasts (Ids & Names) followed in this channel
+Create `.env.development` and `.evn.production` files at your project root with some basic bot information.
 
-#### /follow <keywords> 🔒
+```
+DISCORD_BOT_TOKEN_PROD=ABC.123.XZY.098
+DISCORD_CLIENT_ID_PROD=12345678
+```
 
-> Follow a podcast in this channel matching the search keyword(s)
+#### Install Dependencies
 
-#### /follow-rss <feed> 🔒
-
-> Follow a podcast in this channel using an RSS feed
-
-#### /unfollow <id> 🔒
-
-> Unfollow a podcast in this channel using the Podcast Id
-
-#### /play <id>
-
-> Play the most recent episode of a podcast using the Podcast Id
-> This command requires the issuer to be in a voice channel that the bot has permission to join and speak in.
-
-The 🔒 commands are only available to users with Manage Server permissions.
-
-## Use the Hosted Version of the Bot
+```shell
+apt-get install sqlite3 --no-install-recommends
+```
 
 ### Authorize the Bot for Your Server
 
@@ -55,9 +45,7 @@ https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=28
 ```
 70mm             |  https://anchor.fm/s/12d1fabc/podcast/rss
 Bat & Spider     |  https://anchor.fm/s/184b0a38/podcast/rss
-Cinenauts        |  https://anchor.fm/s/3a0acd20/podcast/rss
 Dune Pod         |  https://anchor.fm/s/238d77c8/podcast/rss
-Film Hags        |  https://feeds.simplecast.com/DPfrjtYE
 Lost Light       |  https://anchor.fm/s/3ae14da0/podcast/rss
 Will Run For...  |  https://anchor.fm/s/23694498/podcast/rss
 ```
@@ -68,27 +56,9 @@ AnnounceCast Green is #7ab87a if you want to match a role color for the bot.
 
 ---
 
-## Host Your Own Version of the Bot
-
-### Setup
-
-Create a .env file at your project root with some basic bot information.
-
-```
-DISCORD_BOT_TOKEN_PROD=ABC.123.XZY.098
-DISCORD_CLIENT_ID_PROD=12345678
-```
-
-### Node Dependency
-
-Built and tested in Node.js 16.
-Other versions will likely work.
-
 ### Additional Software Dependencies in Debian Buster
 
 ```shell
-apt-get install autoconf automake build-essential libtool python3 --no-install-recommends
-apt-get install ffmpeg --no-install-recommends
 apt-get install sqlite3 --no-install-recommends
 ```
 
