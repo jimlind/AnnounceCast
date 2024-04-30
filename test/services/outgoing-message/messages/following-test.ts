@@ -21,7 +21,7 @@ describe('Following Class', function () {
         it('should translate row input to description', async function () {
             const mockedOutgoingMessageHelpers = sinon.createStubInstance(OutgoingMessageHelpers);
             const mockEmbed = sinon.createStubInstance(EmbedBuilder);
-            const rowList = [new PodcastFeedRow(randomUUID(), randomUUID())];
+            const rowList = [new PodcastFeedRow(randomUUID(), randomUUID(), randomUUID())];
             const gridString = randomUUID();
 
             mockedOutgoingMessageHelpers.feedRowsToGridString.returns(gridString);

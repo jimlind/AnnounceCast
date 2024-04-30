@@ -93,7 +93,7 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
             )
             .all(channelId)
             .map((dataRow: any) => {
-                return new PodcastFeedRow(dataRow.id || '', dataRow.title || '');
+                return new PodcastFeedRow(dataRow.id || '', dataRow.url || '', dataRow.title || '');
             });
     }
 
@@ -117,7 +117,7 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
             return null;
         }
 
-        return new PodcastFeedRow(data?.id || '', data?.title || '');
+        return new PodcastFeedRow(data?.id || '', data.url || '', data?.title || '');
     }
 
     getFeedCount(): number {
