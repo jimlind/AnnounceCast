@@ -17,7 +17,7 @@ It is likely that you want to figure out how to use my hosted bot on your Discor
 
 ## Hosting Your Own Bot
 
-If you want to host your own version of the bot or use this code as a starting point for building your own bot that's what the rest of the information on this page is about.
+If you want to host your own version of the bot or use this code as a starting point for building your own bot that's what the rest of the information on this page is about. It is extremely unlikely that this is what you are actually looking for. You probably want to click the link in the paragraph above.
 
 ### Setup
 
@@ -38,11 +38,6 @@ DISCORD_CLIENT_ID_PROD=12345678
 > apt-get install sqlite3 --no-install-recommends
 > npm install
 ```
-
-### Authorize the Bot for Your Server
-
-PRODUCTION
-https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=280576&scope=bot%20applications.commands
 
 ### Some Great Podcasts to Experiment With
 
