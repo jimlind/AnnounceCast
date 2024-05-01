@@ -23,7 +23,7 @@ interface OutgoingMessageFactoryInterface {
     buildPodcastInfoMessage(podcast: Podcast): Promise<EmbedBuilder>;
 }
 
-export default class OutgoingMessageFactory {
+export default class OutgoingMessageFactory implements OutgoingMessageFactoryInterface {
     readonly messageColor = 0x7ab87a;
 
     constructor(

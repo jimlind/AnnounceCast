@@ -17,6 +17,12 @@ interface PodcastDataStorageInterface {
     close(): void;
 }
 
+interface FeedRow {
+    id: string;
+    url: string;
+    title: string;
+}
+
 export default class PodcastDataStorage implements PodcastDataStorageInterface {
     private database: BetterSqlite3.Database;
     readonly GUID_LIST_SEPERATOR = '■■■■■■■■■■';
@@ -36,6 +42,18 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
             'CREATE TABLE IF NOT EXISTS posted (feed_id TEXT PRIMARY KEY UNIQUE, guid TEXT)',
         );
     }
+
+    // Type guard to check return type from the database.
+    // This seems terribly inefficiant and the suggestion from the forums seems to be using a library instead
+    isFeedRow = (value: unknown): value is FeedRow =>
+        !!value &&
+        typeof value === 'object' &&
+        'id' in value &&
+        'url' in value &&
+        'title' in value &&
+        typeof (value as FeedRow).id === 'string' &&
+        typeof (value as FeedRow).url === 'string' &&
+        typeof (value as FeedRow).title === 'string';
 
     addFeed(podcast: Podcast, channelId: string): void {
         this.database
@@ -92,7 +110,8 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
                 'SELECT id, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title',
             )
             .all(channelId)
-            .map((dataRow: any) => {
+            .filter(this.isFeedRow)
+            .map((dataRow: FeedRow) => {
                 return new PodcastFeedRow(dataRow.id || '', dataRow.url || '', dataRow.title || '');
             });
     }
@@ -109,11 +128,11 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
     }
 
     getFeedByFeedId(feedId: string): PodcastFeedRow | null {
-        const data: any = this.database
+        const data: unknown = this.database
             .prepare('SELECT id, title FROM feeds WHERE id = ?')
             .all(feedId);
 
-        if (!data) {
+        if (!this.isFeedRow(data)) {
             return null;
         }
 

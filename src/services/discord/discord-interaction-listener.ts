@@ -1,8 +1,10 @@
+import { ChatInputCommandInteraction } from 'discord.js';
+
 interface DiscordInteractionListenerInterface {
     readonly discordConnection: import('./discord-connection.js').default;
     readonly discordEvents: typeof import('discord.js').Events;
 
-    startListeners(callback: Function): void;
+    startListeners(callback: (arg: ChatInputCommandInteraction) => void): void;
 }
 
 export default class DiscordInteractionListener implements DiscordInteractionListenerInterface {
@@ -11,7 +13,7 @@ export default class DiscordInteractionListener implements DiscordInteractionLis
         readonly discordEvents: typeof import('discord.js').Events,
     ) {}
 
-    async startListeners(callback: Function) {
+    async startListeners(callback: (arg: ChatInputCommandInteraction) => void) {
         const discordClient = await this.discordConnection.getClient();
         discordClient.on(this.discordEvents.InteractionCreate, async (interaction) => {
             // Ignore if not an actual command

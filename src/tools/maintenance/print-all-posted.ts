@@ -26,7 +26,7 @@ async function run(container: Container) {
     database.close();
 }
 
-function writeToFile(rows: any[]) {
+function writeToFile(rows: unknown[]) {
     const outputFile = './src/tools/maintenance/output/all-posted.csv';
     const outputData = ['"feed_id","guid"'];
 

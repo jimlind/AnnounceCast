@@ -72,7 +72,10 @@ async function run(container: Container) {
             try {
                 const podcast = await podcastHelpers.getPodcastFromUrl(feedUrl);
                 podcastsList.push(podcast);
-            } catch (error) {}
+            } catch (error) {
+                // Ignore any errors here. It means there was a problem getting the podcast
+                // from the URL. No reason to worry about that. The internet can be fickle.
+            }
         }
 
         // Post most recent podcast

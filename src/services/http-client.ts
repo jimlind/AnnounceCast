@@ -1,20 +1,22 @@
+import { AxiosInstance, AxiosResponse } from 'axios';
+
 interface HttpClientInterface {
-    readonly axios: import('axios').AxiosInstance;
-    get(url: string, timeout: number): Promise<import('axios').AxiosResponse>;
+    readonly axios: AxiosInstance;
+    get(url: string, timeout: number): Promise<AxiosResponse>;
 }
 
-export default class HttpClient {
+export default class HttpClient implements HttpClientInterface {
     readonly headers = { 'User-Agent': 'AnnounceCast Cient' };
 
-    constructor(readonly axios: import('axios').AxiosInstance) {}
+    constructor(readonly axios: AxiosInstance) {}
 
     /**
      * @param {string} url
      * @param {number} timeout
      *
-     * @returns {Promise<import('axios').AxiosResponse>}
+     * @returns {Promise<AxiosResponse>}
      */
-    async get(url: string, timeout: number): Promise<import('axios').AxiosResponse> {
+    async get(url: string, timeout: number): Promise<AxiosResponse> {
         const axiosParams = { signal: AbortSignal.timeout(timeout), headers: this.headers };
         return await this.axios.get(url, axiosParams);
     }
