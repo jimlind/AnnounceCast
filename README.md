@@ -15,7 +15,7 @@ Follows some Podcasts on your server and lets you know when new episodes drop.
 
 It is likely that you want to figure out how to use my hosted bot on your Discord server. You can find [that documentationt here](https://jimlind.github.io/AnnounceCast/).
 
-## [Hosting Your Own Bot]
+## Hosting Your Own Bot
 
 If you want to host your own version of the bot or use this code as a starting point for building your own bot that's what the rest of the information on this page is about.
 
