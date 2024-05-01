@@ -6,8 +6,7 @@ node_modules/
 .env.production
 
 # Sqlite3 Database Files
-db/podcasts.db
-db/servers.db
+db/*.db
 
 # Application Log File
 log/application.log*
