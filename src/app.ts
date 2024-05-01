@@ -32,7 +32,7 @@ async function run(container: Container) {
     });
 
     // Log number of servers in use
-    const serverCount: Number = discordClient.guilds.cache.size;
+    const serverCount: number = discordClient.guilds.cache.size;
     const logger = container.resolve<Logger>('logger');
     logger.info(`Discord Client Logged In on ${serverCount} Servers`);
 
