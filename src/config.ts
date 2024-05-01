@@ -4,13 +4,13 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 interface Config {
     app: {
-        name: string,
-        version: string,
-    }
+        name: string;
+        version: string;
+    };
     discord: {
-        botToken: string,
-        clientId: string,
-    }
+        botToken: string;
+        clientId: string;
+    };
 }
 
 const config: Config = {
@@ -21,7 +21,7 @@ const config: Config = {
     discord: {
         botToken: process.env.DISCORD_BOT_TOKEN || '',
         clientId: process.env.DISCORD_CLIENT_ID || '',
-    }
-}
+    },
+};
 
 export default config;
