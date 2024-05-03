@@ -49,18 +49,6 @@ Lost Light       |  https://anchor.fm/s/3ae14da0/podcast/rss
 Will Run For...  |  https://anchor.fm/s/23694498/podcast/rss
 ```
 
-### Color Codes
-
-AnnounceCast Green is #7ab87a if you want to match a role color for the bot.
-
----
-
-### Additional Software Dependencies in Debian Buster
-
-```shell
-apt-get install sqlite3 --no-install-recommends
-```
-
 ### Install and run as systemd daemon
 
 ```shell
