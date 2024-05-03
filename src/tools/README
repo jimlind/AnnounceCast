@@ -1,0 +1,10 @@
+This folder contains collections of scripts that are run manually.
+Each script has a comment block at the top of the file describing how to run it.
+
+./app-command
+These scripts put and delete the application commands needed to interact with the bot.
+They are only needed if the commands get updated or changed.
+
+./maintenance
+These script are used for any number of one-off tasks. Debugging or migrating data or similar.
+These are probably not needed at all but I prefer to keep them around.
