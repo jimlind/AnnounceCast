@@ -5,18 +5,18 @@ import PodcastHelpers from '../../podcast/podcast-helpers.js';
 import OutgoingMessageHelpers from '../outgoing-message-helpers.js';
 
 interface EpisodeInfoInterface {
-    readonly prettyMilliseconds: typeof prettyMillisecondsFunction;
     readonly outgoingMessageHelpers: OutgoingMessageHelpers;
     readonly podcastHelpers: PodcastHelpers;
+    readonly prettyMilliseconds: typeof prettyMillisecondsFunction;
 
     build(embedBuilder: EmbedBuilder, podcast: Podcast): EmbedBuilder;
 }
 
 export default class EpisodeInfo implements EpisodeInfoInterface {
     constructor(
-        readonly prettyMilliseconds: typeof prettyMillisecondsFunction,
         readonly outgoingMessageHelpers: OutgoingMessageHelpers,
         readonly podcastHelpers: PodcastHelpers,
+        readonly prettyMilliseconds: typeof prettyMillisecondsFunction,
     ) {}
 
     public build(embedBuilder: EmbedBuilder, podcast: Podcast): EmbedBuilder {

@@ -1,6 +1,5 @@
 interface HelpInterface {
     readonly config: typeof import('../../../config.js').default;
-    readonly discordEmbedBuilder: typeof import('discord.js').EmbedBuilder;
     readonly discordConnection: import('../../discord/discord-connection.js').default;
     readonly podcastDataStorage: import('../../podcast/podcast-data-storage.ts').default;
 
@@ -12,7 +11,6 @@ interface HelpInterface {
 export default class Help implements HelpInterface {
     constructor(
         readonly config: typeof import('../../../config.ts').default,
-        readonly discordEmbedBuilder: typeof import('discord.js').EmbedBuilder,
         readonly discordConnection: import('../../discord/discord-connection.ts').default,
         readonly podcastDataStorage: import('../../podcast/podcast-data-storage.ts').default,
     ) {}
