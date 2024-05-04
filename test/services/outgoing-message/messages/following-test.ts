@@ -9,28 +9,28 @@ import OutgoingMessageHelpers from '../../../../src/services/outgoing-message/ou
 describe('Following Class', function () {
     describe('build Method', function () {
         it('should set the title of the embed', async function () {
-            const mockedOutgoingMessageHelpers = sinon.createStubInstance(OutgoingMessageHelpers);
+            const mockOutgoingMessageHelpers = sinon.createStubInstance(OutgoingMessageHelpers);
             const mockEmbed = sinon.createStubInstance(EmbedBuilder);
 
-            const following = new Following(mockedOutgoingMessageHelpers);
+            const following = new Following(mockOutgoingMessageHelpers);
             following.build(mockEmbed, []);
 
             sinon.assert.calledWith(mockEmbed.setTitle, 'Podcasts Followed in this Channel');
         });
 
         it('should translate row input to description', async function () {
-            const mockedOutgoingMessageHelpers = sinon.createStubInstance(OutgoingMessageHelpers);
+            const mockOutgoingMessageHelpers = sinon.createStubInstance(OutgoingMessageHelpers);
             const mockEmbed = sinon.createStubInstance(EmbedBuilder);
             const rowList = [new PodcastFeedRow(randomUUID(), randomUUID(), randomUUID())];
             const gridString = randomUUID();
 
-            mockedOutgoingMessageHelpers.feedRowsToGridString.returns(gridString);
+            mockOutgoingMessageHelpers.feedRowsToGridString.returns(gridString);
 
-            const following = new Following(mockedOutgoingMessageHelpers);
+            const following = new Following(mockOutgoingMessageHelpers);
             following.build(mockEmbed, rowList);
 
             sinon.assert.calledOnceWithExactly(
-                mockedOutgoingMessageHelpers.feedRowsToGridString,
+                mockOutgoingMessageHelpers.feedRowsToGridString,
                 rowList,
             );
             sinon.assert.calledOnceWithExactly(
@@ -40,10 +40,10 @@ describe('Following Class', function () {
         });
 
         it('should return the same embed builder from input', async function () {
-            const mockedOutgoingMessageHelpers = sinon.createStubInstance(OutgoingMessageHelpers);
+            const mockOutgoingMessageHelpers = sinon.createStubInstance(OutgoingMessageHelpers);
             const mockEmbed = sinon.createStubInstance(EmbedBuilder);
 
-            const following = new Following(mockedOutgoingMessageHelpers);
+            const following = new Following(mockOutgoingMessageHelpers);
             const buildReturn = following.build(mockEmbed, []);
 
             assert.strictEqual(mockEmbed, buildReturn);
