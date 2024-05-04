@@ -107,7 +107,7 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
     getFeedsByChannelId(channelId: string): PodcastFeedRow[] {
         return this.database
             .prepare(
-                'SELECT id, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title',
+                "SELECT id, '' as url, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title",
             )
             .all(channelId)
             .filter(this.isFeedRow)
@@ -129,8 +129,8 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
 
     getFeedByFeedId(feedId: string): PodcastFeedRow | null {
         const data: unknown = this.database
-            .prepare('SELECT id, title FROM feeds WHERE id = ?')
-            .all(feedId);
+            .prepare("SELECT id, '' as url, title FROM feeds WHERE id = ?")
+            .get(feedId);
 
         if (!this.isFeedRow(data)) {
             return null;
