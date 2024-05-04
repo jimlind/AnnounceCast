@@ -1,4 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, Events } from 'discord.js';
+import { Logger } from 'log4js';
 import { Podcast } from 'podparse';
 import DiscordConnection from './discord/discord-connection.js';
 import DiscordMessageSender from './discord/discord-message-sender.js';
@@ -13,11 +14,13 @@ interface BotInterface {
     readonly discordEvents: Events;
     readonly discordMessageSender: DiscordMessageSender;
     readonly httpClient: HttpClient;
+    readonly logger: Logger;
     readonly outgoingMessageFactory: OutgoingMessageFactory;
     readonly podcastAppleApiProcessor: PodcastAppleAPIProcessor;
     readonly podcastDataStorage: PodcastDataStorage;
     readonly podcastHelpers: PodcastHelpers;
 
+    sendMostRecentPodcastEpisode(podcast: Podcast): Promise<void>;
     receiveInteraction(interaction: ChatInputCommandInteraction<CacheType>): void;
 }
 
@@ -27,57 +30,64 @@ export default class Bot implements BotInterface {
         readonly discordEvents: Events,
         readonly discordMessageSender: DiscordMessageSender,
         readonly httpClient: HttpClient,
+        readonly logger: Logger,
         readonly outgoingMessageFactory: OutgoingMessageFactory,
         readonly podcastAppleApiProcessor: PodcastAppleAPIProcessor,
         readonly podcastDataStorage: PodcastDataStorage,
         readonly podcastHelpers: PodcastHelpers,
     ) {}
 
-    receiveInteraction(interaction: ChatInputCommandInteraction<CacheType>) {
-        switch (interaction.commandName) {
-            case 'search':
-                this.search(interaction);
-                break;
-            case 'follow':
-                this.follow(interaction);
-                break;
-            case 'follow-rss':
-                this.followRss(interaction);
-                break;
-            case 'unfollow':
-                this.unfollow(interaction);
-                break;
-            case 'following':
-                this.following(interaction);
-                break;
-            default:
-                this.help(interaction);
-                break;
+    async receiveInteraction(interaction: ChatInputCommandInteraction<CacheType>) {
+        try {
+            switch (interaction.commandName) {
+                case 'search':
+                    await this.search(interaction);
+                    break;
+                case 'follow':
+                    await this.follow(interaction);
+                    break;
+                case 'follow-rss':
+                    await this.followRss(interaction);
+                    break;
+                case 'unfollow':
+                    await this.unfollow(interaction);
+                    break;
+                case 'following':
+                    await this.following(interaction);
+                    break;
+                default:
+                    this.help(interaction);
+                    break;
+            }
+        } catch (error) {
+            const title = 'receiveInteraction method failed';
+            this.logger.info(title, { command: interaction.commandName, interaction, error });
+            this.sendErrorToChannel(interaction);
         }
     }
 
     async sendMostRecentPodcastEpisode(podcast: Podcast): Promise<void> {
-        const outgoingMessage = this.outgoingMessageFactory.buildPodcastEpisodeMessage(podcast);
+        try {
+            const outgoingMessage = this.outgoingMessageFactory.buildPodcastEpisodeMessage(podcast);
 
-        const feedUrl = podcast.meta.importFeedUrl || '';
-        const channelList = this.podcastDataStorage.getChannelsByFeedUrl(feedUrl);
-        const mostRecentEpisode = this.podcastHelpers.getMostRecentPodcastEpisode(podcast);
-        for (const channelId of channelList) {
-            await this.sendMessageToChannel(channelId, outgoingMessage);
-            this.podcastDataStorage.updatePostedData(feedUrl, mostRecentEpisode);
+            const feedUrl = podcast.meta.importFeedUrl || '';
+            const channelList = this.podcastDataStorage.getChannelsByFeedUrl(feedUrl);
+            const mostRecentEpisode = this.podcastHelpers.getMostRecentPodcastEpisode(podcast);
+            for (const channelId of channelList) {
+                await this.sendMessageToChannel(channelId, outgoingMessage);
+                this.podcastDataStorage.updatePostedData(feedUrl, mostRecentEpisode);
+            }
+        } catch (error) {
+            const title = 'sendMostRecentPodcastEpisode method failed';
+            this.logger.info(title, { podcast, error });
         }
     }
 
     private async search(interaction: ChatInputCommandInteraction<CacheType>) {
         const searchKeywords = interaction.options.getString('keywords') || '';
         const podcastList = await this.podcastAppleApiProcessor.search(searchKeywords, 4);
-
-        // TODO: Catch if something went wrong.
-        // this.logger.info(`Unable to search on term ${searchKeywords}`);
-        // return this._sendErrorToChannel(commandInteraction);
-
         if (podcastList.length == 0) {
-            interaction.editReply('No podcasts found.');
+            this.sendNoMatchesMessageToChannel(interaction);
             return;
         }
 
@@ -93,24 +103,14 @@ export default class Bot implements BotInterface {
     private async follow(interaction: ChatInputCommandInteraction<CacheType>) {
         const searchKeywords = interaction.options.getString('keywords') || '';
         const podcastList = await this.podcastAppleApiProcessor.search(searchKeywords, 1);
-        this.followPodcastList(interaction, podcastList);
 
-        // TODO: Log on Failure
-        // this.logger.info(`Unable to follow on term ${searchKeywords}`);
-        // return this._sendErrorToChannel(commandInteraction);
+        this.followPodcastList(interaction, podcastList);
     }
 
     private async followRss(interaction: ChatInputCommandInteraction<CacheType>) {
         const feedUrl = interaction.options.getString('feed') || '';
-        const podcastList = [];
-        try {
-            const podcast = await this.podcastHelpers.getPodcastFromUrl(feedUrl);
-            podcastList.push(podcast);
-        } catch (error) {
-            // TODO: Log on Failure
-            // this.logger.info(`Unable to follow on feed ${feedUrl}`);
-            // return this._sendErrorToChannel(commandInteraction);
-        }
+        const podcast = await this.podcastHelpers.getPodcastFromUrl(feedUrl);
+        const podcastList = !podcast ? [] : [podcast];
 
         this.followPodcastList(interaction, podcastList);
     }
@@ -119,7 +119,7 @@ export default class Bot implements BotInterface {
         const feedId = interaction.options.getString('id') || '';
         const feed = this.podcastDataStorage.getFeedByFeedId(feedId);
         if (!feed) {
-            this.sendErrorToChannel(interaction);
+            this.sendNoMatchesMessageToChannel(interaction);
             return;
         }
 
@@ -134,6 +134,8 @@ export default class Bot implements BotInterface {
     private following(interaction: ChatInputCommandInteraction<CacheType>) {
         const feedList = this.podcastDataStorage.getFeedsByChannelId(interaction.channelId);
         const outgoingMessage = this.outgoingMessageFactory.buildFollowingMessage(feedList);
+        // TODO: Split this into multiple messages/embeds so we don't have issues with too large of embeds
+        // being created and not being able to be sent.
         interaction.editReply({ embeds: [outgoingMessage] });
     }
 
@@ -146,8 +148,10 @@ export default class Bot implements BotInterface {
         interaction: ChatInputCommandInteraction<CacheType>,
         podcastList: Podcast[],
     ) {
+        // TODO: This only supports following a list of quantity 1.
         if (podcastList.length !== 1) {
-            return this.sendErrorToChannel(interaction);
+            this.sendNoMatchesMessageToChannel(interaction);
+            return;
         }
         this.podcastDataStorage.addFeed(podcastList[0], interaction.channelId);
         const message = this.outgoingMessageFactory.buildFollowedMessage(
@@ -161,22 +165,27 @@ export default class Bot implements BotInterface {
         channelId: string,
         embedBuilder: EmbedBuilder,
     ): Promise<void> {
-        await this.discordMessageSender.send(channelId, embedBuilder);
+        try {
+            await this.discordMessageSender.send(channelId, embedBuilder);
 
-        // TODO: Log Success
-        // const memory = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + 'MB';
-        // const data = { title: outgoingMessage.title, channelId, memory };
-        // this.logger.info(`Message Send Success: ${JSON.stringify(data)}`);
-
-        // TODO: Log Failure
-        // const data = {
-        //     message: outgoingMessage.toJSON(),
-        //     channelId,
-        //     error,
-        // };
-        // this.logger.error(`Message Send Failure: ${JSON.stringify(data)}`);
-
+            const memory = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + 'MB';
+            this.logger.info('Message Send Success', {
+                title: embedBuilder.data.title,
+                channelId,
+                memory,
+            });
+        } catch (error) {
+            this.logger.error('Message Send Failure', {
+                message: embedBuilder.toJSON(),
+                channelId,
+                error,
+            });
+        }
         return;
+    }
+
+    private sendNoMatchesMessageToChannel(interaction: ChatInputCommandInteraction<CacheType>) {
+        return interaction.editReply('Nothing was found matching your query.');
     }
 
     private sendErrorToChannel(interaction: ChatInputCommandInteraction<CacheType>) {
