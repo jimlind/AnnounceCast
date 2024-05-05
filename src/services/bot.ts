@@ -1,6 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, Events } from 'discord.js';
 import { Logger } from 'log4js';
 import { Podcast } from 'podparse';
+import PodcastFeedRow from '../models/db/podcast-feed-row.js';
 import DiscordConnection from './discord/discord-connection.js';
 import DiscordMessageSender from './discord/discord-message-sender.js';
 import HttpClient from './http-client.js';
@@ -62,7 +63,7 @@ export default class Bot implements BotInterface {
         } catch (error) {
             const title = 'receiveInteraction method failed';
             this.logger.info(title, { command: interaction.commandName, interaction, error });
-            this.sendErrorToChannel(interaction);
+            await this.sendErrorToChannel(interaction);
         }
     }
 
@@ -87,7 +88,7 @@ export default class Bot implements BotInterface {
         const searchKeywords = interaction.options.getString('keywords') || '';
         const podcastList = await this.podcastAppleApiProcessor.search(searchKeywords, 4);
         if (podcastList.length == 0) {
-            this.sendNoMatchesMessageToChannel(interaction);
+            await this.sendNoMatchesMessageToChannel(interaction);
             return;
         }
 
@@ -97,14 +98,14 @@ export default class Bot implements BotInterface {
             embedList.push(embed);
         }
 
-        interaction.editReply({ embeds: embedList });
+        await interaction.editReply({ embeds: embedList });
     }
 
     private async follow(interaction: ChatInputCommandInteraction<CacheType>) {
         const searchKeywords = interaction.options.getString('keywords') || '';
         const podcastList = await this.podcastAppleApiProcessor.search(searchKeywords, 1);
 
-        this.followPodcastList(interaction, podcastList);
+        await this.followPodcastList(interaction, podcastList);
     }
 
     private async followRss(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -112,14 +113,14 @@ export default class Bot implements BotInterface {
         const podcast = await this.podcastHelpers.getPodcastFromUrl(feedUrl);
         const podcastList = !podcast ? [] : [podcast];
 
-        this.followPodcastList(interaction, podcastList);
+        await this.followPodcastList(interaction, podcastList);
     }
 
-    private unfollow(interaction: ChatInputCommandInteraction<CacheType>) {
+    private async unfollow(interaction: ChatInputCommandInteraction<CacheType>) {
         const feedId = interaction.options.getString('id') || '';
         const feed = this.podcastDataStorage.getFeedByFeedId(feedId);
         if (!feed) {
-            this.sendNoMatchesMessageToChannel(interaction);
+            await this.sendNoMatchesMessageToChannel(interaction);
             return;
         }
 
@@ -128,29 +129,56 @@ export default class Bot implements BotInterface {
             feed.title,
             this.podcastDataStorage.getFeedsByChannelId(interaction.channelId),
         );
-        interaction.editReply({ embeds: [message] });
+        await interaction.editReply({ embeds: [message] });
     }
 
-    private following(interaction: ChatInputCommandInteraction<CacheType>) {
+    private async following(interaction: ChatInputCommandInteraction<CacheType>) {
+        // Helper method to validate message is not null and send it
+        const sendMessage = async (message: EmbedBuilder | null) => {
+            if (message) {
+                await this.sendMessageToChannel(interaction.channelId, message);
+            }
+        };
+
         const feedList = this.podcastDataStorage.getFeedsByChannelId(interaction.channelId);
-        const outgoingMessage = this.outgoingMessageFactory.buildFollowingMessage(feedList);
-        // TODO: Split this into multiple messages/embeds so we don't have issues with too large of embeds
-        // being created and not being able to be sent.
-        interaction.editReply({ embeds: [outgoingMessage] });
+        interaction.deleteReply();
+
+        const partialFeedList: PodcastFeedRow[] = [];
+        let message = null;
+        for (let index = 0; index < feedList.length; index++) {
+            partialFeedList.push(feedList[index]);
+            try {
+                // Try to build the message and store it outside the loop for sending
+                message = this.outgoingMessageFactory.buildFollowingMessage(partialFeedList);
+            } catch (error) {
+                const isSetDescriptionError =
+                    error instanceof Error && error.stack?.includes('EmbedBuilder.setDescription');
+                if (isSetDescriptionError) {
+                    // Because building the message failed reset the list, undo increment, and send it
+                    partialFeedList.length = 0;
+                    index--;
+                    await sendMessage(message);
+                } else {
+                    throw error;
+                }
+            }
+        }
+        // Send any lingering messages
+        await sendMessage(message);
     }
 
     private async help(interaction: ChatInputCommandInteraction<CacheType>) {
         const message = await this.outgoingMessageFactory.buildHelpMessage();
-        interaction.editReply({ embeds: [message] });
+        await interaction.editReply({ embeds: [message] });
     }
 
-    private followPodcastList(
+    private async followPodcastList(
         interaction: ChatInputCommandInteraction<CacheType>,
         podcastList: Podcast[],
     ) {
         // TODO: This only supports following a list of quantity 1.
         if (podcastList.length !== 1) {
-            this.sendNoMatchesMessageToChannel(interaction);
+            await this.sendNoMatchesMessageToChannel(interaction);
             return;
         }
         this.podcastDataStorage.addFeed(podcastList[0], interaction.channelId);
@@ -158,7 +186,7 @@ export default class Bot implements BotInterface {
             podcastList[0],
             this.podcastDataStorage.getFeedsByChannelId(interaction.channelId),
         );
-        interaction.editReply({ embeds: [message] });
+        await interaction.editReply({ embeds: [message] });
     }
 
     private async sendMessageToChannel(
