@@ -25,6 +25,12 @@ export default class Followed implements FollowedInterface {
             : podcast.meta.summary;
         const compressedDescription =
             this.outgoingMessageHelpers.compressPodcastDescription(description);
+
+        if (rows.length > 20) {
+            rows = rows.slice(0, 21);
+            rows[20].id = '...   ';
+            rows[20].title = '...';
+        }
         const gridString = this.outgoingMessageHelpers.feedRowsToGridString(rows);
         embedBuilder.setDescription(compressedDescription + '\n\n```\n' + gridString + '\n```');
 

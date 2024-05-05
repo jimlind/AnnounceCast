@@ -18,7 +18,7 @@ export default class OutgoingMessageHelpers implements OutgoingMessageHelpersInt
     public feedRowsToGridString(rows: PodcastFeedRow[]): string {
         const gridRows: Array<string> = ['ID     / TITLE'];
         rows.forEach((row) => {
-            gridRows.push(`${row.id} / ${row.title}`);
+            gridRows.push(`${row.id} / ${row.title.slice(0, 36)}`);
         });
         return gridRows.join('\n');
     }
