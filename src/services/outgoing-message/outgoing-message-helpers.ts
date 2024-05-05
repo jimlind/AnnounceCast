@@ -32,10 +32,15 @@ export default class OutgoingMessageHelpers implements OutgoingMessageHelpersInt
     public compressEpisodeDescription(episodeDescription: string): string {
         const markdown = this.convertTextToMarkdown(episodeDescription);
         // Match all text up to the next new line
-        return markdown.match(/[^\n\r]*/)?.shift() || '';
+        const text = markdown.match(/[^\n\r]*/)?.shift() || '';
+        return text.length > 1024 ? text.substring(0, 1024).trim() + '...' : text;
     }
 
     private convertTextToMarkdown(input: string): string {
+        if (typeof input !== 'string') {
+            return '';
+        }
+
         const stringWithOnlyHtmlBreaks = input.trim().replace(/[\r\n]+/g, '<br>');
         return this.turndownService.turndown(stringWithOnlyHtmlBreaks);
     }

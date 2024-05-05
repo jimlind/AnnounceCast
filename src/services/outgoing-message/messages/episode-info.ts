@@ -21,11 +21,12 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
 
     public build(embedBuilder: EmbedBuilder, podcast: Podcast): EmbedBuilder {
         const episode = this.podcastHelpers.getMostRecentPodcastEpisode(podcast);
+        const footerText = this.footerText(episode);
 
         embedBuilder.setAuthor({
             name: podcast.meta.title,
             iconURL: podcast.meta.image.url,
-            url: podcast.meta.showUrl,
+            url: podcast.meta.link || podcast.meta.showUrl,
         });
         embedBuilder.setTitle(episode.title);
         embedBuilder.setURL(episode.link || null);
@@ -33,7 +34,9 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
             this.outgoingMessageHelpers.compressEpisodeDescription(episode.description),
         );
         embedBuilder.setImage(episode.image?.url || podcast.meta.image.url);
-        embedBuilder.setFooter({ text: this.footerText(episode) });
+        if (footerText) {
+            embedBuilder.setFooter({ text: footerText });
+        }
 
         return embedBuilder;
     }
@@ -47,7 +50,11 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
         episodeText += episode.episode ? `E${episode.episode}` : '';
         footerData.push(episodeText);
 
-        footerData.push(this.prettyMilliseconds(episode.duration * 1000));
+        const duration = Number(episode.duration);
+        if (duration) {
+            footerData.push(this.prettyMilliseconds(episode.duration * 1000));
+        }
+
         footerData.push(episode.explicit ? 'Parental Advisory - Explicit Content' : '');
 
         return footerData.filter(Boolean).join(' | ');

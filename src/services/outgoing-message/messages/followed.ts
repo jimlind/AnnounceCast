@@ -20,9 +20,11 @@ export default class Followed implements FollowedInterface {
         embedBuilder.setTitle('You are now following ' + podcast.meta.title);
         embedBuilder.setThumbnail(podcast.meta.image.url);
 
-        const compressedDescription = this.outgoingMessageHelpers.compressPodcastDescription(
-            podcast.meta.description,
-        );
+        const description = podcast.meta.description
+            ? podcast.meta.description
+            : podcast.meta.summary;
+        const compressedDescription =
+            this.outgoingMessageHelpers.compressPodcastDescription(description);
         const gridString = this.outgoingMessageHelpers.feedRowsToGridString(rows);
         embedBuilder.setDescription(compressedDescription + '\n\n```\n' + gridString + '\n```');
 
