@@ -31,6 +31,7 @@
         "dotenv": "^16.4.5",
         "exit-hook": "^4.0.0",
         "log4js": "^6.9.1",
+        "normalize-url": "^8.0.1",
         "podparse": "^1.6.0",
         "pretty-ms": "^9.0.0",
         "turndown": "^7.1.3"

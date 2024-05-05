@@ -1,10 +1,12 @@
 import { EmbedBuilder } from 'discord.js';
+import normalizeUrlFunction from 'normalize-url';
 import { Episode, Podcast } from 'podparse';
 import prettyMillisecondsFunction from 'pretty-ms';
 import PodcastHelpers from '../../podcast/podcast-helpers.js';
 import OutgoingMessageHelpers from '../outgoing-message-helpers.js';
 
 interface EpisodeInfoInterface {
+    readonly normalizeUrl: typeof normalizeUrlFunction;
     readonly outgoingMessageHelpers: OutgoingMessageHelpers;
     readonly podcastHelpers: PodcastHelpers;
     readonly prettyMilliseconds: typeof prettyMillisecondsFunction;
@@ -14,6 +16,7 @@ interface EpisodeInfoInterface {
 
 export default class EpisodeInfo implements EpisodeInfoInterface {
     constructor(
+        readonly normalizeUrl: typeof normalizeUrlFunction,
         readonly outgoingMessageHelpers: OutgoingMessageHelpers,
         readonly podcastHelpers: PodcastHelpers,
         readonly prettyMilliseconds: typeof prettyMillisecondsFunction,
@@ -22,11 +25,15 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
     public build(embedBuilder: EmbedBuilder, podcast: Podcast): EmbedBuilder {
         const episode = this.podcastHelpers.getMostRecentPodcastEpisode(podcast);
         const footerText = this.footerText(episode);
+        let url;
+        try {
+            url = this.normalizeUrl(podcast.meta.link || podcast.meta.showUrl || '');
+        } catch (error) {}
 
         embedBuilder.setAuthor({
             name: podcast.meta.title,
             iconURL: podcast.meta.image.url,
-            url: podcast.meta.link || podcast.meta.showUrl,
+            url,
         });
         embedBuilder.setTitle(episode.title);
         embedBuilder.setURL(episode.link || null);

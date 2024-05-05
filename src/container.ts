@@ -13,6 +13,7 @@ import {
 } from 'discord.js';
 import exitHook from 'exit-hook';
 import log4js from 'log4js';
+import normalizeUrl from 'normalize-url';
 import getPodcastFromFeed from 'podparse';
 import prettyMilliseconds from 'pretty-ms';
 import TurndownService from 'turndown';
@@ -78,6 +79,7 @@ export class Container {
             exitHook: awilix.asValue(exitHook),
             getPodcastFromFeed: awilix.asValue(getPodcastFromFeed),
             logger: awilix.asValue(logger),
+            normalizeUrl: awilix.asValue(normalizeUrl),
             prettyMilliseconds: awilix.asValue(prettyMilliseconds),
             turndownService: awilix.asValue(turndownService),
         });
