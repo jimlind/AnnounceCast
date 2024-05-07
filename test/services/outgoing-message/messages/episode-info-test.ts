@@ -11,10 +11,12 @@ describe('Episode Info Class', function () {
         it('should set the title of the embed', async function () {
             const title = randomUUID();
 
+            const mockNormalizeUrl = sinon.stub();
             const mockOutgoingMessageHelpers = sinon.createStubInstance(OutgoingMessageHelpers);
             const mockPodcastHelpers = sinon.createStubInstance(PodcastHelpers);
             const mockPrettyMilliseconds = sinon.stub();
             const episodeInfo = new EpisodeInfo(
+                mockNormalizeUrl,
                 mockOutgoingMessageHelpers,
                 mockPodcastHelpers,
                 mockPrettyMilliseconds,
