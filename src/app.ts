@@ -80,9 +80,14 @@ async function run(container: Container) {
 
         // Post most recent podcast
         for (const podcast of podcastsList) {
-            // Send some episode information if there is a new episode
-            if (podcastHelpers.mostRecentPodcastEpisodeIsNew(podcast)) {
-                await bot.sendMostRecentPodcastEpisode(podcast);
+            try {
+                // Send some episode information if there is a new episode
+                if (podcastHelpers.mostRecentPodcastEpisodeIsNew(podcast)) {
+                    await bot.sendMostRecentPodcastEpisode(podcast);
+                }
+            } catch (error) {
+                // This is likely because the podcast doesn't have any episodes
+                logger.error('Unable to send most recent podcast episode', podcast, error);
             }
         }
 
