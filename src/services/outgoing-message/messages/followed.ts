@@ -18,7 +18,7 @@ export default class Followed implements FollowedInterface {
         rows: PodcastFeedRow[],
     ): EmbedBuilder {
         embedBuilder.setTitle('You are now following ' + podcast.meta.title);
-        embedBuilder.setThumbnail(podcast.meta.image.url);
+        embedBuilder.setThumbnail(podcast.meta.image?.url);
 
         const description = podcast.meta.description
             ? podcast.meta.description

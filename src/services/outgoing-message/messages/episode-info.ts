@@ -32,7 +32,7 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
 
         embedBuilder.setAuthor({
             name: podcast.meta.title,
-            iconURL: podcast.meta.image.url,
+            iconURL: podcast.meta.image?.url || undefined,
             url,
         });
         embedBuilder.setTitle(episode.title);
@@ -40,7 +40,7 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
         embedBuilder.setDescription(
             this.outgoingMessageHelpers.compressEpisodeDescription(episode.description),
         );
-        embedBuilder.setImage(episode.image?.url || podcast.meta.image.url);
+        embedBuilder.setImage(episode.image?.url || podcast.meta.image?.url || null);
         if (footerText) {
             embedBuilder.setFooter({ text: footerText });
         }
