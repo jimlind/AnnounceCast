@@ -6,6 +6,7 @@ import Followed from './messages/followed.js';
 import Following from './messages/following.js';
 import Help from './messages/help.js';
 import PodcastInfo from './messages/podcast-info.js';
+import Unfollowed from './messages/unfollowed.js';
 
 interface OutgoingMessageFactoryInterface {
     readonly discordEmbedBuilder: typeof EmbedBuilder;
@@ -14,6 +15,7 @@ interface OutgoingMessageFactoryInterface {
     readonly following: Following;
     readonly help: Help;
     readonly podcastInfo: PodcastInfo;
+    readonly unfollowed: Unfollowed;
 
     buildFollowedMessage(podcast: Podcast, rowList: PodcastFeedRow[]): EmbedBuilder;
     buildUnfollowedMessage(title: string, rowList: PodcastFeedRow[]): EmbedBuilder;
@@ -33,6 +35,7 @@ export default class OutgoingMessageFactory implements OutgoingMessageFactoryInt
         readonly following: Following,
         readonly help: Help,
         readonly podcastInfo: PodcastInfo,
+        readonly unfollowed: Unfollowed,
     ) {}
 
     public buildFollowedMessage(podcast: Podcast, rowList: PodcastFeedRow[]): EmbedBuilder {
@@ -40,13 +43,7 @@ export default class OutgoingMessageFactory implements OutgoingMessageFactoryInt
     }
 
     public buildUnfollowedMessage(title: string, rowList: PodcastFeedRow[]): EmbedBuilder {
-        const outgoingMessage = this.following.build(this.buildBaseMessage(), rowList);
-        outgoingMessage.setTitle('Unfollow Successful');
-        outgoingMessage.setDescription(
-            `You are no longer following **${title}**\n` + outgoingMessage.data.description,
-        );
-
-        return outgoingMessage;
+        return this.unfollowed.build(this.buildBaseMessage(), title, rowList);
     }
 
     public buildFollowingMessage(rowList: PodcastFeedRow[]): EmbedBuilder {

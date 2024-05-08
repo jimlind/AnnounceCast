@@ -15,7 +15,13 @@ export default class OutgoingMessageHelpers implements OutgoingMessageHelpersInt
         this.turndownService = turndownService;
     }
 
-    public feedRowsToGridString(rows: PodcastFeedRow[]): string {
+    public feedRowsToGridString(rows: PodcastFeedRow[], truncate: boolean = false): string {
+        if (truncate && rows.length > 20) {
+            rows = rows.slice(0, 21);
+            rows[20].id = '...   ';
+            rows[20].title = '...';
+        }
+
         const gridRows: Array<string> = ['ID     / TITLE'];
         rows.forEach((row) => {
             gridRows.push(`${row.id} / ${row.title.slice(0, 36)}`);
