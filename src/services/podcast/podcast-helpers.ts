@@ -1,8 +1,10 @@
 import getPodcastFromFeedFunction, { Episode, Podcast } from 'podparse';
+import * as Constants from '../../constants.js';
 import HttpClient from '../http-client.js';
 import PodcastDataStorage from './podcast-data-storage.js';
 
 interface PodcastHelpersInterface {
+    readonly constants: typeof Constants;
     readonly getPodcastFromFeed: typeof getPodcastFromFeedFunction;
     readonly httpClient: HttpClient;
     readonly podcastDataStorage: PodcastDataStorage;
@@ -14,6 +16,7 @@ interface PodcastHelpersInterface {
 
 export default class PodcastHelpers implements PodcastHelpersInterface {
     constructor(
+        readonly constants: typeof Constants,
         readonly getPodcastFromFeed: typeof getPodcastFromFeedFunction,
         readonly httpClient: HttpClient,
         readonly podcastDataStorage: PodcastDataStorage,
@@ -29,15 +32,16 @@ export default class PodcastHelpers implements PodcastHelpersInterface {
     }
 
     public getMostRecentPodcastEpisode(podcast: Podcast): Episode {
+        if (podcast.episodes.length < 1) {
+            throw new Error(this.constants.ERRORS.NO_PODCAST_EPISODES_FOUND_MESSAGE);
+        }
+
+        // Sort so most recent pubDate becomes first (index zero)
         podcast.episodes.sort((a, b) => {
             return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
         });
 
-        const mostRecentEpisode = podcast?.episodes?.[0];
-        if (!mostRecentEpisode) {
-            throw new Error('Error finding most recent episode.');
-        }
-        return mostRecentEpisode;
+        return podcast?.episodes?.[0];
     }
 
     public mostRecentPodcastEpisodeIsNew(podcast: Podcast): boolean {
