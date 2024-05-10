@@ -19,6 +19,7 @@ import prettyMilliseconds from 'pretty-ms';
 import TurndownService from 'turndown';
 import { URL } from 'url';
 import config from './config.js';
+import * as constants from './constants.js';
 
 export class Container {
     container: awilix.AwilixContainer;
@@ -70,6 +71,7 @@ export class Container {
             axios: awilix.asValue(axios),
             betterSqlite3: awilix.asValue(bettersqlite3),
             config: awilix.asValue(config),
+            constants: awilix.asValue(constants),
             discordClient: awilix.asValue(discordClient),
             discordCommandRoutes: awilix.asValue(discordCommandRoutes),
             discordEmbedBuilder: awilix.asValue(DiscordEmbedBuilder),
