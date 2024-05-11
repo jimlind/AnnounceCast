@@ -19,7 +19,7 @@ export default class PodcastInfo implements PodcastInfoInterface {
     }
 
     private getDescription(podcast: Podcast): string {
-        const compressedDescription = this.outgoingMessageHelpers.compressPodcastDescription(
+        const compressedDescription = this.outgoingMessageHelpers.formatPodcastDescription(
             podcast.meta.description,
         );
 

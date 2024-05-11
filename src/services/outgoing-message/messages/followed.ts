@@ -24,7 +24,7 @@ export default class Followed implements FollowedInterface {
             ? podcast.meta.description
             : podcast.meta.summary;
         const compressedDescription =
-            this.outgoingMessageHelpers.compressPodcastDescription(description);
+            this.outgoingMessageHelpers.formatPodcastDescription(description);
 
         const gridString = this.outgoingMessageHelpers.feedRowsToGridString(rows, true);
         embedBuilder.setDescription(compressedDescription + '\n\n```\n' + gridString + '\n```');

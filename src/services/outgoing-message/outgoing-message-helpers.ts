@@ -5,7 +5,7 @@ interface OutgoingMessageHelpersInterface {
     turndownService: TurndownService;
 
     feedRowsToGridString(rows: PodcastFeedRow[]): string;
-    compressPodcastDescription(podcastDescription: string): string;
+    formatPodcastDescription(podcastDescription: string): string;
     compressEpisodeDescription(episodeDescription: string): string;
 }
 
@@ -29,10 +29,16 @@ export default class OutgoingMessageHelpers implements OutgoingMessageHelpersInt
         return gridRows.join('\n');
     }
 
-    public compressPodcastDescription(podcastDescription: string): string {
+    public formatPodcastDescription(podcastDescription: string): string {
+        // Convert things to markdown for cleanliness before formatting
         const markdown = this.convertTextToMarkdown(podcastDescription);
+
+        // Discord actively tries to prevent phishing attempts by not allowing the link text to look like a URL
+        // To avoid how silly this looks we'll replace that markdown with just the URL
+        const cleanedLinks = markdown.replace(/\[http.*?\]\((.+?)\)/g, '$1');
+
         // Consolidate multiple new lines by replacing duplicate whitespace characters with empty string
-        return markdown.replace(/^\s*\n/gm, '');
+        return cleanedLinks.replace(/^\s*\n/gm, '');
     }
 
     public compressEpisodeDescription(episodeDescription: string): string {
