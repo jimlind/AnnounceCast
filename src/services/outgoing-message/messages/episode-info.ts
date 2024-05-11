@@ -28,7 +28,9 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
         let url;
         try {
             url = this.normalizeUrl(podcast.meta.link || podcast.meta.showUrl || '');
-        } catch (error) {}
+        } catch (error) {
+            // Do nothing. Default to undefined.
+        }
 
         embedBuilder.setAuthor({
             name: podcast.meta.title,
