@@ -110,11 +110,6 @@ export default class Bot implements BotInterface {
         const podcastList = await this.podcastAppleApiProcessor.search(searchKeywords, 1);
 
         await this.followPodcastList(interaction, podcastList);
-        // TODO: Fix this so it doesn't break other things.
-        // https://github.com/jimlind/AnnounceCast/issues/7
-        for (const podcast of podcastList) {
-            await this.sendMostRecentPodcastEpisode(podcast, interaction.channelId);
-        }
     }
 
     private async followRss(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -123,11 +118,6 @@ export default class Bot implements BotInterface {
         const podcastList = !podcast ? [] : [podcast];
 
         await this.followPodcastList(interaction, podcastList);
-        // TODO: Fix this so it doesn't break other things.
-        // https://github.com/jimlind/AnnounceCast/issues/7
-        for (const podcast of podcastList) {
-            await this.sendMostRecentPodcastEpisode(podcast, interaction.channelId);
-        }
     }
 
     private async unfollow(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -201,6 +191,14 @@ export default class Bot implements BotInterface {
             this.podcastDataStorage.getFeedsByChannelId(interaction.channelId),
         );
         await interaction.editReply({ embeds: [message] });
+
+        // Post most recent episode after follow has completed
+        for (const podcast of podcastList) {
+            // If the most recent episode is old only post to the channel the follow request came from
+            const recentEpisodeIsOld = !this.podcastHelpers.mostRecentPodcastEpisodeIsNew(podcast);
+            const channelInput = recentEpisodeIsOld ? interaction.channelId : '';
+            await this.sendMostRecentPodcastEpisode(podcast, channelInput);
+        }
     }
 
     private async sendMessageToChannel(
