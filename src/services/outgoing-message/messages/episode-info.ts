@@ -35,10 +35,12 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
             iconURL: podcast.meta.image?.url || undefined,
             url,
         });
-        embedBuilder.setTitle(episode.title);
+        embedBuilder.setTitle(episode.title || '-');
         embedBuilder.setURL(episode.link || null);
         embedBuilder.setDescription(
-            this.outgoingMessageHelpers.compressEpisodeDescription(episode.description),
+            this.outgoingMessageHelpers.compressEpisodeDescription(
+                episode.description || episode.title || '-',
+            ),
         );
         embedBuilder.setImage(episode.image?.url || podcast.meta.image?.url || null);
         if (footerText) {
