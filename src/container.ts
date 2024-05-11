@@ -65,7 +65,7 @@ export class Container {
             },
         });
         const logger = log4js.getLogger();
-        const turndownService = new TurndownService();
+        const turndownService = new TurndownService({ hr: '\n' });
 
         this.container.register({
             axios: awilix.asValue(axios),
