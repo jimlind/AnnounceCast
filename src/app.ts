@@ -1,5 +1,6 @@
 import exitHook from 'exit-hook';
 import { Logger } from 'log4js';
+import * as Constants from './constants.js';
 import { Container } from './container.js';
 import Bot from './services/bot.js';
 import DiscordConnection from './services/discord/discord-connection.js';
@@ -20,6 +21,7 @@ try {
 
 async function run(container: Container) {
     await container.register();
+    const constants = container.resolve<typeof Constants>('constants');
     const discordConnection = container.resolve<DiscordConnection>('discordConnection');
     const discordClient = await discordConnection.getClient();
 
@@ -86,8 +88,14 @@ async function run(container: Container) {
                     await bot.sendMostRecentPodcastEpisode(podcast);
                 }
             } catch (error) {
-                // This is likely because the podcast doesn't have any episodes
-                logger.error('Unable to send most recent podcast episode', podcast, error);
+                if (
+                    error instanceof Error &&
+                    error.message === constants.ERRORS.NO_PODCAST_EPISODES_FOUND_MESSAGE
+                ) {
+                    logger.info(`No Episodes Found for "${podcast.meta.title}""`);
+                } else {
+                    logger.error('Unable to send most recent podcast episode', podcast, error);
+                }
             }
         }
 
