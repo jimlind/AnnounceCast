@@ -19,12 +19,12 @@ export default class PodcastInfo implements PodcastInfoInterface {
     }
 
     private getDescription(podcast: Podcast): string {
-        const compressedDescription = this.outgoingMessageHelpers.formatPodcastDescription(
+        const formattedDescription = this.outgoingMessageHelpers.formatPodcastDescription(
             podcast.meta.description,
         );
 
         return (
-            compressedDescription +
+            formattedDescription +
             '\n\n' +
             `Show Feed URL: ${podcast.meta.importFeedUrl}` +
             '\n' +
