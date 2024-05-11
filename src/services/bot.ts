@@ -21,7 +21,7 @@ interface BotInterface {
     readonly podcastDataStorage: PodcastDataStorage;
     readonly podcastHelpers: PodcastHelpers;
 
-    sendMostRecentPodcastEpisode(podcast: Podcast): Promise<void>;
+    sendMostRecentPodcastEpisode(podcast: Podcast, channelId: string | undefined): Promise<void>;
     receiveInteraction(interaction: ChatInputCommandInteraction<CacheType>): void;
 }
 
@@ -67,12 +67,16 @@ export default class Bot implements BotInterface {
         }
     }
 
-    async sendMostRecentPodcastEpisode(podcast: Podcast): Promise<void> {
+    async sendMostRecentPodcastEpisode(podcast: Podcast, channelInput: string = ''): Promise<void> {
         try {
             const outgoingMessage = this.outgoingMessageFactory.buildPodcastEpisodeMessage(podcast);
-
             const feedUrl = podcast.meta.importFeedUrl || '';
-            const channelList = this.podcastDataStorage.getChannelsByFeedUrl(feedUrl);
+
+            let channelList = [channelInput];
+            if (!channelInput) {
+                channelList = this.podcastDataStorage.getChannelsByFeedUrl(feedUrl);
+            }
+
             const mostRecentEpisode = this.podcastHelpers.getMostRecentPodcastEpisode(podcast);
             for (const channelId of channelList) {
                 await this.sendMessageToChannel(channelId, outgoingMessage);
@@ -106,6 +110,11 @@ export default class Bot implements BotInterface {
         const podcastList = await this.podcastAppleApiProcessor.search(searchKeywords, 1);
 
         await this.followPodcastList(interaction, podcastList);
+        // TODO: Fix this so it doesn't break other things.
+        // https://github.com/jimlind/AnnounceCast/issues/7
+        for (const podcast of podcastList) {
+            await this.sendMostRecentPodcastEpisode(podcast, interaction.channelId);
+        }
     }
 
     private async followRss(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -114,6 +123,11 @@ export default class Bot implements BotInterface {
         const podcastList = !podcast ? [] : [podcast];
 
         await this.followPodcastList(interaction, podcastList);
+        // TODO: Fix this so it doesn't break other things.
+        // https://github.com/jimlind/AnnounceCast/issues/7
+        for (const podcast of podcastList) {
+            await this.sendMostRecentPodcastEpisode(podcast, interaction.channelId);
+        }
     }
 
     private async unfollow(interaction: ChatInputCommandInteraction<CacheType>) {
