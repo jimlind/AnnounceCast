@@ -1,7 +1,7 @@
 interface HelpInterface {
     readonly config: typeof import('../../../config.js').default;
     readonly discordConnection: import('../../discord/discord-connection.js').default;
-    readonly podcastDataStorage: import('../../podcast/podcast-data-storage.ts').default;
+    readonly podcastDataStorage: import('../../podcast/podcast-data-storage.js').default;
 
     build(
         embedBuilder: import('discord.js').EmbedBuilder,
@@ -10,9 +10,9 @@ interface HelpInterface {
 
 export default class Help implements HelpInterface {
     constructor(
-        readonly config: typeof import('../../../config.ts').default,
-        readonly discordConnection: import('../../discord/discord-connection.ts').default,
-        readonly podcastDataStorage: import('../../podcast/podcast-data-storage.ts').default,
+        readonly config: typeof import('../../../config.js').default,
+        readonly discordConnection: import('../../discord/discord-connection.js').default,
+        readonly podcastDataStorage: import('../../podcast/podcast-data-storage.js').default,
     ) {}
 
     public async build(embedBuilder: import('discord.js').EmbedBuilder) {
@@ -24,26 +24,29 @@ export default class Help implements HelpInterface {
         embedBuilder.setURL('https://jimlind.github.io/AnnounceCast/');
         embedBuilder.setDescription(`Tracking ${feedCount} podcasts on ${serverCount} servers.`);
         embedBuilder.addFields(
-            { name: '/help', value: 'View this help message' },
-            {
-                name: '/find <keywords>',
-                value: 'Replies with up to 4 podcasts matching the search keyword(s)',
-            },
-            {
-                name: '/following',
-                value: 'Replies with the list of all podcasts (Ids & Names) followed in this channel',
-            },
             {
                 name: '/follow <keywords> 🔒',
-                value: 'Follow a podcast in this channel matching the search keyword(s)',
+                value: 'Follow a podcast in the channel matching the search keyword(s)',
             },
             {
                 name: '/follow-rss <feed> 🔒',
-                value: 'Follow a podcast in this channel using an RSS feed',
+                value: 'Follow a podcast in the channel using an RSS feed',
             },
             {
                 name: '/unfollow <id> 🔒',
-                value: 'Unfollow a podcast in this channel using the Podcast Id',
+                value: 'Unfollow a podcast in the channel using a Podcast Id',
+            },
+            {
+                name: '/following',
+                value: 'Display a list of all podcasts followed in the channel',
+            },
+            {
+                name: '/search <keywords>',
+                value: 'Display up to 4 podcasts matching the search keyword(s)',
+            },
+            {
+                name: '/help [test]',
+                value: 'Display this help message, optionally sending test messages',
             },
         );
         embedBuilder.addFields(

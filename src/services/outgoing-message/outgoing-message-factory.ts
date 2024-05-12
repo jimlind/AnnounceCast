@@ -4,6 +4,7 @@ import PodcastFeedRow from '../../models/db/podcast-feed-row.js';
 import EpisodeInfo from './messages/episode-info.js';
 import Followed from './messages/followed.js';
 import Following from './messages/following.js';
+import HelpTests from './messages/help-tests.js';
 import Help from './messages/help.js';
 import PodcastInfo from './messages/podcast-info.js';
 import Unfollowed from './messages/unfollowed.js';
@@ -15,12 +16,14 @@ interface OutgoingMessageFactoryInterface {
     readonly following: Following;
     readonly help: Help;
     readonly podcastInfo: PodcastInfo;
+    readonly helpTests: HelpTests;
     readonly unfollowed: Unfollowed;
 
     buildFollowedMessage(podcast: Podcast, rowList: PodcastFeedRow[]): EmbedBuilder;
     buildUnfollowedMessage(title: string, rowList: PodcastFeedRow[]): EmbedBuilder;
     buildFollowingMessage(rowList: PodcastFeedRow[]): EmbedBuilder;
     buildHelpMessage(): Promise<EmbedBuilder>;
+    buildHelpTestMessageList(): EmbedBuilder[];
     buildPodcastEpisodeMessage(podcast: Podcast): EmbedBuilder;
     buildPodcastInfoMessage(podcast: Podcast): Promise<EmbedBuilder>;
 }
@@ -35,6 +38,7 @@ export default class OutgoingMessageFactory implements OutgoingMessageFactoryInt
         readonly following: Following,
         readonly help: Help,
         readonly podcastInfo: PodcastInfo,
+        readonly helpTests: HelpTests,
         readonly unfollowed: Unfollowed,
     ) {}
 
@@ -50,16 +54,20 @@ export default class OutgoingMessageFactory implements OutgoingMessageFactoryInt
         return this.following.build(this.buildBaseMessage(), rowList);
     }
 
-    public async buildHelpMessage(): Promise<EmbedBuilder> {
-        return await this.help.build(this.buildBaseMessage());
+    public async buildPodcastInfoMessage(podcast: Podcast): Promise<EmbedBuilder> {
+        return this.podcastInfo.build(this.buildBaseMessage(), podcast);
     }
 
     public buildPodcastEpisodeMessage(podcast: Podcast): EmbedBuilder {
         return this.episodeInfo.build(this.buildBaseMessage(), podcast);
     }
 
-    public async buildPodcastInfoMessage(podcast: Podcast): Promise<EmbedBuilder> {
-        return this.podcastInfo.build(this.buildBaseMessage(), podcast);
+    public async buildHelpMessage(): Promise<EmbedBuilder> {
+        return await this.help.build(this.buildBaseMessage());
+    }
+
+    public buildHelpTestMessageList(): EmbedBuilder[] {
+        return this.helpTests.build(this.buildBaseMessage.bind(this));
     }
 
     private buildBaseMessage() {

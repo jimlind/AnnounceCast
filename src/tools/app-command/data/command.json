@@ -1,17 +1,4 @@
 [
-    { "name": "help", "description": "Replies with a some helpful information and links" },
-    {
-        "name": "search",
-        "description": "Replies with up to 4 podcasts matching the search keyword(s)",
-        "options": [
-            {
-                "name": "keywords",
-                "description": "Keyword(s) used to find podcasts",
-                "type": 3,
-                "required": true
-            }
-        ]
-    },
     {
         "name": "follow",
         "description": "Follow a podcast in this channel matching the search keyword(s)",
@@ -54,5 +41,29 @@
     {
         "name": "following",
         "description": "Replies with the list of all podcasts (Ids & Names) followed in this channel"
+    },
+    {
+        "name": "search",
+        "description": "Replies with up to 4 podcasts matching the search keyword(s)",
+        "options": [
+            {
+                "name": "keywords",
+                "description": "Keyword(s) used to find podcasts",
+                "type": 3,
+                "required": true
+            }
+        ]
+    },
+    {
+        "name": "help",
+        "description": "Replies with a some helpful information and links",
+        "options": [
+            {
+                "name": "test",
+                "description": "Sends a series of test messages to validate permissions",
+                "type": 5,
+                "required": false
+            }
+        ]
     }
 ]

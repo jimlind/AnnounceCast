@@ -1,25 +1,24 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, Events } from 'discord.js';
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { Logger } from 'log4js';
 import { Podcast } from 'podparse';
 import PodcastFeedRow from '../models/db/podcast-feed-row.js';
-import DiscordConnection from './discord/discord-connection.js';
 import DiscordMessageSender from './discord/discord-message-sender.js';
-import HttpClient from './http-client.js';
+import HelpCommand from './interaction-command/commands/help-command.js';
+import SearchCommand from './interaction-command/commands/search-command.js';
 import OutgoingMessageFactory from './outgoing-message/outgoing-message-factory.js';
 import PodcastAppleAPIProcessor from './podcast/podcast-apple-api-processor.js';
 import PodcastDataStorage from './podcast/podcast-data-storage.js';
 import PodcastHelpers from './podcast/podcast-helpers.js';
 
 interface BotInterface {
-    readonly discordConnection: DiscordConnection;
-    readonly discordEvents: Events;
     readonly discordMessageSender: DiscordMessageSender;
-    readonly httpClient: HttpClient;
+    readonly helpCommand: HelpCommand;
     readonly logger: Logger;
     readonly outgoingMessageFactory: OutgoingMessageFactory;
     readonly podcastAppleApiProcessor: PodcastAppleAPIProcessor;
     readonly podcastDataStorage: PodcastDataStorage;
     readonly podcastHelpers: PodcastHelpers;
+    readonly searchCommand: SearchCommand;
 
     sendMostRecentPodcastEpisode(podcast: Podcast, channelId: string | undefined): Promise<void>;
     receiveInteraction(interaction: ChatInputCommandInteraction<CacheType>): void;
@@ -27,22 +26,21 @@ interface BotInterface {
 
 export default class Bot implements BotInterface {
     constructor(
-        readonly discordConnection: DiscordConnection,
-        readonly discordEvents: Events,
         readonly discordMessageSender: DiscordMessageSender,
-        readonly httpClient: HttpClient,
+        readonly helpCommand: HelpCommand,
         readonly logger: Logger,
         readonly outgoingMessageFactory: OutgoingMessageFactory,
         readonly podcastAppleApiProcessor: PodcastAppleAPIProcessor,
         readonly podcastDataStorage: PodcastDataStorage,
         readonly podcastHelpers: PodcastHelpers,
+        readonly searchCommand: SearchCommand,
     ) {}
 
     async receiveInteraction(interaction: ChatInputCommandInteraction<CacheType>) {
         try {
             switch (interaction.commandName) {
                 case 'search':
-                    await this.search(interaction);
+                    await this.searchCommand.execute(interaction);
                     break;
                 case 'follow':
                     await this.follow(interaction);
@@ -57,7 +55,7 @@ export default class Bot implements BotInterface {
                     await this.following(interaction);
                     break;
                 default:
-                    this.help(interaction);
+                    this.helpCommand.execute(interaction);
                     break;
             }
         } catch (error) {
@@ -86,23 +84,6 @@ export default class Bot implements BotInterface {
             const title = 'sendMostRecentPodcastEpisode method failed';
             this.logger.info(title, { podcast, error });
         }
-    }
-
-    private async search(interaction: ChatInputCommandInteraction<CacheType>) {
-        const searchKeywords = interaction.options.getString('keywords') || '';
-        const podcastList = await this.podcastAppleApiProcessor.search(searchKeywords, 4);
-        if (podcastList.length == 0) {
-            await this.sendNoMatchesMessageToChannel(interaction);
-            return;
-        }
-
-        const embedList = [];
-        for (const podcast of podcastList) {
-            const embed = await this.outgoingMessageFactory.buildPodcastInfoMessage(podcast);
-            embedList.push(embed);
-        }
-
-        await interaction.editReply({ embeds: embedList });
     }
 
     private async follow(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -169,11 +150,6 @@ export default class Bot implements BotInterface {
         }
         // Send any lingering messages
         await sendMessage(message);
-    }
-
-    private async help(interaction: ChatInputCommandInteraction<CacheType>) {
-        const message = await this.outgoingMessageFactory.buildHelpMessage();
-        await interaction.editReply({ embeds: [message] });
     }
 
     private async followPodcastList(
