@@ -5,12 +5,15 @@ interface PodcastFetchInterface {
 export default class PodcastFetch implements PodcastFetchInterface {
     public async getPartialPodcastStringFromUrl(feedUrl: string, timeout: number): Promise<string> {
         const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+            controller.abort();
+        }, timeout);
 
-        // TODO: Add Timeout
-        // TODO: Add Header  //// headers = { 'User-Agent': 'AnnounceCast Cient' };
-        console.log(timeout);
+        const response = await fetch(feedUrl, {
+            headers: { 'User-Agent': 'AnnounceCast Cient' },
+            signal: controller.signal,
+        });
 
-        const response = await fetch(feedUrl, { signal: controller.signal });
         const streamReader = response.body?.getReader();
         if (!streamReader) {
             return '';
@@ -23,6 +26,8 @@ export default class PodcastFetch implements PodcastFetchInterface {
             resultString += decoder.decode(resultChunk.value);
 
             if (this.firstPubDatesAreSequential(resultString)) {
+                clearTimeout(timeoutId);
+
                 // This feels a little sketchy to abort the controller and return but it works.
                 controller.abort();
                 return this.cleanPartialPodcastFeed(resultString);
@@ -30,6 +35,7 @@ export default class PodcastFetch implements PodcastFetchInterface {
 
             resultChunk = await streamReader.read();
         }
+        clearTimeout(timeoutId);
 
         return resultString;
     }

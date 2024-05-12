@@ -23,9 +23,17 @@ export default class PodcastHelpers implements PodcastHelpersInterface {
     ) {}
 
     public async getPodcastFromUrl(feedUrl: string): Promise<Podcast> {
-        const xmlString = await this.podcastFetch.getPartialPodcastStringFromUrl(feedUrl, 5000);
+        let xmlString = '';
+        try {
+            xmlString = await this.podcastFetch.getPartialPodcastStringFromUrl(feedUrl, 5000);
+        } catch (error) {
+            // The partial podcast method throws an error if it timesout. Putting an empty string here means
+            // that other processes will fail appropriatly
+        }
+
         const podcast = this.getPodcastFromFeed(xmlString);
-        // meta.importFeedUrl is only officially supported in the SoundOn Namespace, but I find it super useful so I'm using it.
+        // meta.importFeedUrl is only officially supported in the SoundOn Namespace, but I find it super useful
+        // so I'm using it.
         podcast.meta.importFeedUrl = feedUrl;
 
         return podcast;
