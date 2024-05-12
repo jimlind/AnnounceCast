@@ -1,13 +1,13 @@
 import getPodcastFromFeedFunction, { Episode, Podcast } from 'podparse';
 import * as Constants from '../../constants.js';
-import HttpClient from '../http-client.js';
 import PodcastDataStorage from './podcast-data-storage.js';
+import PodcastFetch from './podcast-fetch.js';
 
 interface PodcastHelpersInterface {
     readonly constants: typeof Constants;
     readonly getPodcastFromFeed: typeof getPodcastFromFeedFunction;
-    readonly httpClient: HttpClient;
     readonly podcastDataStorage: PodcastDataStorage;
+    readonly podcastFetch: PodcastFetch;
 
     getPodcastFromUrl(url: string): Promise<Podcast>;
     getMostRecentPodcastEpisode(podcast: Podcast): Episode;
@@ -18,13 +18,13 @@ export default class PodcastHelpers implements PodcastHelpersInterface {
     constructor(
         readonly constants: typeof Constants,
         readonly getPodcastFromFeed: typeof getPodcastFromFeedFunction,
-        readonly httpClient: HttpClient,
         readonly podcastDataStorage: PodcastDataStorage,
+        readonly podcastFetch: PodcastFetch,
     ) {}
 
     public async getPodcastFromUrl(feedUrl: string): Promise<Podcast> {
-        const response = await this.httpClient.get(feedUrl, 5000);
-        const podcast = this.getPodcastFromFeed(response?.data || '');
+        const xmlString = await this.podcastFetch.getPartialPodcastStringFromUrl(feedUrl, 5000);
+        const podcast = this.getPodcastFromFeed(xmlString);
         // meta.importFeedUrl is only officially supported in the SoundOn Namespace, but I find it super useful so I'm using it.
         podcast.meta.importFeedUrl = feedUrl;
 
