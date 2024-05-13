@@ -1,0 +1,15 @@
+[Unit]
+Description=AnnounceCast Discord Bot
+Documentation=https://github.com/jimlind/AnnounceCast
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/AnnounceCast
+ExecStart=npm run production --prefix /opt/AnnounceCast
+Restart=always
+RestartSec=360
+
+[Install]
+WantedBy=multi-user.target
