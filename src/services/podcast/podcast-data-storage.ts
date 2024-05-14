@@ -29,6 +29,7 @@ export default class PodcastDataStorage implements PodcastDataStorageInterface {
 
     constructor(betterSqlite3: typeof BetterSqlite3.default) {
         this.database = betterSqlite3('./db/podcasts.db');
+        this.setup();
     }
 
     setup() {
