@@ -5,9 +5,10 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
+Environment=NODE_VERSION=20
 WorkingDirectory=/opt/AnnounceCast
-ExecStart=npm run production --prefix /opt/AnnounceCast
+ExecStart=/home/discord/.nvm/nvm-exec npm run production
+User=discord
 Restart=always
 RestartSec=360
 
