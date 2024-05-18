@@ -8,7 +8,7 @@ import DiscordInteractionListener from './services/discord/discord-interaction-l
 import PodcastDataStorage from './services/podcast/podcast-data-storage.js';
 import PodcastHelpers from './services/podcast/podcast-helpers.js';
 
-const processRestInterval = 10000;
+const processRestInterval = 30000;
 const feedPageLength = 20;
 
 try {
@@ -50,9 +50,9 @@ async function run(container: Container) {
     const startTime = Date.now();
     let feedPage = 1;
     const getNewFeeds = async () => {
-        // Kill the process if 24 hours have passed from starting
-        if (Date.now() > startTime + 24 * 60 * 60000) {
-            logger.info('24 Hour Reset');
+        // Kill the process if 72 hours have passed from starting
+        if (Date.now() > startTime + 72 * 60 * 60000) {
+            logger.info('72 Hour Reset');
             return process.exit();
         }
 
