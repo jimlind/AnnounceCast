@@ -5,6 +5,7 @@ import { Container } from './container.js';
 import Bot from './services/bot.js';
 import DiscordConnection from './services/discord/discord-connection.js';
 import DiscordInteractionListener from './services/discord/discord-interaction-listener.js';
+import DiscordMessageSender from './services/discord/discord-message-sender.js';
 import PodcastDataStorage from './services/podcast/podcast-data-storage.js';
 import PodcastHelpers from './services/podcast/podcast-helpers.js';
 
@@ -65,8 +66,10 @@ async function run(container: Container) {
             feedPage++;
         }
 
-        // Get the helpers setup
+        // Get the dependencies setup
         const podcastHelpers = container.resolve<PodcastHelpers>('podcastHelpers');
+        const discordMessageSender =
+            container.resolve<DiscordMessageSender>('discordMessageSender');
 
         // Fetch podcast data for page of feeds
         const podcastsList = [];
@@ -85,7 +88,7 @@ async function run(container: Container) {
             try {
                 // Send some episode information if there is a new episode
                 if (podcastHelpers.mostRecentPodcastEpisodeIsNew(podcast)) {
-                    await bot.sendMostRecentPodcastEpisode(podcast);
+                    await discordMessageSender.sendMostRecentPodcastEpisode(podcast);
                 }
             } catch (error) {
                 if (

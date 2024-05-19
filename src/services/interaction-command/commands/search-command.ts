@@ -1,14 +1,10 @@
 import { CacheType, ChatInputCommandInteraction } from 'discord.js';
-import { Logger } from 'log4js';
 import DiscordMessageSender from '../../discord/discord-message-sender.js';
 import OutgoingMessageFactory from '../../outgoing-message/outgoing-message-factory.js';
 import PodcastAppleAPIProcessor from '../../podcast/podcast-apple-api-processor.js';
-import CommandHelpers from '../command-helpers.js';
 
 interface SearchCommandInterface {
-    readonly commandHelpers: CommandHelpers;
     readonly discordMessageSender: DiscordMessageSender;
-    readonly logger: Logger;
     readonly outgoingMessageFactory: OutgoingMessageFactory;
     readonly podcastAppleApiProcessor: PodcastAppleAPIProcessor;
 
@@ -17,9 +13,7 @@ interface SearchCommandInterface {
 
 export default class SearchCommand implements SearchCommandInterface {
     constructor(
-        readonly commandHelpers: CommandHelpers,
         readonly discordMessageSender: DiscordMessageSender,
-        readonly logger: Logger,
         readonly outgoingMessageFactory: OutgoingMessageFactory,
         readonly podcastAppleApiProcessor: PodcastAppleAPIProcessor,
     ) {}
@@ -28,7 +22,7 @@ export default class SearchCommand implements SearchCommandInterface {
         const searchKeywords = interaction.options.getString('keywords') || '';
         const podcastList = await this.podcastAppleApiProcessor.search(searchKeywords, 4);
         if (podcastList.length == 0) {
-            await this.commandHelpers.sendNoMatchesMessageAsReply(interaction);
+            await this.discordMessageSender.sendNoMatchesMessageAsReply(interaction);
             return;
         }
 

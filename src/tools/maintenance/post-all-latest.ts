@@ -6,8 +6,8 @@
 
 import bettersqlite3 from 'better-sqlite3';
 import { Container } from '../../container.js';
-import Bot from '../../services/bot.js';
 import DiscordConnection from '../../services/discord/discord-connection.js';
+import DiscordMessageSender from '../../services/discord/discord-message-sender.js';
 import PodcastHelpers from '../../services/podcast/podcast-helpers.js';
 
 try {
@@ -22,7 +22,7 @@ async function run(container: Container) {
     await container.register();
 
     const betterSqlite3 = container.resolve<typeof bettersqlite3>('betterSqlite3');
-    const bot = container.resolve<Bot>('bot');
+    const discordMessageSender = container.resolve<DiscordMessageSender>('discordMessageSender');
     const podcastHelpers = container.resolve<PodcastHelpers>('podcastHelpers');
 
     const database = betterSqlite3('./db/podcasts.db');
@@ -30,7 +30,7 @@ async function run(container: Container) {
 
     for (const feedUrl of feedUrlList) {
         const podcast = await podcastHelpers.getPodcastFromUrl(feedUrl);
-        await bot.sendMostRecentPodcastEpisode(podcast);
+        await discordMessageSender.sendMostRecentPodcastEpisode(podcast);
     }
 
     database.close();
