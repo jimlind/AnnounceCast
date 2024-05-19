@@ -8,7 +8,7 @@ import fs from 'fs';
 import { Container } from '../../container.js';
 
 const outputFile = `./src/tools/maintenance/output/deleted-unused-feeds-${Date.now()}.csv`;
-const dryRun = false;
+const dryRun = true;
 
 try {
     console.log('--------------------');
