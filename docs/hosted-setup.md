@@ -76,6 +76,8 @@ sudo systemctl start announcecast
 sudo systemctl status announcecast
 # Stop system service
 sudo systemctl stop announcecast
+# Watch live logs from AnnounceCast
+tail -f /opt/app/discord.podcasts/log/application.log
 ```
 
 ## Observability
