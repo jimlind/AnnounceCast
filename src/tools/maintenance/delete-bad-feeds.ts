@@ -4,8 +4,12 @@
  */
 
 import bettersqlite3 from 'better-sqlite3';
+import fs from 'fs';
 import { Container } from '../../container.js';
 import PodcastHelpers from '../../services/podcast/podcast-helpers.js';
+
+const outputFile = `./src/tools/maintenance/output/deleted-bad-feeds-${Date.now()}.csv`;
+const dryRun = true;
 
 try {
     console.log('--------------------');
@@ -23,38 +27,62 @@ async function run(container: Container) {
     const podcastHelpers = container.resolve<PodcastHelpers>('podcastHelpers');
 
     const database = betterSqlite3('./db/podcasts.db');
-    const badFeedIdList = await getBadFeedIdList(database, podcastHelpers);
-    for (const feedId of badFeedIdList) {
-        deleteBadData(database, feedId);
-    }
+    let urlList = database.prepare('SELECT url FROM feeds').pluck().all().map(String);
 
-    database.close();
-}
+    for (let index = 0; index < 10; index++) {
+        console.log(`${urlList.length} podcasts to check`);
 
-async function getBadFeedIdList(
-    database: bettersqlite3.Database,
-    podcastHelpers: PodcastHelpers,
-): Promise<string[]> {
-    const rows = database.prepare('SELECT id, url FROM feeds').all().map(Object);
-    const badFeedIdList = [];
-    for (const row of rows) {
-        try {
-            const podcast = await podcastHelpers.getPodcastFromUrl(row?.url || '');
-            if (!podcast.episodes.length) {
-                throw new Error('No Episodes in Podcast');
+        const badUrlList = [];
+        for (const url of urlList) {
+            if (!(await isGoodFeedUrl(String(url), podcastHelpers))) {
+                badUrlList.push(url);
             }
-        } catch (error) {
-            badFeedIdList.push(row?.id || '');
         }
+        urlList = badUrlList;
+        process.stdout.write('\n');
     }
-    return badFeedIdList;
+
+    purgeFeeds(urlList, database);
+    database.close();
+
+    process.exit();
 }
 
-function deleteBadData(database: bettersqlite3.Database, feedId: string) {
-    const postedResult = database.prepare('DELETE FROM posted WHERE feed_id = ?').run(feedId);
-    const channelsResult = database.prepare('DELETE FROM channels WHERE feed_id = ?').run(feedId);
-    const feedsResult = database.prepare('DELETE FROM feeds WHERE id = ?').run(feedId);
+async function isGoodFeedUrl(url: string, podcastHelpers: PodcastHelpers): Promise<boolean> {
+    try {
+        const podcast = await podcastHelpers.getPodcastFromUrl(url);
+        if (!podcast.episodes.length) {
+            throw new Error('No Episodes in Podcast');
+        }
+        process.stdout.write('.');
+        return true;
+    } catch (error) {
+        process.stdout.write('X');
+    }
+    return false;
+}
 
-    const changes = postedResult.changes + channelsResult.changes + feedsResult.changes;
-    console.log(`🚮 ${changes}x changes for feed ${feedId}`);
+async function purgeFeeds(urlList: string[], database: bettersqlite3.Database) {
+    for (const url of urlList) {
+        const feedId = database.prepare('SELECT id FROM feeds WHERE url = ?').pluck().get(url);
+        const channelList = database
+            .prepare('SELECT channel_id FROM channels WHERE feed_id = ?')
+            .pluck()
+            .all(feedId)
+            .map(String);
+        fs.appendFileSync(outputFile, `"${url}","${channelList.join('|')}"\n`, 'utf-8');
+
+        let postedResult, channelsResult, feedsResult;
+        if (!dryRun) {
+            postedResult = database.prepare('DELETE FROM posted WHERE feed_id = ?').run(feedId);
+            channelsResult = database.prepare('DELETE FROM channels WHERE feed_id = ?').run(feedId);
+            feedsResult = database.prepare('DELETE FROM feeds WHERE id = ?').run(feedId);
+        }
+
+        const changes =
+            (postedResult?.changes || 0) +
+            (channelsResult?.changes || 0) +
+            (feedsResult?.changes || 0);
+        console.log(`🚮 ${changes}x changes for feed ${feedId}`);
+    }
 }
