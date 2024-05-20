@@ -20,6 +20,7 @@ try {
     console.log('❌ Unable to run command');
     console.log(error);
 }
+process.exit();
 
 async function run(container: Container) {
     await container.register();
@@ -30,7 +31,7 @@ async function run(container: Container) {
     let urlList = database.prepare('SELECT url FROM feeds').pluck().all().map(String);
 
     for (let index = 0; index < 10; index++) {
-        console.log(`${urlList.length} podcasts to check`);
+        process.stdout.write(`${urlList.length} podcasts to check - `);
 
         const badUrlList = [];
         for (const url of urlList) {
@@ -44,8 +45,6 @@ async function run(container: Container) {
 
     purgeFeeds(urlList, database);
     database.close();
-
-    process.exit();
 }
 
 async function isGoodFeedUrl(url: string, podcastHelpers: PodcastHelpers): Promise<boolean> {
@@ -57,7 +56,7 @@ async function isGoodFeedUrl(url: string, podcastHelpers: PodcastHelpers): Promi
         process.stdout.write('.');
         return true;
     } catch (error) {
-        process.stdout.write('X');
+        process.stdout.write('✗');
     }
     return false;
 }

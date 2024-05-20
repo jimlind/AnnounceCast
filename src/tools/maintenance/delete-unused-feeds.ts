@@ -19,6 +19,7 @@ try {
     console.log('❌ Unable to run command');
     console.log(error);
 }
+process.exit();
 
 async function run(container: Container) {
     await container.register();
@@ -33,8 +34,6 @@ async function run(container: Container) {
 
     purgeFeeds(urlList, database);
     database.close();
-
-    process.exit();
 }
 
 async function purgeFeeds(urlList: string[], database: bettersqlite3.Database) {
