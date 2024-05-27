@@ -14,5 +14,7 @@
         "skipLibCheck": true,
         "moduleResolution": "node16"
     },
+    "files": ["src/@types/index.d.ts"],
+    "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "test", "eslint.config.js"]
 }

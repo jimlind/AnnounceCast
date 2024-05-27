@@ -40,7 +40,7 @@ export default class EpisodeInfo implements EpisodeInfoInterface {
         embedBuilder.setTitle(episode.title || '-');
         embedBuilder.setURL(episode.link || null);
         embedBuilder.setDescription(
-            this.outgoingMessageHelpers.compressEpisodeDescription(
+            this.outgoingMessageHelpers.formatEpisodeDescription(
                 episode.description || episode.title || '-',
             ),
         );

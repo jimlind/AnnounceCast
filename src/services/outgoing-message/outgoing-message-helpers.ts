@@ -1,19 +1,21 @@
+import TruncateMarkdown from 'markdown-truncate';
 import TurndownService from 'turndown';
 import PodcastFeedRow from '../../models/db/podcast-feed-row.js';
 
 interface OutgoingMessageHelpersInterface {
+    truncateMarkdown: typeof TruncateMarkdown;
     turndownService: TurndownService;
 
     feedRowsToGridString(rows: PodcastFeedRow[]): string;
     formatPodcastDescription(podcastDescription: string): string;
-    compressEpisodeDescription(episodeDescription: string): string;
+    formatEpisodeDescription(episodeDescription: string): string;
 }
 
 export default class OutgoingMessageHelpers implements OutgoingMessageHelpersInterface {
-    turndownService: TurndownService;
-    constructor(turndownService: TurndownService) {
-        this.turndownService = turndownService;
-    }
+    constructor(
+        readonly truncateMarkdown: typeof TruncateMarkdown,
+        readonly turndownService: TurndownService,
+    ) {}
 
     public feedRowsToGridString(rows: PodcastFeedRow[], truncate: boolean = false): string {
         if (truncate && rows.length > 20) {
@@ -26,34 +28,54 @@ export default class OutgoingMessageHelpers implements OutgoingMessageHelpersInt
         rows.forEach((row) => {
             gridRows.push(`${row.id} / ${row.title.slice(0, 36)}`);
         });
+
         return gridRows.join('\n');
     }
 
     public formatPodcastDescription(podcastDescription: string): string {
-        // Convert things to markdown for cleanliness before formatting
-        const markdown = this.convertTextToMarkdown(podcastDescription);
+        const markdown = this.convertHtmlToMarkdown(podcastDescription);
+
+        return this.shortenMarkdown(markdown);
+    }
+
+    public formatEpisodeDescription(episodeDescription: string): string {
+        const markdown = this.convertHtmlToMarkdown(episodeDescription);
+        // Match all text up to the next new line
+        const firstParagraph = markdown.match(/[^\n\r]*/)?.shift() || '';
+
+        return this.shortenMarkdown(firstParagraph);
+    }
+
+    private convertHtmlToMarkdown(input: string): string {
+        // Make all line breaks consistent
+        const stringWithOnlyHtmlBreaks = input.trim().replace(/[\r\n]+/g, '<br>');
+        const markdown = this.turndownService.turndown(stringWithOnlyHtmlBreaks);
+
+        // Consolidate multiple new lines by replacing duplicate whitespace characters with empty string
+        const cleanedLineBreaks = markdown.replace(/^\s*\n/gm, '');
 
         // Discord actively tries to prevent phishing attempts by not allowing the link text to look like a URL
         // To avoid how silly this looks we'll replace that markdown with just the URL
-        const cleanedLinks = markdown.replace(/\[http.*?\]\((.+?)\)/g, '$1');
+        const cleanedLinks = cleanedLineBreaks.replace(/\[http.*?\]\((.+?)\)/g, '$1');
 
-        // Consolidate multiple new lines by replacing duplicate whitespace characters with empty string
-        return cleanedLinks.replace(/^\s*\n/gm, '');
+        return cleanedLinks;
     }
 
-    public compressEpisodeDescription(episodeDescription: string): string {
-        const markdown = this.convertTextToMarkdown(episodeDescription);
-        // Match all text up to the next new line
-        const text = markdown.match(/[^\n\r]*/)?.shift() || '';
-        return text.length > 1024 ? text.substring(0, 1024).trim() + '...' : text;
-    }
+    private shortenMarkdown(inputText: string, length: number = 1024): string {
+        const options = { limit: length, ellipsis: true };
+        let truncated = this.truncateMarkdown(inputText, options);
 
-    private convertTextToMarkdown(input: string): string {
-        if (typeof input !== 'string') {
-            return '';
+        // The truncateMarkdown method truncates for display text but we are more concerned with actual
+        // character count because we can't send too many total characters in a message.
+        if (truncated.length > length) {
+            const matchedPartialLinkFormats = [...truncated.matchAll(/]\(.*?\)/g)];
+            const linkFormatLength = matchedPartialLinkFormats.reduce((accumulator, current) => {
+                return accumulator + current[0].length + 1;
+            }, 0);
+            options.limit = length > linkFormatLength ? length - linkFormatLength : 1;
+            truncated = this.truncateMarkdown(inputText, options);
         }
 
-        const stringWithOnlyHtmlBreaks = input.trim().replace(/[\r\n]+/g, '<br>');
-        return this.turndownService.turndown(stringWithOnlyHtmlBreaks);
+        return truncated;
     }
 }
