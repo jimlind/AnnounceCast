@@ -1,9 +1,10 @@
 # Hosted Setup
 
-It is hosted on a small VPS on https://crunchbits.com running Ubuntu 22 LTS.  
-VPS has 1 CPU Core, 1.5 GB RAM, 40 GB SSD Storage, and an IPv4 address.
+This document mostly serves as a record for myself so that I don't have to try to remember everything. Maybe other people might get some value from it, but that seems extremely doubtful.
 
-I tried my best to get things in the right order and have sudo in the right place, but I probably screwed up some of these directions because I was going fast.
+It is hosted on a small VPS on https://crunchbits.com running Ubuntu 22 LTS. VPS has 1 CPU Core, 1.5 GB RAM, 40 GB SSD Storage, and an IPv4 address. I got it from a sale thread on https://lowendtalk.com/ when my previous host went under. The VPS has plenty of power for what I need and a bonux that when I use up my allocated bandwidth for a month Crunchbits doesn't shut me down but deprioritizes my traffic. Perfect for what I need.
+
+I tried my best to get things in the right order and have sudo in the right place, but I probably screwed up some of these directions. 🤷
 
 ## Install Ubuntu 22 System Dependency
 
@@ -94,7 +95,12 @@ tail -f /opt/app/discord.podcasts/log/application.log
 
 ### Grafana
 
-I thought about this for a while, but eventually decided to stop thinking and take advantage of Grafana Cloud. Grafana Alloy is the current supported and suggested client so I installed it. Still not sure how to see all the things that I need but I followed the documentes to set things up and it seems to work pretty well.
+I thought about this for a while, but eventually decided to stop thinking and take advantage of free tier of Grafana Cloud. That limits the length of time and quantity of logs they'll keep but for this project I'm well inside the limits of what they offer.
+
+The [config.alloy](config.alloy) file here contains mostly default configs. Values marked with `$$$$ grafana_value $$$$` need to be replace with values from your Grafana configs. There are articles with some additional information about the config here:
+
+-   https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-linux-node/
+-   https://www.andreacasarin.com/2024/5/4/grafana-agent-meets-alloy.html.
 
 ## Development Version of the Bot
 
