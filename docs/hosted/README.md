@@ -97,10 +97,25 @@ tail -f /opt/app/discord.podcasts/log/application.log
 
 I thought about this for a while, but eventually decided to stop thinking and take advantage of free tier of Grafana Cloud. That limits the length of time and quantity of logs they'll keep but for this project I'm well inside the limits of what they offer.
 
-The [config.alloy](config.alloy) file here contains mostly default configs. Values marked with `$$$$ grafana_value $$$$` need to be replace with values from your Grafana configs. There are articles with some additional information about the config here:
+You should start with the "Get Started" documebntation here https://grafana.com/docs/alloy/latest/get-started/run/linux/.
+
+The [config.alloy](config.alloy) file here contains mostly default configs. Values marked with `$$$$ grafana_value $$$$` need to be replace with values from your Grafana configs. The file in question in stored in `/etc/alloy/config.alloy` on a normal linux system. There are articles with some additional information about the config here:
 
 -   https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-linux-node/
 -   https://www.andreacasarin.com/2024/5/4/grafana-agent-meets-alloy.html.
+
+### Trying to Figure Out "Matches" in loki.souce.journal
+
+Documentation is here: https://grafana.com/docs/alloy/latest/reference/components/loki.source.journal/
+PR for code change (and tests) is here: https://github.com/grafana/agent/pull/2825/files
+
+From looking at the code and the test I sorted out that the intent is that the the format is FIELD=value but I couldn't really tell what it wanted in either of those fields. Through a bunch of trial and error I was able to sort out that it wants something like the string below. It has been commited to my reference config.alloy file.
+
+```
+matches = "_SYSTEMD_UNIT=announcecast.service"
+```
+
+When I get my real blog running I need to create an article about this because it wasn't really documented anywhere.
 
 ## Development Version of the Bot
 

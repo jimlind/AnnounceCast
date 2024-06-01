@@ -115,6 +115,7 @@ loki.source.journal "logs_integrations_integrations_node_exporter_journal_scrape
   max_age       = "24h0m0s"
   relabel_rules = discovery.relabel.logs_integrations_integrations_node_exporter_journal_scrape.rules
   forward_to    = [loki.write.grafana_cloud_loki.receiver]
+  matches       = "_SYSTEMD_UNIT=announcecast.service"
 }
 
 discovery.relabel "logs_integrations_integrations_node_exporter_journal_scrape" {
