@@ -49,6 +49,22 @@ export class Container {
             },
         });
 
+        // A logger layout that ignores anything that isn't the first argument
+        log4js.addLayout('simple', () => {
+            return (event) => `${event?.startTime} ${event?.level?.levelStr}  ${event?.data?.[0]}`;
+        });
+
+        // A logger layout that writes things to standard JSON blobs
+        log4js.addLayout('json', () => {
+            return (event) =>
+                JSON.stringify({
+                    timestamp: event?.startTime,
+                    message: event?.data?.[0],
+                    ...event,
+                    data: event?.data?.[1],
+                });
+        });
+
         // Create logger
         log4js.configure({
             appenders: {
@@ -58,8 +74,9 @@ export class Container {
                     maxLogSize: 10485760,
                     backups: 3,
                     compress: true,
+                    layout: { type: 'json' },
                 },
-                out: { type: 'stdout' },
+                out: { type: 'stdout', layout: { type: 'simple' } },
             },
             categories: {
                 default: { appenders: ['log_to_file', 'out'], level: 'debug' },
