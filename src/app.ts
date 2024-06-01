@@ -51,9 +51,10 @@ async function run(container: Container) {
     const startTime = Date.now();
     let feedPage = 1;
     const getNewFeeds = async () => {
-        // Kill the process if 72 hours have passed from starting
-        if (Date.now() > startTime + 72 * 60 * 60000) {
-            logger.info('72 Hour Reset');
+        const hourResetValue = 72;
+        // Kill the process some hours have passed from starting
+        if (Date.now() > startTime + hourResetValue * 60 * 60000) {
+            logger.info(`${hourResetValue} Hour Reset to Avoid Process from Going Rogue`);
             return process.exit();
         }
 
@@ -91,13 +92,21 @@ async function run(container: Container) {
                     await discordMessageSender.sendMostRecentPodcastEpisode(podcast);
                 }
             } catch (error) {
+                const title = podcast?.meta?.title;
+                const data = {
+                    error,
+                    title,
+                    feed: podcast.meta.importFeedUrl,
+                    episodeLength: podcast.episodes.length,
+                };
+
                 if (
                     error instanceof Error &&
                     error.message === constants.ERRORS.NO_PODCAST_EPISODES_FOUND_MESSAGE
                 ) {
-                    logger.info(`No Episodes Found for "${podcast.meta.title}""`);
+                    logger.info(`No Episodes Found for Podcast: "${title}"`, data);
                 } else {
-                    logger.error('Unable to send most recent podcast episode', podcast, error);
+                    logger.error(`Error Sending Latest Episode for Podcast: "${title}"`, data);
                 }
             }
         }

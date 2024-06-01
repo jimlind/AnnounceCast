@@ -46,7 +46,7 @@ export default class DiscordMessageSender implements DiscordMessageSenderInterfa
                 this.podcastDataStorage.updatePostedData(feedUrl, mostRecentEpisode);
             }
         } catch (error) {
-            const title = 'sendMostRecentPodcastEpisode method failed';
+            const title = `Method 'sendMostRecentPodcastEpisode' Failed for Podcast: ${podcast?.meta.title}`;
             this.logger.info(title, { podcast, error });
         }
     }
@@ -57,17 +57,10 @@ export default class DiscordMessageSender implements DiscordMessageSenderInterfa
     ): Promise<void> {
         try {
             await this.send(channelId, embedBuilder);
-
-            const memory = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + 'MB';
-            this.logger.info('Message Send Success', {
-                title: embedBuilder.data.title,
-                channelId,
-                memory,
-            });
+            this.logger.info(`Message Send Success  [${channelId}} | ${embedBuilder.data.title}]`);
         } catch (error) {
-            this.logger.error('Message Send Failure', {
+            this.logger.error(`Message Send Failure  [${channelId}} |${embedBuilder.data.title}]`, {
                 message: embedBuilder.toJSON(),
-                channelId,
                 error,
             });
         }

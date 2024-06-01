@@ -1,5 +1,4 @@
 import { CacheType, ChatInputCommandInteraction } from 'discord.js';
-import { Logger } from 'log4js';
 import { Podcast } from 'podparse';
 import DiscordMessageSender from '../discord/discord-message-sender.js';
 import OutgoingMessageFactory from '../outgoing-message/outgoing-message-factory.js';
@@ -8,7 +7,6 @@ import PodcastHelpers from '../podcast/podcast-helpers.js';
 
 interface CommandHelpersInterface {
     readonly discordMessageSender: DiscordMessageSender;
-    readonly logger: Logger;
     readonly outgoingMessageFactory: OutgoingMessageFactory;
     readonly podcastDataStorage: PodcastDataStorage;
     readonly podcastHelpers: PodcastHelpers;
@@ -22,7 +20,6 @@ interface CommandHelpersInterface {
 export default class CommandHelpers implements CommandHelpersInterface {
     constructor(
         readonly discordMessageSender: DiscordMessageSender,
-        readonly logger: Logger,
         readonly outgoingMessageFactory: OutgoingMessageFactory,
         readonly podcastDataStorage: PodcastDataStorage,
         readonly podcastHelpers: PodcastHelpers,
