@@ -71,6 +71,7 @@ export class Container {
                 log_to_file: {
                     type: 'file',
                     filename: 'log/application.log',
+                    mode: 0o644,
                     maxLogSize: 10485760,
                     backups: 3,
                     compress: true,

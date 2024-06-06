@@ -104,6 +104,16 @@ The [config.alloy](config.alloy) file here contains mostly default configs. Valu
 -   https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-linux-node/
 -   https://www.andreacasarin.com/2024/5/4/grafana-agent-meets-alloy.html.
 
+### Logging Permission in Grafana Alloy
+
+The important thing is that logs are set to allow all to read all the way up the parent chain. The `/opt/` directory should be that way but we want to make sure the rest are as well.
+
+```shell
+sudo chmod a+rx /opt/AnnounceCast
+sudo chmod a+rx /opt/AnnounceCast/log
+sudo chmod 644 /opt/AnnounceCast/log/*
+```
+
 ### Trying to Figure Out "Matches" in loki.souce.journal
 
 Documentation is here: https://grafana.com/docs/alloy/latest/reference/components/loki.source.journal/

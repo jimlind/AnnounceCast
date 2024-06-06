@@ -118,6 +118,15 @@ loki.source.journal "logs_integrations_integrations_node_exporter_journal_scrape
   matches       = "_SYSTEMD_UNIT=announcecast.service"
 }
 
+local.file_match "logs_integrations_integrations_node_exporter_direct_scrape" {
+  path_targets = [{
+    __address__ = "localhost",
+    __path__    = "/opt/AnnounceCast/log/application.log",
+    instance    = constants.hostname,
+    job         = "integrations/node_exporter",
+  }]
+}
+
 discovery.relabel "logs_integrations_integrations_node_exporter_journal_scrape" {
   targets = []
 
@@ -140,4 +149,9 @@ discovery.relabel "logs_integrations_integrations_node_exporter_journal_scrape" 
     source_labels = ["__journal_priority_keyword"]
     target_label  = "level"
   }
+}
+
+loki.source.file "logs_integrations_integrations_node_exporter_direct_scrape" {
+  targets    = local.file_match.logs_integrations_integrations_node_exporter_direct_scrape.targets
+  forward_to = [loki.write.grafana_cloud_loki.receiver]
 }
