@@ -10,8 +10,15 @@ import fs from 'fs';
 import { Container } from '../../container.js';
 import DiscordConnection from '../../services/discord/discord-connection.js';
 
-const outputFile = `./src/tools/maintenance/output/deleted-bad-channels-${Date.now()}.csv`;
+const outputFolder = './src/tools/maintenance/output';
+const outputFile = `${outputFolder}/deleted-bad-channels-${Date.now()}.csv`;
 const dryRun = true;
+
+try {
+    fs.mkdirSync(outputFolder);
+} catch (e) {
+    // Do nothing output folder exists
+}
 
 try {
     console.log('--------------------');
