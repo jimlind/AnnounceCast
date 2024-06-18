@@ -1,4 +1,11 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, TextChannel } from 'discord.js';
+import {
+    BaseGuildTextChannel,
+    CacheType,
+    ChatInputCommandInteraction,
+    EmbedBuilder,
+    PermissionsBitField,
+    ThreadChannel,
+} from 'discord.js';
 import { Logger } from 'log4js';
 import { Podcast } from 'podparse';
 import OutgoingMessageFactory from '../outgoing-message/outgoing-message-factory.js';
@@ -81,13 +88,31 @@ export default class DiscordMessageSender implements DiscordMessageSenderInterfa
         const discordClient = await this.discordConnection.getClient();
         const channel = discordClient.channels.cache.find((ch) => ch.id === channelId);
 
-        if (!(channel instanceof TextChannel)) {
+        // This covers all the current text channels
+        if (!(channel instanceof BaseGuildTextChannel) && !(channel instanceof ThreadChannel)) {
             return false;
         }
+
         const botPermissions = channel.permissionsFor(discordClient.user || '');
-        if (!botPermissions?.has(['ViewChannel', 'SendMessages', 'EmbedLinks'])) {
+        // Check that the bot has some ability to send messages
+        if (
+            !botPermissions?.has(PermissionsBitField.Flags.SendMessages) &&
+            !botPermissions?.has(PermissionsBitField.Flags.SendMessagesInThreads)
+        ) {
             return false;
         }
+
+        // Check that the bot has can view the channel and embed links
+        if (
+            !botPermissions?.has([
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.EmbedLinks,
+            ])
+        ) {
+            return false;
+        }
+
+        // Try to send, but if there's a problem ignore it because it probably isn't anything important
         try {
             await channel.send({ embeds: [embedBuilder] });
         } catch (error) {
