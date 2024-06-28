@@ -55,7 +55,8 @@ async function run(container: Container) {
         // Kill the process some hours have passed from starting
         if (Date.now() > startTime + hourResetValue * 60 * 60000) {
             logger.info(`${hourResetValue} Hour Reset to Avoid Process from Going Rogue`);
-            return process.exit();
+            setTimeout(process.exit, processRestInterval);
+            return;
         }
 
         // Get some feeds and reset or increment index as neccesary.
@@ -83,6 +84,9 @@ async function run(container: Container) {
                 // from the URL. No reason to worry about that. The internet can be fickle.
             }
         }
+
+        const podcastQuantity = podcastsList.length;
+        logger.debug('Processing a page of podcasts', { feedPage, podcastQuantity });
 
         // Post most recent podcast
         for (const podcast of podcastsList) {

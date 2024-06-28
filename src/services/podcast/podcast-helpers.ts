@@ -1,3 +1,5 @@
+import { Logger } from 'log4js';
+import { performance } from 'perf_hooks';
 import getPodcastFromFeedFunction, { Episode, Podcast } from 'podparse';
 import * as Constants from '../../constants.js';
 import PodcastDataStorage from './podcast-data-storage.js';
@@ -6,6 +8,7 @@ import PodcastFetch from './podcast-fetch.js';
 interface PodcastHelpersInterface {
     readonly constants: typeof Constants;
     readonly getPodcastFromFeed: typeof getPodcastFromFeedFunction;
+    readonly logger: Logger;
     readonly podcastDataStorage: PodcastDataStorage;
     readonly podcastFetch: PodcastFetch;
 
@@ -18,18 +21,24 @@ export default class PodcastHelpers implements PodcastHelpersInterface {
     constructor(
         readonly constants: typeof Constants,
         readonly getPodcastFromFeed: typeof getPodcastFromFeedFunction,
+        readonly logger: Logger,
         readonly podcastDataStorage: PodcastDataStorage,
         readonly podcastFetch: PodcastFetch,
     ) {}
 
     public async getPodcastFromUrl(feedUrl: string): Promise<Podcast> {
+        this.logger.debug('Podcast fetch starting', { feedUrl });
+        const start = performance.now();
+
         let xmlString = '';
         try {
             xmlString = await this.podcastFetch.getPartialPodcastStringFromUrl(feedUrl, 5000);
         } catch (error) {
-            // The partial podcast method throws an error if it timesout. Putting an empty string here means
-            // that other processes will fail appropriatly
+            this.logger.debug('Podcast fetch time-out', { feedUrl, error });
         }
+
+        const end = performance.now();
+        this.logger.debug('Podcast fetch finished', { feedUrl, timeElapsed: end - start });
 
         const podcast = this.getPodcastFromFeed(xmlString);
         // meta.importFeedUrl is only officially supported in the SoundOn Namespace, but I find it super useful
