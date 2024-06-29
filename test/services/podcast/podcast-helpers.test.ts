@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { Logger } from 'log4js';
 import sinon from 'sinon';
 import * as Constants from '../../../src/constants.js';
 import PodcastDataStorage from '../../../src/services/podcast/podcast-data-storage.js';
@@ -12,12 +13,16 @@ describe('Podcast Helpers Class', function () {
                 ERRORS: { NO_PODCAST_EPISODES_FOUND_MESSAGE: randomUUID() },
             };
             const mockedGetPodcastFromFeed = sinon.stub().returns({ meta: {} });
+            const mockedLogger = <Logger>{};
             const mockedPodcastDataStorage = sinon.createStubInstance(PodcastDataStorage);
             const mockedPodcastFetch = sinon.createStubInstance(PodcastFetch);
+
+            mockedLogger.debug = sinon.stub();
 
             const podcastHelpers = new PodcastHelpers(
                 mockedConstants,
                 mockedGetPodcastFromFeed,
+                mockedLogger,
                 mockedPodcastDataStorage,
                 mockedPodcastFetch,
             );
@@ -36,8 +41,11 @@ describe('Podcast Helpers Class', function () {
                 ERRORS: { NO_PODCAST_EPISODES_FOUND_MESSAGE: randomUUID() },
             };
             const mockedGetPodcastFromFeed = sinon.stub().returns({ meta: {} });
+            const mockedLogger = <Logger>{};
             const mockedPodcastDataStorage = sinon.createStubInstance(PodcastDataStorage);
             const mockedPodcastFetch = sinon.createStubInstance(PodcastFetch);
+
+            mockedLogger.debug = sinon.stub();
 
             const responseData = randomUUID();
             const responsePromise: Promise<string> = new Promise((resolve) =>
@@ -50,6 +58,7 @@ describe('Podcast Helpers Class', function () {
             const podcastHelpers = new PodcastHelpers(
                 mockedConstants,
                 mockedGetPodcastFromFeed,
+                mockedLogger,
                 mockedPodcastDataStorage,
                 mockedPodcastFetch,
             );
