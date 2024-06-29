@@ -23,12 +23,12 @@ sudo adduser discord
 
 I like the idea of having NodeJS and NPM installed via NVM because it gives me a lot of flexibility in the specific version of the the tools that I have installed on the server.
 
-At the time of writing this installs NodeJS v20.13.1 and NPM v10.5.2
+At the time of writing this installs NodeJS v22.3.0 and NPM v10.8.1
 
 ```shell
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 source ~/.bashrc
-nvm install 20
+nvm install 22
 ```
 
 ### SQLite v3 via APT
