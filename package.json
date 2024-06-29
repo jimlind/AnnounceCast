@@ -1,7 +1,7 @@
 {
     "name": "announcecast",
     "description": "AnnounceCast - Podcast New Release Announcement Bot for Discord",
-    "version": "2.0.0-beta.18",
+    "version": "2.0.0-beta.19",
     "private": false,
     "license": "AGPL-3.0",
     "author": "Jim Lind",
@@ -10,7 +10,7 @@
         "url": "https://github.com/jimlind/AnnounceCast"
     },
     "engines": {
-        "node": "^20"
+        "node": "^22"
     },
     "type": "module",
     "main": "dist/app.js",
@@ -30,6 +30,7 @@
         "discord.js": "^14.15.3",
         "dotenv": "^16.4.5",
         "exit-hook": "^4.0.0",
+        "inquirer": "^9.3.1",
         "log4js": "^6.9.1",
         "markdown-truncate": "^1.1.0",
         "normalize-url": "^8.0.1",
@@ -40,6 +41,7 @@
     "devDependencies": {
         "@eslint/js": "^9.6.0",
         "@types/better-sqlite3": "^7.6.10",
+        "@types/inquirer": "^9.0.7",
         "@types/mocha": "^10.0.7",
         "@types/node": "^20.14.9",
         "@types/sinon": "^17.0.3",
@@ -51,7 +53,7 @@
         "prettier-plugin-organize-imports": "^3.2.4",
         "sinon": "^18.0.0",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.5",
+        "typescript": "^5.5.2",
         "typescript-eslint": "^7.14.1"
     }
 }

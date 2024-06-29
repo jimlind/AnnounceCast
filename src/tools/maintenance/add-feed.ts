@@ -3,8 +3,7 @@
  * >>> node --loader ts-node/esm src/tools/maintenance/add-feed.ts
  */
 
-import { stdin as input, stdout as output } from 'node:process';
-import * as readline from 'node:readline/promises';
+import inquirer from 'inquirer';
 import { Container } from '../../container.js';
 import PodcastDataStorage from '../../services/podcast/podcast-data-storage.js';
 import PodcastHelpers from '../../services/podcast/podcast-helpers.js';
@@ -20,20 +19,26 @@ try {
 }
 
 async function run(container: Container) {
-    let feedUrl = 'https://anchor.fm/s/238d77c8/podcast/rss';
-    let channelId = '1203413874183774290';
-
     await container.register();
     const podcastHelpers = container.resolve<PodcastHelpers>('podcastHelpers');
     const podcastDataStorage = container.resolve<PodcastDataStorage>('podcastDataStorage');
-    const readlineInterface = readline.createInterface({ input, output });
 
-    readlineInterface.write(feedUrl);
-    feedUrl = await readlineInterface.question('Podcast Feed URL: ');
-    readlineInterface.write(channelId);
-    channelId = await readlineInterface.question('Discord Channel ID: ');
-    readlineInterface.close();
+    const questions = [
+        {
+            type: 'input',
+            name: 'feedUrl',
+            message: 'Enter the podcast feed URL',
+            default: 'https://anchor.fm/s/238d77c8/podcast/rss',
+        },
+        {
+            type: 'input',
+            name: 'channelId',
+            message: 'Enter the discord channel Id',
+            default: '1203413874183774290',
+        },
+    ];
 
-    const podcast = await podcastHelpers.getPodcastFromUrl(feedUrl);
-    podcastDataStorage.addFeed(podcast, channelId);
+    const answers = await inquirer.prompt(questions);
+    const podcast = await podcastHelpers.getPodcastFromUrl(answers.feedUrl || '');
+    podcastDataStorage.addFeed(podcast, answers.channelId || '');
 }
