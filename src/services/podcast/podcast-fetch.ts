@@ -14,6 +14,11 @@ export default class PodcastFetch implements PodcastFetchInterface {
             signal: controller.signal,
         });
 
+        // If the response doesn't have an OK success message exit early
+        if (response.status !== 200) {
+            return '';
+        }
+
         const streamReader = response.body?.getReader();
         if (!streamReader) {
             return '';

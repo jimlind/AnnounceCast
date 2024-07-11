@@ -40,6 +40,11 @@ export default class PodcastHelpers implements PodcastHelpersInterface {
         const end = performance.now();
         this.logger.debug('Podcast fetch finished', { feedUrl, timeElapsed: end - start });
 
+        // If the returned string is falsey don't try to parse it.
+        if (!xmlString) {
+            throw new Error('Nothing returned from podcast fetch method.');
+        }
+
         const podcast = this.getPodcastFromFeed(xmlString);
         // meta.importFeedUrl is only officially supported in the SoundOn Namespace, but I find it super useful
         // so I'm using it.
