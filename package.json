@@ -1,7 +1,7 @@
 {
     "name": "announcecast",
     "description": "AnnounceCast - Podcast New Release Announcement Bot for Discord",
-    "version": "2.0.0-beta.19",
+    "version": "2.0.0-beta.20",
     "private": false,
     "license": "AGPL-3.0",
     "author": "Jim Lind",
@@ -26,13 +26,12 @@
     "dependencies": {
         "awilix": "^10.0.2",
         "axios": "^1.7.2",
-        "better-sqlite3": "^11.1.1",
+        "better-sqlite3": "^11.1.2",
         "discord.js": "^14.15.3",
         "dotenv": "^16.4.5",
         "exit-hook": "^4.0.0",
-        "inquirer": "^9.3.1",
         "log4js": "^6.9.1",
-        "markdown-truncate": "^1.1.0",
+        "markdown-truncate": "^1.1.1",
         "normalize-url": "^8.0.1",
         "podparse": "^1.6.0",
         "pretty-ms": "^9.0.0",
@@ -40,20 +39,21 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.6.0",
-        "@types/better-sqlite3": "^7.6.10",
+        "@types/better-sqlite3": "^7.6.11",
         "@types/inquirer": "^9.0.7",
         "@types/mocha": "^10.0.7",
         "@types/node": "^20.14.9",
         "@types/sinon": "^17.0.3",
         "@types/turndown": "^5.0.4",
         "eslint": "^8.57.0",
-        "globals": "^15.6.0",
-        "mocha": "^10.5.2",
+        "globals": "^15.8.0",
+        "inquirer": "^10.0.1",
+        "mocha": "^10.6.0",
         "prettier": "^3.3.2",
-        "prettier-plugin-organize-imports": "^3.2.4",
+        "prettier-plugin-organize-imports": "^4.0.0",
         "sinon": "^18.0.0",
         "ts-node": "^10.9.2",
-        "typescript": "^5.5.2",
-        "typescript-eslint": "^7.14.1"
+        "typescript": "^5.5.3",
+        "typescript-eslint": "^7.16.0"
     }
 }
