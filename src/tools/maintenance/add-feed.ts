@@ -36,7 +36,7 @@ async function run(container: Container) {
             message: 'Enter the discord channel Id',
             default: '1203413874183774290',
         },
-    ];
+    ] as any;
 
     const answers = await inquirer.prompt(questions);
     const podcast = await podcastHelpers.getPodcastFromUrl(answers.feedUrl || '');
