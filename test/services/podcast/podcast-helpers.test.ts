@@ -19,6 +19,14 @@ describe('Podcast Helpers Class', function () {
 
             mockedLogger.debug = sinon.stub();
 
+            const responseData = randomUUID();
+            const responsePromise: Promise<string> = new Promise((resolve) =>
+                resolve(responseData),
+            );
+            (mockedPodcastFetch.getPartialPodcastStringFromUrl = sinon.stub()).returns(
+                responsePromise,
+            );
+
             const podcastHelpers = new PodcastHelpers(
                 mockedConstants,
                 mockedGetPodcastFromFeed,
