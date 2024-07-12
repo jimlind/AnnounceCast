@@ -18,11 +18,11 @@ try {
 async function run(container: Container) {
     await container.register();
 
-    const discordRest = container.resolve<import('discord.js').REST>('discordRest');
-    const discordCommandRoutes = container.resolve<`/${string}`>('discordCommandRoutes');
-
     const commandBuffer = readFileSync(new URL('./data/command.json', import.meta.url));
     const commandData = JSON.parse(commandBuffer.toString());
+
+    const discordRest = container.resolve<import('discord.js').REST>('discordRest');
+    const discordCommandRoutes = container.resolve<`/${string}`>('discordCommandRoutes');
 
     const commandList = await discordRest.put(discordCommandRoutes, { body: commandData });
 

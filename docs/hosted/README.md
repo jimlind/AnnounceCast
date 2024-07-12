@@ -68,10 +68,10 @@ sudo systemctl start announcecast
 
 ## Publish Slash Commands
 
-The Discord servers need to know what slash commands they should use for the bot.
+The Discord servers need to know what slash commands they should use for the bot. Run the following command to put them in place. You should see a message that says "Set 6 Application Commands" when it completes.
 
 ```shell
-NODE_ENV=development node --loader ts-node/esm src/tools/app-command/put-application-commands.ts
+NODE_ENV=production node --import ./register.mjs ./src/tools/app-command/put-application-commands.ts
 ```
 
 ## Miscellaneous Shortcuts
@@ -131,4 +131,11 @@ When I get my real blog running I need to create an article about this because i
 
 As you may have figured out from the `.env` files above but there are dev and prod versions of the bot registered with Discord. The dev version of the bot shouldn't be useful to anybody other than me. It is only online for short bursts so I can test things. None the less I want to have it documented for myself.
 
+Use this link to authorize the dev bot on your server:  
 https://discord.com/oauth2/authorize?client_id=851611029687500850&permissions=280576&scope=bot%20applications.commands
+
+I use this command to setup dev commands for my bot:
+
+```shell
+NODE_ENV=development node --import ./register.mjs ./src/tools/app-command/put-application-commands.ts
+```
