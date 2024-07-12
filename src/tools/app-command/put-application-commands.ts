@@ -1,7 +1,7 @@
 /**
  * Run this command in the terminal for prod or dev like this:
- * >>> NODE_ENV=production node --loader ts-node/esm src/tools/app-command/put-application-commands.ts
- * >>> NODE_ENV=development node --loader ts-node/esm src/tools/app-command/put-application-commands.ts
+ * >>> NODE_ENV=production node --import ./register.mjs ./src/tools/app-command/put-application-commands.ts
+ * >>> NODE_ENV=development node --import ./register.mjs ./src/tools/app-command/put-application-commands.ts
  */
 
 import { readFileSync } from 'fs';

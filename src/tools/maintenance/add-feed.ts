@@ -1,6 +1,6 @@
 /**
  * Run this command in the terminal to update the local database like this:
- * >>> node --loader ts-node/esm src/tools/maintenance/add-feed.ts
+ * >>> node --import ./register.mjs ./src/tools/maintenance/add-feed.ts
  */
 
 import { input } from '@inquirer/prompts';

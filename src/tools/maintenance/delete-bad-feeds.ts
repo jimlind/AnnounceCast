@@ -1,6 +1,6 @@
 /**
  * Run this command in the terminal against the local database like this:
- * >>> node --loader ts-node/esm src/tools/maintenance/delete-bad-feeds.ts
+ * >>> node --import ./register.mjs ./src/tools/maintenance/delete-bad-feeds.ts
  */
 
 import bettersqlite3 from 'better-sqlite3';
