@@ -27,6 +27,7 @@ If you aren't really sure what you should be doing with the bot you need to foll
 | ------------------------------------------------------ | ---------------------------------------- |
 | [70mm](https://solo.to/70mm)                           | https://anchor.fm/s/12d1fabc/podcast/rss |
 | [Bat & Spider](https://flow.page/batandspider)         | https://anchor.fm/s/184b0a38/podcast/rss |
+| [Cinenauts](https://solo.to/cinenauts)                 | https://anchor.fm/s/3a0acd20/podcast/rss |
 | [Escape Hatch](https://solo.to/escapehatch)            | https://anchor.fm/s/238d77c8/podcast/rss |
 | [The Letterboxd Show](https://anchor.fm/letterboxd)    | https://anchor.fm/s/133d445c/podcast/rss |
 | [Lost Light](https://lostlightpod.github.io)           | https://anchor.fm/s/3ae14da0/podcast/rss |
