@@ -3,7 +3,7 @@
  * >>> node --loader ts-node/esm src/tools/maintenance/add-feed.ts
  */
 
-import inquirer from 'inquirer';
+import { input } from '@inquirer/prompts';
 import { Container } from '../../container.js';
 import PodcastDataStorage from '../../services/podcast/podcast-data-storage.js';
 import PodcastHelpers from '../../services/podcast/podcast-helpers.js';
@@ -23,22 +23,15 @@ async function run(container: Container) {
     const podcastHelpers = container.resolve<PodcastHelpers>('podcastHelpers');
     const podcastDataStorage = container.resolve<PodcastDataStorage>('podcastDataStorage');
 
-    const questions = [
-        {
-            type: 'input',
-            name: 'feedUrl',
-            message: 'Enter the podcast feed URL',
-            default: 'https://anchor.fm/s/238d77c8/podcast/rss',
-        },
-        {
-            type: 'input',
-            name: 'channelId',
-            message: 'Enter the discord channel Id',
-            default: '1203413874183774290',
-        },
-    ] as any;
+    const feedUrl = await input({
+        message: 'Enter the podcast feed URL',
+        default: 'https://anchor.fm/s/238d77c8/podcast/rss',
+    });
+    const channelId = await input({
+        message: 'Enter the discord channel Id',
+        default: '1203413874183774290',
+    });
 
-    const answers = await inquirer.prompt(questions);
-    const podcast = await podcastHelpers.getPodcastFromUrl(answers.feedUrl || '');
-    podcastDataStorage.addFeed(podcast, answers.channelId || '');
+    const podcast = await podcastHelpers.getPodcastFromUrl(feedUrl);
+    podcastDataStorage.addFeed(podcast, channelId);
 }
