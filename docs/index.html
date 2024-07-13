@@ -42,24 +42,22 @@
         </div>
 
         <div class="container">
-            <h2 class="mt-5">About the Bot</h2>
             <p>
-                This started out as a dumb script that was hacked together quickly because the RSS
-                parsers that were serving similar purposes were all pretty bad and wierdly
-                expensive. So I spent a weekend throwing together the first version of this bot and
-                now we've got a much more stable version that continues that original vision. Check
-                out the
+                This bot posts automated messages in your Discord server when a new podcast episode
+                is released. The bot can search for podcasts on Spotify, Apple, or use your RSS
+                feed. Check out the
                 <a href="https://discord.com/application-directory/839657120689684533"
                     >AnnounceCast Discord Application Directory Entry</a
                 >
-                for some quick information about the bot.
+                for the easiest way to setup the bot on your server. Otherwise, you can use the big
+                button below to setup your server.
             </p>
 
             <h2 class="mt-5">Installation</h2>
             <p>
                 <a
                     class="btn btn-primary btn-lg px-5 py-3"
-                    href="https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=280576&scope=bot%20applications.commands"
+                    href="https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=274877926400&scope=bot%20applications.commands"
                 >
                     <i class="fas fa-robot mx-2"></i>
                     Authorize the Bot</a
@@ -140,25 +138,61 @@
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-header" id="headingTwo">
+                    <div class="card-header" id="headingPermission">
                         <h5 class="mb-0">
                             <button
                                 class="btn btn-link collapsed"
                                 data-toggle="collapse"
-                                data-target="#collapseTwo"
+                                data-target="#collapsePermission"
                             >
                                 What permissions are required?
                             </button>
                         </h5>
                     </div>
-                    <div id="collapseTwo" class="collapse" data-parent="#accordion">
+                    <div id="collapsePermission" class="collapse" data-parent="#accordion">
                         <div class="card-body">
                             <p>
-                                The invite link above includes the neccessary permissions. They are:
+                                The invite link above includes the neccessary permissions. But if
+                                you are creating a custom permissions scheme the specifics that the
+                                bot needs to function in a channel are:
                             </p>
                             <ul>
+                                <li>View Channel</li>
+                                <li>Send Messages</li>
+                                <li>Send Messages in Threads</li>
                                 <li>Posting Embeds</li>
                             </ul>
+                            <p>
+                                If you use Discord defaults the only thing special is the "Posting
+                                Embeds" permission.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header" id="headingAnnouncementChannels">
+                        <h5 class="mb-0">
+                            <button
+                                class="btn btn-link collapsed"
+                                data-toggle="collapse"
+                                data-target="#collapseAnnouncementChannels"
+                            >
+                                How do I get the bot to work in an Announcement Channel?
+                            </button>
+                        </h5>
+                    </div>
+                    <div
+                        id="collapseAnnouncementChannels"
+                        class="collapse"
+                        data-parent="#accordion"
+                    >
+                        <div class="card-body">
+                            <p>
+                                You will need to grant the bot special permissions to "Send
+                                Messages" (under Text Channel Permissions) in the channel. Discord
+                                defaults to not allowing @everyone to post in that channel and the
+                                bot is part of that group by default.
+                            </p>
                         </div>
                     </div>
                 </div>

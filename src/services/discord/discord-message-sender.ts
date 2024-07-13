@@ -88,7 +88,7 @@ export default class DiscordMessageSender implements DiscordMessageSenderInterfa
         const discordClient = await this.discordConnection.getClient();
         const channel = discordClient.channels.cache.find((ch) => ch.id === channelId);
 
-        // This covers all the current text channels
+        // This covers all the current text channels (announcments, threads, etc)
         if (!(channel instanceof BaseGuildTextChannel) && !(channel instanceof ThreadChannel)) {
             return false;
         }

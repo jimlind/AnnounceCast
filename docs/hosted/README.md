@@ -132,7 +132,7 @@ When I get my real blog running I need to create an article about this because i
 As you may have figured out from the `.env` files above but there are dev and prod versions of the bot registered with Discord. The dev version of the bot shouldn't be useful to anybody other than me. It is only online for short bursts so I can test things. None the less I want to have it documented for myself.
 
 Use this link to authorize the dev bot on your server:  
-https://discord.com/oauth2/authorize?client_id=851611029687500850&permissions=280576&scope=bot%20applications.commands
+https://discord.com/oauth2/authorize?client_id=851611029687500850&permissions=274877926400&scope=bot%20applications.commands
 
 I use this command to setup dev commands for my bot:
 
