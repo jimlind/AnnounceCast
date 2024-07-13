@@ -56,13 +56,18 @@ export class Container {
 
         // A logger layout that writes things to standard JSON blobs
         log4js.addLayout('json', () => {
+            const replacer = (key: string, value: unknown) =>
+                typeof value === 'bigint' ? value.toString() : value;
             return (event) =>
-                JSON.stringify({
-                    timestamp: event?.startTime,
-                    message: event?.data?.[0],
-                    ...event,
-                    data: event?.data?.[1],
-                });
+                JSON.stringify(
+                    {
+                        timestamp: event?.startTime,
+                        message: event?.data?.[0],
+                        ...event,
+                        data: event?.data?.[1],
+                    },
+                    replacer,
+                );
         });
 
         // Create logger
