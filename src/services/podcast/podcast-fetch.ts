@@ -52,7 +52,7 @@ export default class PodcastFetch implements PodcastFetchInterface {
         }
 
         const isSequential =
-            new Date(pubDates[0][1]).getTime() > new Date(pubDates[1][1]).getTime();
+            new Date(pubDates[0][1]).getTime() >= new Date(pubDates[1][1]).getTime();
         const secondPubDateisClosed = input.indexOf('</item>', pubDates[1]['index']) > 0;
 
         return isSequential && secondPubDateisClosed;
