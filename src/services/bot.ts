@@ -57,7 +57,13 @@ export default class Bot implements BotInterface {
             }
         } catch (error) {
             const title = `receiveInteraction method failed for ${interaction.commandName}`;
-            this.logger.info(title, { interaction, error });
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.logger.info(title, {
+                interaction,
+                optionsData: interaction.options.data,
+                errorMessage,
+                error,
+            });
             await this.discordMessageSender.sendErrorAsReply(interaction);
         }
     }
