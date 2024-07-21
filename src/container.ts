@@ -1,6 +1,7 @@
 import awilix from 'awilix';
 import axios from 'axios';
 import bettersqlite3 from 'better-sqlite3';
+import * as chrono from 'chrono-node';
 import {
     ActivityType as DiscordActivityType,
     Client as DiscordClient,
@@ -94,6 +95,7 @@ export class Container {
         this.container.register({
             axios: awilix.asValue(axios),
             betterSqlite3: awilix.asValue(bettersqlite3),
+            chrono: awilix.asValue(chrono),
             config: awilix.asValue(config),
             constants: awilix.asValue(constants),
             discordClient: awilix.asValue(discordClient),

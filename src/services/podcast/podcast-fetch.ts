@@ -1,3 +1,4 @@
+import * as Chrono from 'chrono-node';
 import { Logger } from 'log4js';
 
 interface PodcastFetchInterface {
@@ -6,124 +7,89 @@ interface PodcastFetchInterface {
 }
 
 export default class PodcastFetch implements PodcastFetchInterface {
-    constructor(readonly logger: Logger) {}
+    constructor(
+        readonly chrono: typeof Chrono,
+        readonly logger: Logger,
+    ) {}
 
     public async getPartialPodcastStringFromUrl(feedUrl: string, timeout: number): Promise<string> {
-        const isProblematicPodcast = feedUrl.includes('meinpodcast');
-
+        // Set up the abort controller and start the timer
         const controller = new AbortController();
         const timeoutId = setTimeout(() => {
-            if (isProblematicPodcast) {
-                this.logger.debug('ProblematicPodcast Timeout Happened');
-            }
             controller.abort();
         }, timeout);
 
-        if (isProblematicPodcast) {
-            this.logger.debug('ProblematicPodcast Fetch Started');
-        }
-
+        // Fetch the feed to start getting response data
         const response = await fetch(feedUrl, {
             headers: { 'User-Agent': 'AnnounceCast Cient' },
             signal: controller.signal,
         });
 
-        if (isProblematicPodcast) {
-            this.logger.debug('ProblematicPodcast Fetch Completed', { response });
-        }
-
         // If the response doesn't have an OK success message exit early
         if (response.status !== 200) {
-            if (isProblematicPodcast) {
-                this.logger.debug('ProblematicPodcast Response is not OK', {
-                    status: response.status,
-                });
-            }
             return '';
         }
 
+        // If we can't setup a stream reader exit early
         const streamReader = response.body?.getReader();
         if (!streamReader) {
-            if (isProblematicPodcast) {
-                this.logger.debug('ProblematicPodcast Response can not get reader', {
-                    streamReader,
-                });
-            }
             return '';
         }
 
-        const decoder = new TextDecoder();
         let resultString = '';
+        let channelTags = '';
+        let latestItem = { pub: 0, item: '' };
+        const itemRegexOpenAndClose = /<item.*?>[\s\S]+?<\/item>/g;
+        const itemRegexOpen = /<item.*?>/;
+        const pubDateRegexInner = /<pubDate>(.+?)<\/pubDate>/;
+
+        // Start reading chunks of data
+        const decoder = new TextDecoder();
         let resultChunk = await streamReader.read();
         while (!resultChunk.done) {
-            if (isProblematicPodcast) {
-                this.logger.debug('ProblematicPodcast has read a chunk');
-            }
-
+            // Build the most full return string
             resultString += decoder.decode(resultChunk.value);
 
-            if (isProblematicPodcast) {
-                this.logger.debug('ProblematicPodcast has added to result string', {
-                    length: resultString.length,
-                });
+            // Set the channel tags if they aren't already
+            if (!channelTags) {
+                const firstItemPosition = resultString.search(itemRegexOpen);
+                if (firstItemPosition > 0) {
+                    channelTags = resultString.substring(0, firstItemPosition);
+                    // Remove checked data. Keep the resultString small.
+                    resultString = resultString.substring(firstItemPosition);
+                }
             }
 
-            if (this.firstPubDatesAreSequential(resultString)) {
-                if (isProblematicPodcast) {
-                    this.logger.debug('ProblematicPodcast is done checking pubdates', {
-                        length: resultString.length,
-                    });
+            // Set the most latest item
+            const itemList = resultString.match(itemRegexOpenAndClose) || [];
+            for (const item of itemList) {
+                const pubDate = item.match(pubDateRegexInner) || [];
+                const pubInt = this.chrono.parseDate(pubDate[1])?.getTime() || 0;
+
+                // We found a newer item. Set the latestItem and continue.
+                // Explicitly using "<" under the assumption that if there are multiple items with same pubsub that we
+                // want to use the first one.
+                if (latestItem.pub < pubInt) {
+                    latestItem = { pub: pubInt, item: item };
                 }
 
-                clearTimeout(timeoutId);
-
-                // This feels a little sketchy to abort the controller and return but it works.
-                controller.abort();
-                return this.cleanPartialPodcastFeed(resultString);
+                // We found an older item. We won't find any new items so exit.
+                // Explicitly using ">="" under the assumption that if there are multiple items with same pubsub that we
+                // should abort and return the first one.
+                if (latestItem.pub >= pubInt) {
+                    controller.abort();
+                    return channelTags + latestItem.item + '</channel></rss>';
+                }
             }
 
-            if (isProblematicPodcast) {
-                this.logger.debug('ProblematicPodcast starting reading another chunk', {
-                    length: resultString.length,
-                });
-            }
-
+            // Remove checked data. Keep the resultString small.
+            resultString = resultString.replace(itemRegexOpenAndClose, '');
+            // Read the next chunk
             resultChunk = await streamReader.read();
-
-            if (isProblematicPodcast) {
-                this.logger.debug('ProblematicPodcast completed reading another chunk', {
-                    length: resultString.length,
-                });
-            }
         }
 
-        if (isProblematicPodcast) {
-            this.logger.debug('ProblematicPodcast done with the while loop', {
-                length: resultString.length,
-            });
-        }
+        // Stop the timer. Just for some odd edgecase possibilities.
         clearTimeout(timeoutId);
-
-        return resultString;
-    }
-
-    private firstPubDatesAreSequential(input: string) {
-        const pubDates = [...input.matchAll(/<item>[\s\S]+?<pubDate>(.+?)<\/pubDate>/g)];
-        if (pubDates.length < 2) {
-            return false;
-        }
-
-        const isSequential =
-            new Date(pubDates[0][1]).getTime() >= new Date(pubDates[1][1]).getTime();
-        const secondPubDateisClosed = input.indexOf('</item>', pubDates[1]['index']) > 0;
-
-        return isSequential && secondPubDateisClosed;
-    }
-
-    private cleanPartialPodcastFeed(input: string) {
-        const lastItemClose = input.lastIndexOf('</item>');
-        const unclosedItemString = input.substring(0, lastItemClose);
-
-        return unclosedItemString + '</item></channel></rss>';
+        return channelTags + latestItem.item + '</channel></rss>';
     }
 }

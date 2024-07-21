@@ -1,7 +1,7 @@
 {
     "name": "announcecast",
     "description": "AnnounceCast - Podcast New Release Announcement Bot for Discord",
-    "version": "2.0.0-beta.23",
+    "version": "2.0.0-beta.24",
     "private": false,
     "license": "AGPL-3.0",
     "author": "Jim Lind",
@@ -27,6 +27,7 @@
         "awilix": "^10.0.2",
         "axios": "^1.7.2",
         "better-sqlite3": "^11.1.2",
+        "chrono-node": "^2.7.6",
         "discord.js": "^14.15.3",
         "dotenv": "^16.4.5",
         "exit-hook": "^4.0.0",
