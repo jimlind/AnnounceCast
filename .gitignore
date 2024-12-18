@@ -19,3 +19,6 @@ dist
 
 # Maintenance Output
 src/tools/maintenance/output/*
+
+#IntelliJ
+/.idea
