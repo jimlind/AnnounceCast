@@ -11,5 +11,8 @@ target
 # MacOS System Files
 .DS_Store
 
-#IntelliJ
+# IntelliJ
 .idea
+
+# Scripts for local development setup
+dev-util/local-dev-setup.sh
