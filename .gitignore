@@ -1,6 +1,3 @@
-# Dependencies
-node_modules/
-
 # Environment Variables
 .env.development
 .env.production
@@ -8,17 +5,11 @@ node_modules/
 # Sqlite3 Database Files
 db/*.db
 
-# Application Log File
-log/application.log*
-
-# Transpiled Application
-dist
+# Compiled Applicaiton
+target
 
 # MacOS System Files
 .DS_Store
 
-# Maintenance Output
-src/tools/maintenance/output/*
-
 #IntelliJ
-/.idea
+.idea
