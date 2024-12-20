@@ -1,13 +1,13 @@
-package com.mycompany.app;
+package jimlind.announcecast;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple Main.
  */
-public class AppTest {
+public class MainTest {
 
     /**
      * Rigorous Test :-)
