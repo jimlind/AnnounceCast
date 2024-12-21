@@ -5,8 +5,9 @@
 # Sqlite3 Database Files
 db/*.db
 
-# Compiled Applicaiton
-target
+# Compilation Artifacts
+/target
+/dependency-reduced-pom.xml
 
 # MacOS System Files
 .DS_Store
