@@ -2,65 +2,76 @@ package jimlind.announcecast;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Timer;
 import java.util.TimerTask;
+import jimlind.announcecast.podcast.Client;
+import jimlind.announcecast.podcast.Episode;
+import jimlind.announcecast.podcast.Podcast;
 
 public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello Main World!");
+  public static void main(String[] args) {
+    System.out.println("Hello Main World!");
 
-        Injector injector = Guice.createInjector(new BasicModule());
-        Discord discord = injector.getInstance(Discord.class);
-        discord.run();
+    Injector injector =
+        Guice.createInjector(new BasicModule(), new jimlind.announcecast.podcast.BasicModule());
+    Discord discord = injector.getInstance(Discord.class);
+    discord.run();
 
-        int pageSize = 10;
-        String url = "jdbc:sqlite:db/podcasts.db";
-        Connection conn;
-        try {
-            conn = DriverManager.getConnection(url);
-        } catch (SQLException e) {
-            System.out.println("Connection to SQLite failed!");
-            return;
-        }
-
-        Timer timer = new Timer();
-        TimerTask task =
-                new TimerTask() {
-                    private int pageNumber = 1;
-                    public void run() {
-                        int offset = (pageNumber - 1) * pageSize;
-                        String sql = "SELECT id, url, title FROM feeds LIMIT ? OFFSET ?";
-                        try {
-                            System.out.println(offset);
-                            PreparedStatement stmt = conn.prepareStatement(sql);
-                            stmt.setInt(1, pageSize);
-                            stmt.setInt(2, offset);
-                            ResultSet rs = stmt.executeQuery();
-
-                            if (!rs.isBeforeFirst() ) {
-                                this.pageNumber = 1;
-                            } else {
-                                this.pageNumber++;
-                            }
-
-                            while (rs.next()) {
-                                new PodcastParser().run(rs.getString("url"));
-                            }
-
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-
-
-                        System.out.println("------");
-                    }
-                };
-        timer.scheduleAtFixedRate(task, 0, 2000);
+    int pageSize = 1;
+    String url = "jdbc:sqlite:db/podcasts.db";
+    Connection conn;
+    try {
+      conn = DriverManager.getConnection(url);
+    } catch (SQLException e) {
+      System.out.println("Connection to SQLite failed!");
+      return;
     }
+
+    Timer timer = new Timer();
+    TimerTask task =
+        new TimerTask() {
+          private int pageNumber = 1;
+
+          @Override
+          public void run() {
+            int offset = (pageNumber - 1) * pageSize;
+            String sql = "SELECT id, url, title FROM feeds LIMIT ? OFFSET ?";
+            try {
+              System.out.println(offset);
+              PreparedStatement stmt = conn.prepareStatement(sql);
+              stmt.setInt(1, pageSize);
+              stmt.setInt(2, offset);
+              ResultSet rs = stmt.executeQuery();
+
+              if (!rs.isBeforeFirst()) {
+                this.pageNumber = 1;
+              } else {
+                this.pageNumber++;
+              }
+
+              while (rs.next()) {
+                Client podcastClient = injector.getInstance(Client.class);
+                Podcast podcast = podcastClient.createPodcastFromFeedUrl(rs.getString("url"), 5);
+
+                System.out.println(podcast.getTitle());
+                System.out.println(podcast.getAuthor());
+                System.out.println(podcast.getLink());
+                System.out.println(podcast.getImageUrl());
+
+                for (Episode episode : podcast.getEpisodeList()) {
+                  System.out.println(episode.getTitle());
+                  System.out.println(episode.getLink());
+                }
+              }
+
+            } catch (Exception e) {
+              System.out.println(e.getMessage());
+            }
+
+            System.out.println("------");
+          }
+        };
+    timer.scheduleAtFixedRate(task, 0, 200000);
+  }
 }
