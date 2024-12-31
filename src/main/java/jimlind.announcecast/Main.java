@@ -10,15 +10,19 @@ import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
 
 public class Main {
-  public static void main(String[] args) {
-    System.out.println("Hello Main World!");
+  static int PAGE_SIZE = 10;
+  static int PAGINATION_DELAY = 2000;
 
+  public static void main(String[] args) {
     Injector injector =
-        Guice.createInjector(new BasicModule(), new jimlind.announcecast.podcast.BasicModule());
+        Guice.createInjector(
+            new BasicModule(),
+            new jimlind.announcecast.discord.BasicModule(),
+            new jimlind.announcecast.podcast.BasicModule());
+
     Discord discord = injector.getInstance(Discord.class);
     discord.run();
 
-    int pageSize = 1;
     String url = "jdbc:sqlite:db/podcasts.db";
     Connection conn;
     try {
@@ -35,13 +39,12 @@ public class Main {
 
           @Override
           public void run() {
-            int offset = (pageNumber - 1) * pageSize;
             String sql = "SELECT id, url, title FROM feeds LIMIT ? OFFSET ?";
             try {
-              System.out.println(offset);
+              System.out.println(pageNumber);
               PreparedStatement stmt = conn.prepareStatement(sql);
-              stmt.setInt(1, pageSize);
-              stmt.setInt(2, offset);
+              stmt.setInt(1, PAGE_SIZE);
+              stmt.setInt(2, (pageNumber - 1) * PAGE_SIZE);
               ResultSet rs = stmt.executeQuery();
 
               if (!rs.isBeforeFirst()) {
@@ -53,6 +56,12 @@ public class Main {
               while (rs.next()) {
                 Client podcastClient = injector.getInstance(Client.class);
                 Podcast podcast = podcastClient.createPodcastFromFeedUrl(rs.getString("url"), 5);
+                if (podcast == null) {
+                  // There was some issue loading the podcast from the feed but this happens for a
+                  // multitude of reasons related for connectivity of formatting, so I'll just
+                  // ignore them all for now and assume users will report any interesting issues
+                  continue;
+                }
 
                 System.out.println(podcast.getTitle());
                 System.out.println(podcast.getAuthor());
@@ -72,6 +81,7 @@ public class Main {
             System.out.println("------");
           }
         };
-    timer.scheduleAtFixedRate(task, 0, 200000);
+    // Don't start the podcast scraping looper
+    // timer.scheduleAtFixedRate(task, 0, PAGINATION_DELAY);
   }
 }
