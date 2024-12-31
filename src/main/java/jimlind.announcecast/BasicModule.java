@@ -5,9 +5,8 @@ import com.google.inject.Scopes;
 
 public class BasicModule extends AbstractModule {
 
-    @Override
-    protected void configure() {
-        bind(Listeners.class).in(Scopes.SINGLETON);
-        bind(Message.class).in(Scopes.SINGLETON);
-    }
+  @Override
+  protected void configure() {
+    bind(Discord.class).in(Scopes.SINGLETON);
+  }
 }
