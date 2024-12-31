@@ -45,10 +45,18 @@ public class Parser {
               episode.setTitle(titleText);
             }
             break;
+          case "description":
+            String descriptionText = xmlStreamReader.getElementText();
+            if (isChildOfChannel(elementStack)) {
+              podcast.setDescription(descriptionText);
+            } else if (isChildOfItem(elementStack)) {
+              episode.setDescription(descriptionText);
+            }
+            break;
           case "link":
             String linkText = xmlStreamReader.getElementText();
             if (isChildOfChannel(elementStack)) {
-              podcast.setLink(linkText);
+              podcast.setShowUrl(linkText);
             } else if (isChildOfItem(elementStack)) {
               episode.setLink(linkText);
             }
@@ -62,16 +70,35 @@ public class Parser {
           case "itunes:image":
             for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
               if (xmlStreamReader.getAttributeLocalName(i).equals("href")) {
-                podcast.setImageUrl(xmlStreamReader.getAttributeValue(i));
+                if (isChildOfChannel(elementStack)) {
+                  podcast.setImageUrl(xmlStreamReader.getAttributeValue(i));
+                } else if (isChildOfItem(elementStack)) {
+                  episode.setImageUrl(xmlStreamReader.getAttributeValue(i));
+                }
                 break;
               }
+            }
+            elementStack.push(qualifiedElementName);
+            break;
+          case "atom:link":
+            String href = "";
+            String rel = "";
+            for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
+              if (xmlStreamReader.getAttributeLocalName(i).equals("href")) {
+                href = xmlStreamReader.getAttributeValue(i);
+              }
+              if (xmlStreamReader.getAttributeLocalName(i).equals("rel")) {
+                rel = xmlStreamReader.getAttributeValue(i);
+              }
+            }
+            if (rel.equals("self")) {
+              podcast.setFeedUrl(href);
             }
             elementStack.push(qualifiedElementName);
             break;
           case "item":
             episode = new Episode();
             elementStack.push(qualifiedElementName);
-
             break;
           default:
             elementStack.push(qualifiedElementName);

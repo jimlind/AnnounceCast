@@ -33,7 +33,7 @@ public class ITunes {
       // Parse Response
       JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
       JsonArray results = jsonObject.getAsJsonArray("results");
-      Stream<JsonElement> stream = StreamSupport.stream(results.spliterator(), true);
+      Stream<JsonElement> stream = StreamSupport.stream(results.spliterator(), true).limit(count);
 
       return stream.map(element -> element.getAsJsonObject().get("feedUrl").getAsString()).toList();
     } catch (Exception e) {

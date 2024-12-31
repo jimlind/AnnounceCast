@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 public class Podcast {
   private String title;
-  private String link;
+  private String description;
+  private String feedUrl;
+  private String showUrl;
   private String imageUrl;
   private String author;
   private List<Episode> episodeList = new LinkedList<>();

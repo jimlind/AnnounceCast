@@ -65,7 +65,7 @@ public class Main {
 
                 System.out.println(podcast.getTitle());
                 System.out.println(podcast.getAuthor());
-                System.out.println(podcast.getLink());
+                System.out.println(podcast.getShowUrl());
                 System.out.println(podcast.getImageUrl());
 
                 for (Episode episode : podcast.getEpisodeList()) {
