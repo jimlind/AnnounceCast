@@ -2,6 +2,7 @@ package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
 import java.util.List;
+import jimlind.announcecast.discord.message.Podcast;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.ITunes;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -30,12 +31,11 @@ public class SlashCommandManager {
 
       for (String feed : feedList) {
         try {
-          MessageEmbed messageEmbed =
-              jimlind.announcecast.discord.message.Podcast.build(
-                  client.createPodcastFromFeedUrl(feed, 0));
+          MessageEmbed messageEmbed = Podcast.build(client.createPodcastFromFeedUrl(feed, 0));
           messageChannel.sendMessageEmbeds(messageEmbed).queue();
         } catch (Exception ignored) {
-          // Ignore podcast message creation or sends
+          // Ignore podcast message creation or send errors for now
+          System.out.println(ignored);
         }
       }
     }
