@@ -2,8 +2,7 @@ package jimlind.announcecast.podcast;
 
 import com.google.inject.Inject;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URLConnection;
+import java.net.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.xml.XMLConstants;
@@ -20,7 +19,12 @@ public class Client {
   public Podcast createPodcastFromFeedUrl(String feed, int episodeCount) {
     URLConnection connection;
     try {
-      connection = new URI(feed).toURL().openConnection();
+      URL url = new URI(feed).toURL();
+      connection = url.openConnection();
+      connection.setRequestProperty("Host", url.getHost());
+      connection.setRequestProperty("User-Agent", "AnnounceCast");
+      connection.setConnectTimeout(CONNECTION_CONNECT_TIMEOUT);
+      connection.setReadTimeout(CONNECTION_READ_TIMEOUT);
     } catch (Exception ignored) {
       // Ignore any errors from attempting to build a URL or open a connection
       // It isn't my role to validate the whole Internet
@@ -28,8 +32,6 @@ public class Client {
     }
 
     InputStream inputStream;
-    connection.setConnectTimeout(CONNECTION_CONNECT_TIMEOUT);
-    connection.setReadTimeout(CONNECTION_READ_TIMEOUT);
     try {
       inputStream = connection.getInputStream();
     } catch (Exception ignored) {
@@ -66,14 +68,8 @@ public class Client {
         };
     timer.schedule(task, XMLSTREAM_READ_TIMEOUT);
 
-    Podcast podcast;
-    try {
-      podcast = this.parser.processStreamReader(xmlStreamReader, episodeCount);
-    } catch (Exception e) {
-      // TODO: Log the failure here. I want to know about it.
-      System.out.println(e);
-      return null;
-    }
+    // This will never error out, and will always get some kind of Podcast/null object
+    Podcast podcast = this.parser.processStreamReader(xmlStreamReader, episodeCount);
 
     try {
       timer.cancel(); // Cancel the timer if processing finished
