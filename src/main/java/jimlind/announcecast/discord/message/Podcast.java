@@ -7,10 +7,14 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 public class Podcast {
   public static MessageEmbed build(jimlind.announcecast.podcast.Podcast podcast) {
     String feedLine = "Show Feed URL: " + podcast.getFeedUrl();
-    String siteLine = "Show's Website: " + podcast.getShowUrl();
+
+    String siteLine = "";
+    if (podcast.getShowUrl() != null) {
+      siteLine = "\nShow's Website: " + podcast.getShowUrl();
+    }
 
     String description = Helper.htmlToMarkdown(podcast.getDescription(), 256);
-    description += "\n\n" + feedLine + "\n" + siteLine;
+    description += "\n\n" + feedLine + siteLine;
 
     EmbedBuilder embedBuilder = new EmbedBuilder();
 
@@ -18,7 +22,9 @@ public class Podcast {
     embedBuilder.setDescription(description);
     embedBuilder.setThumbnail(podcast.getImageUrl());
 
-    embedBuilder.setFooter("Credit: " + podcast.getAuthor());
+    if (podcast.getAuthor() != null) {
+      embedBuilder.setFooter("Credit: " + podcast.getAuthor());
+    }
 
     return embedBuilder.build();
   }
