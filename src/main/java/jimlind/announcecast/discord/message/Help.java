@@ -4,15 +4,17 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class Help {
-  public static MessageEmbed build() {
+  public static MessageEmbed build(
+      String name, String version, long podcastCount, long guildCount) {
     EmbedBuilder embedBuilder = new EmbedBuilder();
 
     // Set title
-    String title = String.format("%s v%s Documentation", "AnnounceCast", "1.0.0-alpha");
+    String title = String.format("%s v%s Documentation", name, version);
     embedBuilder.setTitle(title, "https://jimlind.github.io/AnnounceCast/");
 
     // Set description
-    String description = String.format("Tracking %s podcasts on %s servers.", "20", "6");
+    String description =
+        String.format("Tracking %s podcasts on %s servers.", podcastCount, guildCount);
     embedBuilder.setDescription(description);
 
     // Set fields for slash commands

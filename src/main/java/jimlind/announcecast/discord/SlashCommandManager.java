@@ -17,9 +17,9 @@ public class SlashCommandManager {
 
   public boolean process(SlashCommandInteractionEvent event) {
     event.deferReply().queue();
-    String name = event.getName();
+    String eventName = event.getName();
 
-    if (name.equals("search")) {
+    if (eventName.equals("search")) {
       OptionMapping keywordsOption = event.getInteraction().getOption("keywords");
       String keywords = keywordsOption != null ? keywordsOption.getAsString() : "";
 
@@ -38,9 +38,11 @@ public class SlashCommandManager {
           System.out.println(ignored);
         }
       }
-    } else if (name.equals("help")) {
+    } else if (eventName.equals("help")) {
       try {
-        MessageEmbed messageEmbed = Help.build();
+        String name = getClass().getPackage().getImplementationTitle();
+        String version = getClass().getPackage().getImplementationVersion();
+        MessageEmbed messageEmbed = Help.build(name, version, 10, 3);
         event.getHook().sendMessageEmbeds(messageEmbed).queue();
       } catch (Exception ignored) {
         // Ignore podcast message creation or send errors for now
