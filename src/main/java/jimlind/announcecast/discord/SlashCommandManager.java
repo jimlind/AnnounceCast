@@ -2,8 +2,9 @@ package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
 import java.util.List;
-import jimlind.announcecast.discord.message.Help;
-import jimlind.announcecast.discord.message.Podcast;
+import jimlind.announcecast.discord.message.HelpMessage;
+import jimlind.announcecast.discord.message.PodcastMessage;
+import jimlind.announcecast.integration.context.HelpContext;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.ITunes;
 import jimlind.announcecast.storage.db.Feed;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 public class SlashCommandManager {
   @Inject private Client client;
   @Inject private Feed feed;
+  @Inject private HelpContext helpContext;
   @Inject private ITunes iTunes;
   @Inject private Joined joined;
 
@@ -34,7 +36,8 @@ public class SlashCommandManager {
 
       for (String feed : feedList) {
         try {
-          MessageEmbed messageEmbed = Podcast.build(client.createPodcastFromFeedUrl(feed, 0));
+          MessageEmbed messageEmbed =
+              PodcastMessage.build(client.createPodcastFromFeedUrl(feed, 0));
           messageChannel.sendMessageEmbeds(messageEmbed).queue();
         } catch (Exception ignored) {
           // Ignore podcast message creation or send errors for now
@@ -42,21 +45,8 @@ public class SlashCommandManager {
         }
       }
     } else if (eventName.equals("help")) {
-      try {
-        String name = getClass().getPackage().getImplementationTitle();
-        String version = getClass().getPackage().getImplementationVersion();
-        long podcastCount = this.feed.getCount();
-        long guildCount =
-            event.getJDA().getShardManager() != null
-                ? event.getJDA().getShardManager().getGuildCache().size()
-                : event.getJDA().getGuildCache().size();
-
-        MessageEmbed messageEmbed = Help.build(name, version, podcastCount, guildCount);
-        event.getHook().sendMessageEmbeds(messageEmbed).queue();
-      } catch (Exception ignored) {
-        // Ignore podcast message creation or send errors for now
-        System.out.println(ignored);
-      }
+      MessageEmbed messageEmbed = HelpMessage.build(this.helpContext.build(event));
+      event.getHook().sendMessageEmbeds(messageEmbed).queue();
     } else if (eventName.equals("following")) {
       try {
         List<jimlind.announcecast.storage.model.Feed> feedList =

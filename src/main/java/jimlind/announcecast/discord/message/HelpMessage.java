@@ -1,21 +1,23 @@
 package jimlind.announcecast.discord.message;
 
+import jimlind.announcecast.integration.context.HelpContext;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-public class Help {
-  public static MessageEmbed build(
-      String name, String version, long podcastCount, long guildCount) {
+public class HelpMessage {
+  public static MessageEmbed build(HelpContext context) {
     EmbedBuilder embedBuilder = new EmbedBuilder();
 
     // Set title
-    String title = String.format("%s v%s Documentation", name, version);
-    embedBuilder.setTitle(title, "https://jimlind.github.io/AnnounceCast/");
+    embedBuilder.setTitle(
+        String.format("%s v%s Documentation", context.getName(), context.getVersion()),
+        "https://jimlind.github.io/AnnounceCast/");
 
     // Set description
-    String description =
-        String.format("Tracking %s podcasts on %s servers.", podcastCount, guildCount);
-    embedBuilder.setDescription(description);
+    embedBuilder.setDescription(
+        String.format(
+            "Tracking %s podcasts on %s servers.",
+            context.getPodcastCount(), context.getGuildCount()));
 
     // Set fields for slash commands
     embedBuilder.addField(

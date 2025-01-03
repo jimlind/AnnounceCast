@@ -4,7 +4,7 @@ import jimlind.announcecast.Helper;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-public class Podcast {
+public class PodcastMessage {
   public static MessageEmbed build(jimlind.announcecast.podcast.Podcast podcast) {
     String feedLine = "Show Feed URL: " + podcast.getFeedUrl();
 
