@@ -2,6 +2,7 @@ package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
 import java.util.List;
+import jimlind.announcecast.discord.message.Help;
 import jimlind.announcecast.discord.message.Podcast;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.ITunes;
@@ -17,7 +18,6 @@ public class SlashCommandManager {
   public boolean process(SlashCommandInteractionEvent event) {
     event.deferReply().queue();
     String name = event.getName();
-    System.out.println(name);
 
     if (name.equals("search")) {
       OptionMapping keywordsOption = event.getInteraction().getOption("keywords");
@@ -37,6 +37,14 @@ public class SlashCommandManager {
           // Ignore podcast message creation or send errors for now
           System.out.println(ignored);
         }
+      }
+    } else if (name.equals("help")) {
+      try {
+        MessageEmbed messageEmbed = Help.build();
+        event.getHook().sendMessageEmbeds(messageEmbed).queue();
+      } catch (Exception ignored) {
+        // Ignore podcast message creation or send errors for now
+        System.out.println(ignored);
       }
     }
 
