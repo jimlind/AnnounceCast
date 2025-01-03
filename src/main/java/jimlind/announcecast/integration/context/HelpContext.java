@@ -5,12 +5,11 @@ import jimlind.announcecast.storage.db.Feed;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-@Getter
 public class HelpContext {
-  String name;
-  String version;
-  long podcastCount;
-  long guildCount;
+  @Getter String name;
+  @Getter String version;
+  @Getter long podcastCount;
+  @Getter long guildCount;
 
   @Inject private Feed feed;
 

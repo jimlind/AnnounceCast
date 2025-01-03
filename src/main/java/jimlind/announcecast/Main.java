@@ -19,7 +19,8 @@ public class Main {
             new BasicModule(),
             new jimlind.announcecast.storage.BasicModule(),
             new jimlind.announcecast.discord.BasicModule(),
-            new jimlind.announcecast.podcast.BasicModule());
+            new jimlind.announcecast.podcast.BasicModule(),
+            new jimlind.announcecast.integration.BasicModule());
 
     Discord discord = injector.getInstance(Discord.class);
     discord.run();

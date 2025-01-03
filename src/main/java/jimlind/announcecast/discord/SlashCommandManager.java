@@ -2,52 +2,32 @@ package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
 import java.util.List;
-import jimlind.announcecast.discord.message.HelpMessage;
-import jimlind.announcecast.discord.message.PodcastMessage;
+import jimlind.announcecast.discord.message.HelpMessageList;
+import jimlind.announcecast.discord.message.SearchMessageList;
 import jimlind.announcecast.integration.context.HelpContext;
-import jimlind.announcecast.podcast.Client;
-import jimlind.announcecast.podcast.ITunes;
-import jimlind.announcecast.storage.db.Feed;
+import jimlind.announcecast.integration.context.SearchContext;
 import jimlind.announcecast.storage.db.Joined;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 public class SlashCommandManager {
-  @Inject private Client client;
-  @Inject private Feed feed;
   @Inject private HelpContext helpContext;
-  @Inject private ITunes iTunes;
+  @Inject private SearchContext searchContext;
   @Inject private Joined joined;
 
   public boolean process(SlashCommandInteractionEvent event) {
     event.deferReply().queue();
     String eventName = event.getName();
-    MessageChannelUnion messageChannel = event.getChannel();
 
     if (eventName.equals("search")) {
-      OptionMapping keywordsOption = event.getInteraction().getOption("keywords");
-      String keywords = keywordsOption != null ? keywordsOption.getAsString() : "";
-
-      List<String> feedList = iTunes.search(keywords, 4);
-      String message = String.format("Displaying %s podcasts", feedList.size());
-      event.getHook().sendMessage(message).queue();
-
-      for (String feed : feedList) {
-        try {
-          MessageEmbed messageEmbed =
-              PodcastMessage.build(client.createPodcastFromFeedUrl(feed, 0));
-          messageChannel.sendMessageEmbeds(messageEmbed).queue();
-        } catch (Exception ignored) {
-          // Ignore podcast message creation or send errors for now
-          System.out.println(ignored);
-        }
-      }
+      List<MessageEmbed> messageList = SearchMessageList.build(this.searchContext.build(event));
+      event.getHook().sendMessageEmbeds(messageList).queue();
     } else if (eventName.equals("help")) {
-      MessageEmbed messageEmbed = HelpMessage.build(this.helpContext.build(event));
-      event.getHook().sendMessageEmbeds(messageEmbed).queue();
+      List<MessageEmbed> messageList = HelpMessageList.build(this.helpContext.build(event));
+      event.getHook().sendMessageEmbeds(messageList).queue();
     } else if (eventName.equals("following")) {
+      MessageChannelUnion messageChannel = event.getChannel();
       try {
         List<jimlind.announcecast.storage.model.Feed> feedList =
             this.joined.getFeedsByChannelId(messageChannel.getId());
