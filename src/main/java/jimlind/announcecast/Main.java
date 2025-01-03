@@ -17,7 +17,7 @@ public class Main {
     Injector injector =
         Guice.createInjector(
             new BasicModule(),
-            new jimlind.announcecast.database.BasicModule(),
+            new jimlind.announcecast.storage.BasicModule(),
             new jimlind.announcecast.discord.BasicModule(),
             new jimlind.announcecast.podcast.BasicModule());
 

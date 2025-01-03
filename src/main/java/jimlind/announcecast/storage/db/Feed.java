@@ -1,4 +1,4 @@
-package jimlind.announcecast.database;
+package jimlind.announcecast.storage.db;
 
 import java.sql.*;
 
