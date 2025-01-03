@@ -2,6 +2,7 @@ package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
 import java.util.List;
+import jimlind.announcecast.database.Feed;
 import jimlind.announcecast.discord.message.Help;
 import jimlind.announcecast.discord.message.Podcast;
 import jimlind.announcecast.podcast.Client;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 public class SlashCommandManager {
   @Inject private Client client;
+  @Inject private Feed feed;
   @Inject private ITunes iTunes;
 
   public boolean process(SlashCommandInteractionEvent event) {
@@ -42,7 +44,13 @@ public class SlashCommandManager {
       try {
         String name = getClass().getPackage().getImplementationTitle();
         String version = getClass().getPackage().getImplementationVersion();
-        MessageEmbed messageEmbed = Help.build(name, version, 10, 3);
+        long podcastCount = this.feed.getCount();
+        long guildCount =
+            event.getJDA().getShardManager() != null
+                ? event.getJDA().getShardManager().getGuildCache().size()
+                : event.getJDA().getGuildCache().size();
+
+        MessageEmbed messageEmbed = Help.build(name, version, podcastCount, guildCount);
         event.getHook().sendMessageEmbeds(messageEmbed).queue();
       } catch (Exception ignored) {
         // Ignore podcast message creation or send errors for now
