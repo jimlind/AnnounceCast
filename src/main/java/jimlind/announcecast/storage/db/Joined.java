@@ -1,6 +1,7 @@
 package jimlind.announcecast.storage.db;
 
 import java.sql.*;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
