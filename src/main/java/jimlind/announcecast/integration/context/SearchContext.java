@@ -20,8 +20,9 @@ public class SearchContext {
     OptionMapping keywordsOption = event.getInteraction().getOption("keywords");
     String keywords = keywordsOption != null ? keywordsOption.getAsString() : "";
 
-    Stream<String> feedStream = iTunes.search(keywords, 4).stream();
-    this.podcastList = feedStream.map(feed -> client.createPodcastFromFeedUrl(feed, 0)).toList();
+    Stream<String> feedStream = this.iTunes.search(keywords, 4).stream();
+    this.podcastList =
+        feedStream.map(feed -> this.client.createPodcastFromFeedUrl(feed, 0)).toList();
 
     return this;
   }
