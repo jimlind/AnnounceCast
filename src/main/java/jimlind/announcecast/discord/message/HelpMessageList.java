@@ -1,6 +1,5 @@
 package jimlind.announcecast.discord.message;
 
-import java.util.Collections;
 import java.util.List;
 import jimlind.announcecast.integration.context.HelpContext;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -43,6 +42,6 @@ public class HelpMessageList {
     embedBuilder.addField(
         ":left_speech_bubble: Discord", "[Join the Discord](https://discord.gg/sEjJTTjG3M)", true);
 
-    return Collections.singletonList(embedBuilder.build());
+    return List.of(embedBuilder.build());
   }
 }
