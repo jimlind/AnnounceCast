@@ -6,10 +6,10 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class HelpContext {
-  @Getter String name;
-  @Getter String version;
-  @Getter long podcastCount;
-  @Getter long guildCount;
+  @Getter private String name;
+  @Getter private String version;
+  @Getter private long podcastCount;
+  @Getter private long guildCount;
 
   @Inject private Feed feed;
 

@@ -11,10 +11,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 public class SearchContext {
-  @Inject ITunes iTunes;
-  @Inject Client client;
-
   @Getter private List<Podcast> podcastList;
+
+  @Inject private ITunes iTunes;
+  @Inject private Client client;
 
   public SearchContext build(SlashCommandInteractionEvent event) {
     OptionMapping keywordsOption = event.getInteraction().getOption("keywords");
