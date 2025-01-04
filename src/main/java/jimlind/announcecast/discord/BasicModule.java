@@ -9,6 +9,6 @@ public class BasicModule extends AbstractModule {
   protected void configure() {
     bind(Listeners.class).in(Scopes.SINGLETON);
     bind(Message.class).in(Scopes.SINGLETON);
-    bind(SlashCommandManager.class).in(Scopes.SINGLETON);
+    bind(SlashCommand.class).in(Scopes.SINGLETON);
   }
 }

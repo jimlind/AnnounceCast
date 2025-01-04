@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class Listeners extends ListenerAdapter {
   @Inject private Message message;
-  @Inject private SlashCommandManager slashCommandManager;
+  @Inject private SlashCommand slashCommandManager;
 
   @Override
   public void onReady(ReadyEvent e) {
