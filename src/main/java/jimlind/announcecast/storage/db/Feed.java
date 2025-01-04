@@ -1,67 +1,46 @@
 package jimlind.announcecast.storage.db;
 
+import com.google.inject.Inject;
 import java.sql.*;
-import java.sql.Connection;
 
 public class Feed {
+  private @Inject jimlind.announcecast.storage.db.Connection connection;
+
   public long getCount() {
-    String url = "jdbc:sqlite:db/podcasts.db";
-    Connection conn;
-    try {
-      conn = DriverManager.getConnection(url);
-    } catch (SQLException e) {
-      System.out.println("Connection to SQLite failed!");
-      return 0;
+    int countValue = 0;
+    try (Statement statement = connection.createStatement()) {
+      ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM feeds");
+      resultSet.next();
+      countValue = resultSet.getInt(1);
+    } catch (Exception ignore) {
+      // TODO: Log the exception
     }
-
-    String sql = "SELECT COUNT(*) FROM feeds";
-    try {
-      Statement stmt = conn.createStatement();
-      ResultSet rs = stmt.executeQuery(sql);
-      rs.next();
-      int count = rs.getInt(1);
-      stmt.close();
-      return count;
-
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    return countValue;
   }
 
   public String addFeed(String feedUrl, String feedTitle) {
-    String url = "jdbc:sqlite:db/podcasts.db";
-    Connection conn;
-    try {
-      conn = DriverManager.getConnection(url);
-    } catch (SQLException e) {
-      System.out.println("Connection to SQLite failed!");
-      return "";
-    }
+    String feedId = "";
 
-    String sql =
+    String insertSql =
         "INSERT OR IGNORE INTO feeds (id, url, title) VALUES (lower(hex(randomblob(3))), ?, ?)";
-    try {
-      PreparedStatement stmt = conn.prepareStatement(sql);
-      stmt.setString(1, feedUrl);
-      stmt.setString(2, feedTitle);
-      stmt.executeUpdate();
-      stmt.close();
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
+    try (PreparedStatement statement = connection.prepareStatement(insertSql)) {
+      statement.setString(1, feedUrl);
+      statement.setString(2, feedTitle);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      // TODO: Log the exception
     }
 
-    String selectQuery = "SELECT id FROM feeds WHERE url = ? LIMIT 1";
-    try {
-      PreparedStatement selectStatement = conn.prepareStatement(selectQuery);
-      selectStatement.setString(1, feedUrl);
-      ResultSet rs = selectStatement.executeQuery();
-      rs.next();
-      String id = rs.getString("id");
-      selectStatement.close();
-      conn.close();
-      return id;
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
+    String selectSql = "SELECT id FROM feeds WHERE url = ? LIMIT 1";
+    try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
+      statement.setString(1, feedUrl);
+      ResultSet resultSet = statement.executeQuery();
+      resultSet.next();
+      feedId = resultSet.getString("id");
+    } catch (Exception ignore) {
+      // TODO: Log the exception
     }
+
+    return feedId;
   }
 }

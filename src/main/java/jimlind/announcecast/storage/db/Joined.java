@@ -1,40 +1,32 @@
 package jimlind.announcecast.storage.db;
 
+import com.google.inject.Inject;
 import java.sql.*;
-import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import jimlind.announcecast.storage.model.Feed;
 
 public class Joined {
+  private @Inject jimlind.announcecast.storage.db.Connection connection;
+
   public List<Feed> getFeedsByChannelId(String channelId) {
-    String url = "jdbc:sqlite:db/podcasts.db";
-    Connection conn;
-    try {
-      conn = DriverManager.getConnection(url);
-    } catch (SQLException e) {
-      System.out.println("Connection to SQLite failed!");
-      return Collections.emptyList();
-    }
+    List<Feed> feedList = new ArrayList<>();
 
     String sql =
         "SELECT id, title FROM feeds INNER JOIN channels ON feeds.id = channels.feed_id WHERE channel_id = ? ORDER BY title";
-    List<Feed> feedList = new ArrayList<Feed>();
-    try {
-      PreparedStatement stmt = conn.prepareStatement(sql);
-      stmt.setString(1, channelId);
-      ResultSet rs = stmt.executeQuery();
-      while (rs.next()) {
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, channelId);
+      ResultSet resultSet = statement.executeQuery();
+      while (resultSet.next()) {
         Feed feed = new Feed();
-        feed.setId(rs.getString("id"));
-        feed.setTitle(rs.getString("title"));
+        feed.setId(resultSet.getString("id"));
+        feed.setTitle(resultSet.getString("title"));
         feedList.add(feed);
       }
-    } catch (Exception e) {
-      System.out.println(e);
-      return Collections.emptyList();
+    } catch (Exception ignore) {
+      // TODO: Log the exception
     }
+
     return feedList;
   }
 }
