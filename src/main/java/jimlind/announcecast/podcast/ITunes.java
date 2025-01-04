@@ -24,16 +24,24 @@ public class ITunes {
     String encodedKeywords = URLEncoder.encode(keywords, StandardCharsets.UTF_8);
     URI uri = URI.create(String.format(urlTemplate, encodedKeywords, limit));
 
+    String title = getClass().getPackage().getImplementationTitle();
+    String version = getClass().getPackage().getImplementationVersion();
+
     try (HttpClient client = HttpClient.newHttpClient()) {
       // Send Request
       HttpRequest request =
-          HttpRequest.newBuilder().uri(uri).timeout(Duration.of(1, SECONDS)).GET().build();
+          HttpRequest.newBuilder()
+              .uri(uri)
+              .header("User-Agent", title + "/" + version)
+              .timeout(Duration.of(1, SECONDS))
+              .GET()
+              .build();
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
       // Parse Response
       JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
       JsonArray results = jsonObject.getAsJsonArray("results");
-      Stream<JsonElement> stream = StreamSupport.stream(results.spliterator(), true).limit(count);
+      Stream<JsonElement> stream = StreamSupport.stream(results.spliterator(), false).limit(count);
 
       return stream.map(element -> element.getAsJsonObject().get("feedUrl").getAsString()).toList();
     } catch (Exception e) {

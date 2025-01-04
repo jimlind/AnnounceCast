@@ -17,12 +17,15 @@ public class Client {
   @Inject private Parser parser;
 
   public Podcast createPodcastFromFeedUrl(String feed, int episodeCount) {
+    String title = getClass().getPackage().getImplementationTitle();
+    String version = getClass().getPackage().getImplementationVersion();
+
     URLConnection connection;
     try {
       URL url = new URI(feed).toURL();
       connection = url.openConnection();
       connection.setRequestProperty("Host", url.getHost());
-      connection.setRequestProperty("User-Agent", "AnnounceCast");
+      connection.setRequestProperty("User-Agent", title + "/" + version);
       connection.setConnectTimeout(CONNECTION_CONNECT_TIMEOUT);
       connection.setReadTimeout(CONNECTION_READ_TIMEOUT);
     } catch (Exception ignored) {
