@@ -79,22 +79,6 @@ public class Parser {
               }
               elementStack.push(qualifiedElementName);
               break;
-            case "atom:link":
-              String href = "";
-              String rel = "";
-              for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
-                if (xmlStreamReader.getAttributeLocalName(i).equals("href")) {
-                  href = xmlStreamReader.getAttributeValue(i);
-                }
-                if (xmlStreamReader.getAttributeLocalName(i).equals("rel")) {
-                  rel = xmlStreamReader.getAttributeValue(i);
-                }
-              }
-              if (rel.equals("self")) {
-                podcast.setFeedUrl(href);
-              }
-              elementStack.push(qualifiedElementName);
-              break;
             case "item":
               episode = new Episode();
               elementStack.push(qualifiedElementName);

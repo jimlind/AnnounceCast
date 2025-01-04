@@ -70,6 +70,7 @@ public class Client {
 
     // This will never error out, and will always get some kind of Podcast/null object
     Podcast podcast = this.parser.processStreamReader(xmlStreamReader, episodeCount);
+    podcast.setFeedUrl(feed);
 
     try {
       timer.cancel(); // Cancel the timer if processing finished
