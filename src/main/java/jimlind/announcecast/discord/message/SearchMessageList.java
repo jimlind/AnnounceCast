@@ -13,7 +13,7 @@ public class SearchMessageList {
 
     EmbedBuilder embedBuilder = new EmbedBuilder();
     embedBuilder.setDescription(
-        String.format("Displaying %s podcast(s)", context.getPodcastList().size()));
+        String.format("Displaying %s podcast(s)...", context.getPodcastList().size()));
     messageList.add(embedBuilder.build());
 
     for (Podcast podcast : context.getPodcastList()) {
