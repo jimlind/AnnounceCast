@@ -26,11 +26,11 @@ jobs:
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
         run: |
-          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no /tmp/announcecast.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }}:/opt/bot/
+          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no /tmp/announcecast.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }}:/opt/bot/announcecast/
 
       - name: Deploy via SSH
         env:
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }} "systemctl start announcecast"
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }} "systemctl restart announcecast"
