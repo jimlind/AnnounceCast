@@ -9,7 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up SSH key
+      - name: Download Latest Release
+        run: wget https://github.com/jimlind/AnnounceCast/releases/latest/download/announcecast.jar -P /tmp
+
+      - name: Set SSH key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
@@ -17,6 +20,13 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Copy Latest Release
+        env:
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
+        run: |
+          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no /tmp/announcecast.jar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }}:/opt/bot/
 
       - name: Deploy via SSH
         env:
