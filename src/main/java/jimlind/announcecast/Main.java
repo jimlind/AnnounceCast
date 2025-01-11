@@ -2,7 +2,9 @@ package jimlind.announcecast;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import java.io.FileInputStream;
 import java.sql.*;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import jimlind.announcecast.podcast.Client;
@@ -14,6 +16,14 @@ public class Main {
   static int PAGINATION_DELAY = 2000;
 
   public static void main(String[] args) {
+    Properties properties = new Properties();
+    try (FileInputStream input = new FileInputStream(args[0])) {
+      properties.load(input);
+    } catch (Exception e) {
+      System.out.println("Application expects a formatted properties files as only argument");
+      System.exit(-1);
+    }
+
     Injector injector =
         Guice.createInjector(
             new BasicModule(),
@@ -23,7 +33,7 @@ public class Main {
             new jimlind.announcecast.integration.BasicModule());
 
     Discord discord = injector.getInstance(Discord.class);
-    discord.run();
+    discord.run(properties.getProperty("DISCORD_BOT_TOKEN"));
 
     String url = "jdbc:sqlite:db/podcasts.db";
     Connection conn;
