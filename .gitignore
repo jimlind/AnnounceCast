@@ -15,5 +15,5 @@ db/*.db
 # IntelliJ
 .idea
 
-# Scripts for local development setup
-dev-util/local-dev-setup.sh
+# Protecte Application Properties
+/input
