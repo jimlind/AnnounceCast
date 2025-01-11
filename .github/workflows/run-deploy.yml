@@ -2,6 +2,7 @@ name: Run Deploy
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   deploy:
