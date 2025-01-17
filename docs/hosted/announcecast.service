@@ -1,0 +1,20 @@
+[Unit]
+Description=AnnounceCast Discord Bot
+Documentation=https://github.com/jimlind/AnnounceCast
+After=syslog.target network.target
+
+[Service]
+SuccessExitStatus=143
+
+User=bot
+Type=simple
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+LoadCredentialEncrypted=properties:/opt/bot/announcecast/ciphertext.cred
+
+WorkingDirectory=/opt/bot/announcecast
+ExecStart=/usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar announcecast.jar ${CREDENTIALS_DIRECTORY}/properties
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
