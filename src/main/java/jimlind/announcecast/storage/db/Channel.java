@@ -28,4 +28,15 @@ public class Channel {
       // TODO: Log the exception
     }
   }
+
+  public void removeChannel(String feedUrl, String channelId) {
+    String deleteSql = "DELETE FROM channels WHERE feed_id = ? AND channel_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(deleteSql)) {
+      statement.setString(1, feedUrl);
+      statement.setString(2, channelId);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      // TODO: Log the exception
+    }
+  }
 }

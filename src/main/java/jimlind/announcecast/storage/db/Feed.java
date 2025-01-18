@@ -6,6 +6,20 @@ import java.sql.*;
 public class Feed {
   private @Inject jimlind.announcecast.storage.db.Connection connection;
 
+  public String getUrl(String feedId) {
+    String url = "";
+    String selectSql = "SELECT url FROM feeds WHERE id = ? LIMIT 1";
+    try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
+      statement.setString(1, feedId);
+      ResultSet resultSet = statement.executeQuery();
+      resultSet.next();
+      url = resultSet.getString("url");
+    } catch (Exception ignore) {
+      // TODO: Log the exception
+    }
+    return url;
+  }
+
   public long getCount() {
     int countValue = 0;
     try (Statement statement = connection.createStatement()) {
