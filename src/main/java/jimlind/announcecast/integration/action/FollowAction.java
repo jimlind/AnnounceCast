@@ -20,7 +20,7 @@ public class FollowAction {
     String keywords = keywordsOption != null ? keywordsOption.getAsString() : "";
 
     String feed = this.iTunes.search(keywords, 1).getFirst();
-    Podcast podcast = this.client.createPodcastFromFeedUrl(feed, 1);
+    Podcast podcast = this.client.createPodcastFromFeedUrl(feed, 0);
     String feedId = this.feed.addFeed(podcast.getFeedUrl(), podcast.getTitle());
     this.channel.addChannel(feedId, event.getChannelId());
 
