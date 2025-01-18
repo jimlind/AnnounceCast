@@ -80,6 +80,10 @@ public class Parser {
               elementStack.push(qualifiedElementName);
               break;
             case "item":
+              if (episodeCount == 0) {
+                return podcast;
+              }
+
               episode = new Episode();
               elementStack.push(qualifiedElementName);
               break;
@@ -93,9 +97,9 @@ public class Parser {
           String localElementName = xmlStreamReader.getLocalName();
           if (localElementName.equals("item")) {
             podcast.addEpisode(episode);
-            //            if (--episodeCount <= 0) {
-            //                            break;
-            //            }
+            if (--episodeCount <= 0) {
+              break;
+            }
           }
           elementStack.pop();
         }
