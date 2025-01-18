@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+import org.jetbrains.annotations.Nullable;
 
 public class Client {
   int CONNECTION_CONNECT_TIMEOUT = 500; // 0.5s
@@ -16,7 +17,7 @@ public class Client {
 
   @Inject private Parser parser;
 
-  public Podcast createPodcastFromFeedUrl(String feed, int episodeCount) {
+  public @Nullable Podcast createPodcastFromFeedUrl(String feed, int episodeCount) {
     String title = getClass().getPackage().getImplementationTitle();
     String version = getClass().getPackage().getImplementationVersion();
 

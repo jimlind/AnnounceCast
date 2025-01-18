@@ -7,10 +7,11 @@ import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.Feed;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.Nullable;
 
 public class FollowContext {
   @Getter private List<Feed> feedList;
-  @Getter private Podcast podcast;
+  @Getter private @Nullable Podcast podcast;
 
   @Inject private Joined joined;
 

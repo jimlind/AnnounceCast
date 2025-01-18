@@ -10,6 +10,11 @@ public class UnfollowMessageList {
   public static List<MessageEmbed> build(UnfollowContext context) {
     List<MessageEmbed> messageList = new ArrayList<>();
 
+    if (context.getPodcast() == null) {
+      messageList.add(NoPodcastMessage.build());
+      return messageList;
+    }
+
     EmbedBuilder embedBuilder = new EmbedBuilder();
     embedBuilder.setDescription("You are no longer following " + context.getPodcast().getTitle());
     embedBuilder.setThumbnail(context.getPodcast().getImageUrl());

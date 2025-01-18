@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import jimlind.announcecast.discord.ShutdownThread;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
@@ -24,16 +25,12 @@ public class Main {
       System.exit(-1);
     }
 
-    Injector injector =
-        Guice.createInjector(
-            new BasicModule(),
-            new jimlind.announcecast.storage.BasicModule(),
-            new jimlind.announcecast.discord.BasicModule(),
-            new jimlind.announcecast.podcast.BasicModule(),
-            new jimlind.announcecast.integration.BasicModule());
-
+    Injector injector = Guice.createInjector(new BasicModule());
     Discord discord = injector.getInstance(Discord.class);
     discord.run(properties.getProperty("DISCORD_BOT_TOKEN"));
+
+    // Register the shutdownThread to the shutdownHook
+    Runtime.getRuntime().addShutdownHook(injector.getInstance(ShutdownThread.class));
 
     String url = "jdbc:sqlite:db/podcasts.db";
     Connection conn;

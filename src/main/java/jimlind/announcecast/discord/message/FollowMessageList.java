@@ -10,6 +10,11 @@ public class FollowMessageList {
   public static List<MessageEmbed> build(FollowContext context) {
     List<MessageEmbed> messageList = new ArrayList<>();
 
+    if (context.getPodcast() == null) {
+      messageList.add(NoPodcastMessage.build());
+      return messageList;
+    }
+
     EmbedBuilder embedBuilder = new EmbedBuilder();
     embedBuilder.setDescription("You are following a new podcast...");
     messageList.add(embedBuilder.build());
