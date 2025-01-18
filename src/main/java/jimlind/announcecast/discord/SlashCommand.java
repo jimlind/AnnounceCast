@@ -2,15 +2,10 @@ package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
 import java.util.List;
-import jimlind.announcecast.discord.message.FollowMessageList;
-import jimlind.announcecast.discord.message.FollowingMessageList;
-import jimlind.announcecast.discord.message.HelpMessageList;
-import jimlind.announcecast.discord.message.SearchMessageList;
+import jimlind.announcecast.discord.message.*;
 import jimlind.announcecast.integration.action.FollowAction;
-import jimlind.announcecast.integration.context.FollowContext;
-import jimlind.announcecast.integration.context.FollowingContext;
-import jimlind.announcecast.integration.context.HelpContext;
-import jimlind.announcecast.integration.context.SearchContext;
+import jimlind.announcecast.integration.action.UnfollowAction;
+import jimlind.announcecast.integration.context.*;
 import jimlind.announcecast.podcast.Podcast;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,6 +16,8 @@ public class SlashCommand {
   @Inject private FollowingContext followingContext;
   @Inject private HelpContext helpContext;
   @Inject private SearchContext searchContext;
+  @Inject private UnfollowAction unfollowAction;
+  @Inject private UnfollowContext unfollowContext;
 
   public boolean process(SlashCommandInteractionEvent event) {
     event.deferReply().queue();
@@ -33,6 +30,10 @@ public class SlashCommand {
           }
           case "following" -> FollowingMessageList.build(this.followingContext.build(event));
           case "search" -> SearchMessageList.build(this.searchContext.build(event));
+          case "unfollow" -> {
+            Podcast podcast = this.unfollowAction.run(event);
+            yield UnfollowMessageList.build(this.unfollowContext.build(event, podcast));
+          }
           default -> HelpMessageList.build(this.helpContext.build(event));
         };
 

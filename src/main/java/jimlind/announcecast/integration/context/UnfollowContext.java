@@ -1,0 +1,23 @@
+package jimlind.announcecast.integration.context;
+
+import com.google.inject.Inject;
+import java.util.List;
+import jimlind.announcecast.podcast.Podcast;
+import jimlind.announcecast.storage.db.Joined;
+import jimlind.announcecast.storage.model.Feed;
+import lombok.Getter;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
+public class UnfollowContext {
+  @Getter private List<Feed> feedList;
+  @Getter private Podcast podcast;
+
+  @Inject private Joined joined;
+
+  public UnfollowContext build(SlashCommandInteractionEvent event, Podcast podcast) {
+    this.feedList = this.joined.getFeedsByChannelId(event.getChannel().getId());
+    this.podcast = podcast;
+
+    return this;
+  }
+}
