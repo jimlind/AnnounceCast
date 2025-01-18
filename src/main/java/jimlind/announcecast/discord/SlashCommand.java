@@ -43,6 +43,12 @@ public class SlashCommand {
           default -> HelpMessageList.build(this.helpContext.build(event));
         };
 
+    if (messageList.isEmpty()) {
+      // TODO LOG THE ERROR
+      System.out.println("Nothing returned in the message list");
+      return true;
+    }
+
     event.getHook().sendMessageEmbeds(messageList.getFirst()).queue();
     messageList.stream()
         .skip(1)
