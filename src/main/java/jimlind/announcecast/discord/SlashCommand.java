@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import java.util.List;
 import jimlind.announcecast.discord.message.*;
 import jimlind.announcecast.integration.action.*;
-import jimlind.announcecast.integration.context.*;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,7 +13,7 @@ public class SlashCommand {
   @Inject private FollowAction followAction;
   @Inject private FollowingAction followingAction;
   @Inject private FollowRssAction followRssAction;
-  @Inject private HelpContext helpContext;
+  @Inject private HelpAction helpAction;
   @Inject private SearchAction searchAction;
   @Inject private UnfollowAction unfollowAction;
 
@@ -28,7 +27,7 @@ public class SlashCommand {
           case "following" -> FollowingMessageList.build(this.followingAction.run(event));
           case "search" -> SearchMessageList.build(this.searchAction.run(event));
           case "unfollow" -> UnfollowMessageList.build(this.unfollowAction.run(event));
-          default -> HelpMessageList.build(this.helpContext.build(event));
+          default -> HelpMessageList.build(this.helpAction.run(event));
         };
 
     if (messageList.isEmpty()) {
