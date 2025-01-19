@@ -36,6 +36,16 @@ public class HelpMessageList {
     embedBuilder.addField(
         "/help [test]", "Display this help message optionally sending test messages", false);
 
+    // Set fields for permissions data
+    String viewStatus = context.isViewChannelEnabled() ? "✅" : "❌";
+    String sendStatus = context.isSendMessageEnabled() ? "✅" : "❌";
+    String embedStatus = context.isEmbedLinkEnabled() ? "✅" : "❌";
+    String permissions =
+        String.format(
+            "``` %s View channel\n %s Send message in channel/thread\n %s Embed link```",
+            viewStatus, sendStatus, embedStatus);
+    embedBuilder.addField(":gear:️ Permissions", permissions, false);
+
     // Set fields for support links
     embedBuilder.addField(
         ":clap: Patreon", "[Support on Patreon](https://www.patreon.com/AnnounceCast)", true);
