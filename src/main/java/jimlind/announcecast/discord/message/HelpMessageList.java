@@ -1,5 +1,6 @@
 package jimlind.announcecast.discord.message;
 
+import java.util.ArrayList;
 import java.util.List;
 import jimlind.announcecast.integration.context.HelpContext;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -7,6 +8,13 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class HelpMessageList {
   public static List<MessageEmbed> build(HelpContext context) {
+    if (context.getPodcast() != null) {
+      return buildTest(context);
+    }
+    return buildDefault(context);
+  }
+
+  public static List<MessageEmbed> buildDefault(HelpContext context) {
     EmbedBuilder embedBuilder = new EmbedBuilder();
 
     // Set title
@@ -34,7 +42,7 @@ public class HelpMessageList {
     embedBuilder.addField(
         "/search <keywords>", "Display up to 4 podcasts matching the search keyword(s)", false);
     embedBuilder.addField(
-        "/help [test]", "Display this help message optionally sending test messages", false);
+        "/help [test]", "Display this help message optionally sending test message", false);
 
     // Set fields for permissions data
     String viewStatus = context.isViewChannelEnabled() ? "✅" : "❌";
@@ -53,5 +61,17 @@ public class HelpMessageList {
         ":left_speech_bubble: Discord", "[Join the Discord](https://discord.gg/sEjJTTjG3M)", true);
 
     return List.of(embedBuilder.build());
+  }
+
+  public static List<MessageEmbed> buildTest(HelpContext context) {
+    ArrayList<MessageEmbed> messageList = new ArrayList<>();
+    EmbedBuilder embedBuilder = new EmbedBuilder();
+
+    embedBuilder.setDescription(
+        "The latest episode of Escape Hatch will be published below. If you don't see you need to adjust your permissions.");
+    messageList.add(embedBuilder.build());
+    messageList.add(EpisodeMessage.build(context.getPodcast()));
+
+    return messageList;
   }
 }
