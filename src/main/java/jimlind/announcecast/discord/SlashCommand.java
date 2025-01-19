@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 @Slf4j
 public class SlashCommand {
   @Inject private FollowAction followAction;
-  @Inject private FollowContext followContext;
   @Inject private FollowRssAction followRssAction;
   @Inject private FollowingContext followingContext;
   @Inject private HelpContext helpContext;
@@ -28,14 +27,8 @@ public class SlashCommand {
 
     List<MessageEmbed> messageList =
         switch (event.getName()) {
-          case "follow" -> {
-            Podcast podcast = this.followAction.run(event);
-            yield FollowMessageList.build(this.followContext.build(event, podcast));
-          }
-          case "follow-rss" -> {
-            Podcast podcast = this.followRssAction.run(event);
-            yield FollowMessageList.build(this.followContext.build(event, podcast));
-          }
+          case "follow" -> FollowMessageList.build(this.followAction.run(event));
+          case "follow-rss" -> FollowMessageList.build(this.followRssAction.run(event));
           case "following" -> FollowingMessageList.build(this.followingContext.build(event));
           case "search" -> SearchMessageList.build(this.searchContext.build(event));
           case "unfollow" -> {

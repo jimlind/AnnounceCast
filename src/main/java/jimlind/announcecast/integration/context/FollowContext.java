@@ -1,24 +1,18 @@
 package jimlind.announcecast.integration.context;
 
-import com.google.inject.Inject;
 import java.util.List;
 import jimlind.announcecast.podcast.Podcast;
-import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.Feed;
 import lombok.Getter;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.Nullable;
 
+@Getter
 public class FollowContext {
-  @Getter private List<Feed> feedList;
-  @Getter private @Nullable Podcast podcast;
+  private final List<Feed> feedList;
+  private final @Nullable Podcast podcast;
 
-  @Inject private Joined joined;
-
-  public FollowContext build(SlashCommandInteractionEvent event, Podcast podcast) {
-    this.feedList = this.joined.getFeedsByChannelId(event.getChannel().getId());
+  public FollowContext(@Nullable Podcast podcast, List<Feed> feedList) {
     this.podcast = podcast;
-
-    return this;
+    this.feedList = feedList;
   }
 }
