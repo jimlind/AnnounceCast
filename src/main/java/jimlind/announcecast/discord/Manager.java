@@ -1,12 +1,11 @@
-package jimlind.announcecast;
+package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
-import jimlind.announcecast.discord.Listeners;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import org.jetbrains.annotations.Nullable;
 
-public class Discord {
+public class Manager {
   @Inject private Listeners listeners;
   private @Nullable ShardManager shardManager;
 

@@ -7,6 +7,8 @@ import java.sql.*;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import jimlind.announcecast.discord.BasicModule;
+import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.ShutdownThread;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Episode;
@@ -26,8 +28,8 @@ public class Main {
     }
 
     Injector injector = Guice.createInjector(new BasicModule());
-    Discord discord = injector.getInstance(Discord.class);
-    discord.run(properties.getProperty("DISCORD_BOT_TOKEN"));
+    Manager discordManager = injector.getInstance(Manager.class);
+    discordManager.run(properties.getProperty("DISCORD_BOT_TOKEN"));
 
     // Register the shutdownThread to the shutdownHook
     Runtime.getRuntime().addShutdownHook(injector.getInstance(ShutdownThread.class));
