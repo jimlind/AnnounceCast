@@ -5,7 +5,6 @@ import java.util.List;
 import jimlind.announcecast.discord.message.*;
 import jimlind.announcecast.integration.action.*;
 import jimlind.announcecast.integration.context.*;
-import jimlind.announcecast.podcast.Podcast;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,7 +17,6 @@ public class SlashCommand {
   @Inject private HelpContext helpContext;
   @Inject private SearchAction searchAction;
   @Inject private UnfollowAction unfollowAction;
-  @Inject private UnfollowContext unfollowContext;
 
   public boolean process(SlashCommandInteractionEvent event) {
     event.deferReply().queue();
@@ -29,10 +27,7 @@ public class SlashCommand {
           case "follow-rss" -> FollowMessageList.build(this.followRssAction.run(event));
           case "following" -> FollowingMessageList.build(this.followingAction.run(event));
           case "search" -> SearchMessageList.build(this.searchAction.run(event));
-          case "unfollow" -> {
-            Podcast podcast = this.unfollowAction.run(event);
-            yield UnfollowMessageList.build(this.unfollowContext.build(event, podcast));
-          }
+          case "unfollow" -> UnfollowMessageList.build(this.unfollowAction.run(event));
           default -> HelpMessageList.build(this.helpContext.build(event));
         };
 
