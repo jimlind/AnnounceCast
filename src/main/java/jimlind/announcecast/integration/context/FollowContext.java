@@ -8,8 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class FollowContext {
-  private final List<Feed> feedList;
   private final @Nullable Podcast podcast;
+  private final List<Feed> feedList;
 
   public FollowContext(@Nullable Podcast podcast, List<Feed> feedList) {
     this.podcast = podcast;
