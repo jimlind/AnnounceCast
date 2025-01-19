@@ -1,29 +1,14 @@
 package jimlind.announcecast.integration.context;
 
-import com.google.inject.Inject;
 import java.util.List;
-import java.util.stream.Stream;
-import jimlind.announcecast.podcast.Client;
-import jimlind.announcecast.podcast.ITunes;
 import jimlind.announcecast.podcast.Podcast;
 import lombok.Getter;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+@Getter
 public class SearchContext {
-  @Getter private List<Podcast> podcastList;
+  private final List<Podcast> podcastList;
 
-  @Inject private ITunes iTunes;
-  @Inject private Client client;
-
-  public SearchContext build(SlashCommandInteractionEvent event) {
-    OptionMapping keywordsOption = event.getInteraction().getOption("keywords");
-    String keywords = keywordsOption != null ? keywordsOption.getAsString() : "";
-
-    Stream<String> feedStream = this.iTunes.search(keywords, 4).stream();
-    this.podcastList =
-        feedStream.map(feed -> this.client.createPodcastFromFeedUrl(feed, 0)).toList();
-
-    return this;
+  public SearchContext(List<Podcast> podcastList) {
+    this.podcastList = podcastList;
   }
 }
