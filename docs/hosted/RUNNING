@@ -6,8 +6,8 @@ Create the location that bot is going to be running in
 `> cd /opt/announcecast`
 `> wget https://github.com/jimlind/AnnounceCast/releases/latest/download/announcecast.jar`
 
-Create the database directory and put something there
-TODO: This is cheating, we don't have a starter database and we don't need one
+If you don't have a database to put in place it will get created automatically.
+But you'll probably be reusing an existing one.
 `> mkdir -p /opt/bot/announcecast/db`
 `> scp db/podcasts.db vps:/opt/bot/announecast/db/podcasts.db`
 
