@@ -5,7 +5,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import jimlind.announcecast.storage.model.Feed;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Joined {
   private @Inject jimlind.announcecast.storage.db.Connection connection;
 
@@ -24,7 +26,10 @@ public class Joined {
         feedList.add(feed);
       }
     } catch (Exception ignore) {
-      // TODO: Log the exception
+      log.atWarn()
+          .setMessage("Unable to get feeds by channel id")
+          .addKeyValue("channelId", channelId)
+          .log();
     }
 
     return feedList;

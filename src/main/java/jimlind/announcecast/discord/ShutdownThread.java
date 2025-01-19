@@ -1,14 +1,14 @@
 package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
-import jimlind.announcecast.Discord;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ShutdownThread extends Thread {
-  @Inject private Discord discord;
+  @Inject private Manager manager;
 
   public void run() {
-    // TODO: Log!
-    System.out.println("Shutting Things Down!");
-    this.discord.halt();
+    log.atInfo().setMessage("Shutting things down").log();
+    this.manager.halt();
   }
 }

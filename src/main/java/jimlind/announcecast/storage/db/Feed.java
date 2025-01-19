@@ -2,7 +2,9 @@ package jimlind.announcecast.storage.db;
 
 import com.google.inject.Inject;
 import java.sql.*;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Feed {
   private @Inject jimlind.announcecast.storage.db.Connection connection;
 
@@ -15,7 +17,7 @@ public class Feed {
       resultSet.next();
       url = resultSet.getString("url");
     } catch (Exception ignore) {
-      // TODO: Log the exception
+      log.atWarn().setMessage("Unable to get feed url").addKeyValue("feedId", feedId).log();
     }
     return url;
   }
@@ -27,7 +29,7 @@ public class Feed {
       resultSet.next();
       countValue = resultSet.getInt(1);
     } catch (Exception ignore) {
-      // TODO: Log the exception
+      log.atWarn().setMessage("Unable to get the feed count").log();
     }
     return countValue;
   }
@@ -42,7 +44,11 @@ public class Feed {
       statement.setString(2, feedTitle);
       statement.executeUpdate();
     } catch (Exception ignore) {
-      // TODO: Log the exception
+      log.atWarn()
+          .setMessage("Unable to add a new feed")
+          .addKeyValue("feedUrl", feedUrl)
+          .addKeyValue("feedTitle", feedTitle)
+          .log();
     }
 
     String selectSql = "SELECT id FROM feeds WHERE url = ? LIMIT 1";
@@ -52,7 +58,7 @@ public class Feed {
       resultSet.next();
       feedId = resultSet.getString("id");
     } catch (Exception ignore) {
-      // TODO: Log the exception
+      log.atWarn().setMessage("Unable to get feed id by url").addKeyValue("feedUrl", feedUrl).log();
     }
 
     return feedId;

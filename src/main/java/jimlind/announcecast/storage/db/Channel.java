@@ -1,8 +1,12 @@
 package jimlind.announcecast.storage.db;
 
 import com.google.inject.Inject;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Channel {
   private @Inject jimlind.announcecast.storage.db.Connection connection;
 
@@ -13,7 +17,7 @@ public class Channel {
       resultSet.next();
       countValue = resultSet.getInt(1);
     } catch (Exception ignore) {
-      // TODO: Log the exception
+      log.atWarn().setMessage("Unable to get the channel count").log();
     }
     return countValue;
   }
@@ -25,7 +29,11 @@ public class Channel {
       statement.setString(2, channelId);
       statement.executeUpdate();
     } catch (Exception ignore) {
-      // TODO: Log the exception
+      log.atWarn()
+          .setMessage("Unable to add a new channel")
+          .addKeyValue("feedUrl", feedUrl)
+          .addKeyValue("channelId", channelId)
+          .log();
     }
   }
 
@@ -36,7 +44,11 @@ public class Channel {
       statement.setString(2, channelId);
       statement.executeUpdate();
     } catch (Exception ignore) {
-      // TODO: Log the exception
+      log.atWarn()
+          .setMessage("Unable to remove a channel")
+          .addKeyValue("feedUrl", feedUrl)
+          .addKeyValue("channelId", channelId)
+          .log();
     }
   }
 }

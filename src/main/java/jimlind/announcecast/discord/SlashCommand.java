@@ -8,9 +8,11 @@ import jimlind.announcecast.integration.action.FollowRssAction;
 import jimlind.announcecast.integration.action.UnfollowAction;
 import jimlind.announcecast.integration.context.*;
 import jimlind.announcecast.podcast.Podcast;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
+@Slf4j
 public class SlashCommand {
   @Inject private FollowAction followAction;
   @Inject private FollowContext followContext;
@@ -44,8 +46,7 @@ public class SlashCommand {
         };
 
     if (messageList.isEmpty()) {
-      // TODO LOG THE ERROR
-      System.out.println("Nothing returned in the message list");
+      log.atWarn().setMessage("Nothing returned in the message list").log();
       return true;
     }
 
