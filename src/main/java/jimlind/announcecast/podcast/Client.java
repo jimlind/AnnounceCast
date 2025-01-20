@@ -21,10 +21,10 @@ public class Client {
     String title = getClass().getPackage().getImplementationTitle();
     String version = getClass().getPackage().getImplementationVersion();
 
-    URLConnection connection;
+    HttpURLConnection connection;
     try {
       URL url = new URI(feed).toURL();
-      connection = url.openConnection();
+      connection = (HttpURLConnection) url.openConnection();
       connection.setRequestProperty("Host", url.getHost());
       connection.setRequestProperty("User-Agent", title + "/" + version);
       connection.setConnectTimeout(CONNECTION_CONNECT_TIMEOUT);
@@ -32,6 +32,17 @@ public class Client {
     } catch (Exception ignored) {
       // Ignore any errors from attempting to build a URL or open a connection
       // It isn't my role to validate the whole Internet
+      return null;
+    }
+
+    try {
+      int responseCode = connection.getResponseCode();
+      if (responseCode > 299 && responseCode < 400) {
+        return createPodcastFromFeedUrl(connection.getHeaderField("Location"), episodeCount);
+      }
+    } catch (Exception ignored) {
+      // Ignore any errors from trying to get a response code
+      // It isn't my roles to validate the whole Internet
       return null;
     }
 
