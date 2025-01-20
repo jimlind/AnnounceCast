@@ -79,6 +79,22 @@ public class Parser {
               }
               elementStack.push(qualifiedElementName);
               break;
+            case "itunes:season":
+              String seasonText = xmlStreamReader.getElementText();
+              episode.setSeasonId(seasonText);
+              break;
+            case "itunes:episode":
+              String episodeText = xmlStreamReader.getElementText();
+              episode.setEpisodeId(episodeText);
+              break;
+            case "itunes:duration":
+              String durationText = xmlStreamReader.getElementText();
+              episode.setDuration(durationText);
+              break;
+            case "itunes:explicit":
+              String explicitText = xmlStreamReader.getElementText();
+              episode.setExplicit(explicitText);
+              break;
             case "item":
               if (episodeCount == 0) {
                 return podcast;

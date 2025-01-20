@@ -3,6 +3,7 @@ package jimlind.announcecast.discord.message;
 import java.util.ArrayList;
 import java.util.List;
 import jimlind.announcecast.integration.context.HelpContext;
+import jimlind.announcecast.podcast.Episode;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -68,9 +69,13 @@ public class HelpMessageList {
     EmbedBuilder embedBuilder = new EmbedBuilder();
 
     embedBuilder.setDescription(
-        "The latest episode of Escape Hatch will be published below. If you don't see you need to adjust your permissions.");
+        "The latest episode of Escape Hatch will be published below. If you don't see it you need to adjust your permissions.");
     messageList.add(embedBuilder.build());
-    messageList.add(EpisodeMessage.build(context.getPodcast()));
+
+    List<Episode> episodeList = context.getPodcast().getEpisodeList();
+    if (!episodeList.isEmpty()) {
+      messageList.add(EpisodeMessage.build(context.getPodcast(), 0));
+    }
 
     return messageList;
   }
