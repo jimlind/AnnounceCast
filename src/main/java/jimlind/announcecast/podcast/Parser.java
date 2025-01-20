@@ -60,6 +60,12 @@ public class Parser {
                 episode.setLink(linkText);
               }
               break;
+            case "guid":
+              String guidText = xmlStreamReader.getElementText();
+              if (isChildOfItem(elementStack)) {
+                episode.setGuid(guidText);
+              }
+              break;
             case "itunes:author":
               String authorText = xmlStreamReader.getElementText();
               if (isChildOfChannel(elementStack)) {

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 @Setter
 public class Episode {
   private String title;
+  private String guid;
   private String description;
   private String link;
   private String imageUrl;
