@@ -10,6 +10,7 @@ import lombok.Setter;
 public class Podcast {
   private String title;
   private String description;
+  private String summary;
   private String feedUrl;
   private String showUrl;
   private String imageUrl;

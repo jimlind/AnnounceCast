@@ -66,6 +66,14 @@ public class Parser {
                 episode.setGuid(guidText);
               }
               break;
+            case "itunes:summary":
+              String summaryText = xmlStreamReader.getElementText();
+              if (isChildOfChannel(elementStack)) {
+                podcast.setSummary(summaryText);
+              } else if (isChildOfItem(elementStack)) {
+                episode.setSummary(summaryText);
+              }
+              break;
             case "itunes:author":
               String authorText = xmlStreamReader.getElementText();
               if (isChildOfChannel(elementStack)) {
