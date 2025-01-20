@@ -5,6 +5,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import jimlind.announcecast.storage.model.Feed;
+import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,5 +34,37 @@ public class Joined {
     }
 
     return feedList;
+  }
+
+  public List<PostedFeed> getPaginatedPostedFeed(int paginationSize, int paginationIndex) {
+    List<PostedFeed> postedFeedList = new ArrayList<>();
+
+    String selectSql =
+        "SELECT id, url, guid FROM feeds INNER JOIN posted ON feeds.id = posted.feed_id LIMIT ? OFFSET ?";
+    try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
+      statement.setInt(1, paginationSize);
+      statement.setInt(2, paginationIndex * paginationSize);
+      ResultSet resultSet = statement.executeQuery();
+
+      if (!resultSet.isBeforeFirst()) {
+        return null;
+      }
+
+      while (resultSet.next()) {
+        PostedFeed postedFeed = new PostedFeed();
+        postedFeed.setUrl(resultSet.getString("url"));
+        postedFeed.setGuid(resultSet.getString("guid"));
+
+        postedFeedList.add(postedFeed);
+      }
+    } catch (Exception ignore) {
+      log.atWarn()
+          .setMessage("Unable to get posted feed page")
+          .addKeyValue("paginationSize", paginationSize)
+          .addKeyValue("paginationIndex", paginationIndex)
+          .log();
+    }
+
+    return postedFeedList;
   }
 }
