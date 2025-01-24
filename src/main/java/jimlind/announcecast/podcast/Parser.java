@@ -36,6 +36,17 @@ public class Parser {
               elementPrefix.isBlank() ? localElementName : elementPrefix + ":" + localElementName;
 
           switch (qualifiedElementName) {
+            case "link":
+              String linkText = xmlStreamReader.getElementText();
+              if (isChildOfChannel(elementStack)) {
+                podcast.setShowUrl(linkText);
+              } else if (isChildOfItem(elementStack)) {
+                episode.setLink(linkText);
+              }
+              continue;
+          }
+
+          switch (localElementName) {
             case "title":
               String titleText = xmlStreamReader.getElementText();
               if (isChildOfChannel(elementStack)) {
@@ -52,21 +63,13 @@ public class Parser {
                 episode.setDescription(descriptionText);
               }
               break;
-            case "link":
-              String linkText = xmlStreamReader.getElementText();
-              if (isChildOfChannel(elementStack)) {
-                podcast.setShowUrl(linkText);
-              } else if (isChildOfItem(elementStack)) {
-                episode.setLink(linkText);
-              }
-              break;
             case "guid":
               String guidText = xmlStreamReader.getElementText();
               if (isChildOfItem(elementStack)) {
                 episode.setGuid(guidText);
               }
               break;
-            case "itunes:summary":
+            case "summary":
               String summaryText = xmlStreamReader.getElementText();
               if (isChildOfChannel(elementStack)) {
                 podcast.setSummary(summaryText);
@@ -74,13 +77,13 @@ public class Parser {
                 episode.setSummary(summaryText);
               }
               break;
-            case "itunes:author":
+            case "author":
               String authorText = xmlStreamReader.getElementText();
               if (isChildOfChannel(elementStack)) {
                 podcast.setAuthor(authorText);
               }
               break;
-            case "itunes:image":
+            case "image":
               for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
                 if (xmlStreamReader.getAttributeLocalName(i).equals("href")) {
                   if (isChildOfChannel(elementStack)) {
@@ -91,34 +94,35 @@ public class Parser {
                   break;
                 }
               }
-              elementStack.push(qualifiedElementName);
+              elementStack.push(localElementName);
               break;
-            case "itunes:season":
+            case "season":
               String seasonText = xmlStreamReader.getElementText();
               episode.setSeasonId(seasonText);
               break;
-            case "itunes:episode":
+            case "episode":
               String episodeText = xmlStreamReader.getElementText();
               episode.setEpisodeId(episodeText);
               break;
-            case "itunes:duration":
+            case "duration":
               String durationText = xmlStreamReader.getElementText();
               episode.setDuration(durationText);
               break;
-            case "itunes:explicit":
+            case "explicit":
               String explicitText = xmlStreamReader.getElementText();
               episode.setExplicit(explicitText);
               break;
             case "item":
+              // If we don't want any episodes return the podcast when first item is reached
               if (episodeCount == 0) {
                 return podcast;
               }
 
               episode = new Episode();
-              elementStack.push(qualifiedElementName);
+              elementStack.push(localElementName);
               break;
             default:
-              elementStack.push(qualifiedElementName);
+              elementStack.push(localElementName);
               break;
           }
         }
