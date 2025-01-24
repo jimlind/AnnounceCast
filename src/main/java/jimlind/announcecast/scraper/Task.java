@@ -4,10 +4,14 @@ import com.google.inject.Inject;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import jimlind.announcecast.discord.Manager;
+import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
+import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.PostedFeed;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class Task {
   int PAGINATION_DELAY = 5000;
@@ -15,6 +19,7 @@ public class Task {
 
   @Inject private Client client;
   @Inject private Joined joined;
+  @Inject private Manager manager;
   @Inject private Queue queue;
 
   public void run() {
@@ -33,10 +38,14 @@ public class Task {
             this.paginationIndex++;
 
             for (PostedFeed postedFeed : postedFeedList) {
-              System.out.println(" xxxx " + postedFeed.getUrl());
               Podcast podcast = client.createPodcastFromFeedUrl(postedFeed.getUrl(), 1);
               if (podcast == null) {
-                return;
+                continue;
+              }
+
+              if (postedFeed.getGuid() == null || postedFeed.getGuid().isBlank()) {
+                queue.set(postedFeed.getUrl());
+                continue;
               }
 
               if (!postedFeed.getGuid().contains(podcast.getEpisodeList().getFirst().getGuid())) {
@@ -59,18 +68,16 @@ public class Task {
                 return;
               }
 
-              // TODO: When we know we have a good podcast write some info about it.
-              System.out.println(podcast.getTitle());
-              System.out.println(podcast.getAuthor());
+              List<Episode> episodeList = podcast.getEpisodeList();
+              if (episodeList.isEmpty()) {
+                return;
+              }
 
-              String description =
-                  podcast.getDescription().isBlank()
-                      ? podcast.getSummary()
-                      : podcast.getDescription();
-              System.out.println(description);
+              MessageEmbed message = EpisodeMessage.build(podcast, 0);
+              manager.sendMessage("1260736216568168519", message);
             }
           }
         };
-    new Timer().schedule(queuedTask, 10, 10);
+    new Timer().schedule(queuedTask, 1000, 10);
   }
 }
