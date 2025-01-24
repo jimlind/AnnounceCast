@@ -9,12 +9,12 @@ import org.jetbrains.annotations.Nullable;
 public class Episode {
   private String title;
   private String guid;
-  private String description;
+  private @Nullable String description;
   private String summary;
   private String link;
-  private String imageUrl;
+  private @Nullable String imageUrl;
   private @Nullable String seasonId;
   private @Nullable String episodeId;
-  private String duration;
-  private String explicit;
+  private @Nullable String duration;
+  private @Nullable String explicit;
 }
