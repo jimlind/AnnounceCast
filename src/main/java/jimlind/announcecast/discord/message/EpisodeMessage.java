@@ -8,23 +8,28 @@ import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.Nullable;
 
 public class EpisodeMessage {
   public static MessageEmbed build(Podcast podcast, int index) {
     Episode episode = podcast.getEpisodeList().get(index);
 
     EmbedBuilder embedBuilder = new EmbedBuilder();
-    embedBuilder.setDescription(getDescriptionText(episode));
+    embedBuilder.setDescription(getDescriptionText(podcast.getDescription(), episode));
     embedBuilder.setTitle(episode.getTitle(), episode.getLink());
-    embedBuilder.setImage(episode.getImageUrl());
-    embedBuilder.setAuthor(podcast.getTitle(), podcast.getShowUrl(), podcast.getImageUrl());
+    embedBuilder.setImage(getEpisodeImage(podcast, episode));
+    embedBuilder.setAuthor(podcast.getTitle(), getUrl(podcast.getShowUrl()), podcast.getImageUrl());
     embedBuilder.setFooter(getFooterText(episode));
 
     return embedBuilder.build();
   }
 
-  private static String getDescriptionText(Episode episode) {
-    String markdownText = Helper.htmlToMarkdown(episode.getDescription(), 1024);
+  private static String getDescriptionText(String defaultValue, Episode episode) {
+    // Prefer description over summary over default value
+    String description = episode.getSummary() != null ? episode.getSummary() : defaultValue;
+    description = episode.getDescription() != null ? episode.getDescription() : description;
+
+    String markdownText = Helper.htmlToMarkdown(description, 512);
 
     int newlineIndex = markdownText.indexOf('\n');
     if (newlineIndex == -1) {
@@ -34,8 +39,24 @@ public class EpisodeMessage {
     return markdownText.substring(0, newlineIndex);
   }
 
+  private static @Nullable String getUrl(String input) {
+    if (input == null || input.isBlank()) {
+      return null;
+    }
+
+    if (!input.startsWith("http")) {
+      input = "https://" + input;
+    }
+
+    return input;
+  }
+
+  private static String getEpisodeImage(Podcast podcast, Episode episode) {
+    return episode.getImageUrl() != null ? episode.getImageUrl() : podcast.getImageUrl();
+  }
+
   private static String getDuration(Episode episode) {
-    if (episode.getDuration().isBlank()) {
+    if (episode.getDuration() == null || episode.getDuration().isBlank()) {
       return "";
     }
 
@@ -48,6 +69,10 @@ public class EpisodeMessage {
       hours = Integer.parseInt(timeSlices[0]);
       minutes = Integer.parseInt(timeSlices[1]);
       seconds = Integer.parseInt(timeSlices[2]);
+    } else if (timeSlices.length == 2) {
+      hours = 0;
+      minutes = Integer.parseInt(timeSlices[0]);
+      seconds = Integer.parseInt(timeSlices[1]);
     } else {
       int totalSeconds = Integer.parseInt(episode.getDuration());
       hours = totalSeconds / 3600;
@@ -74,7 +99,9 @@ public class EpisodeMessage {
     footerPieces.add(episodeText);
     footerPieces.add(getDuration(episode));
     footerPieces.add(
-        episode.getExplicit().equals("true") ? "Parental Advisory - Explicit Content" : "");
+        episode.getExplicit() != null && episode.getExplicit().equals("true")
+            ? "Parental Advisory - Explicit Content"
+            : "");
 
     return footerPieces.stream()
         .filter(input -> !input.isEmpty())
