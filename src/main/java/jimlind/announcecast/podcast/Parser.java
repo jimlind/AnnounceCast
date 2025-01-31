@@ -3,6 +3,7 @@ package jimlind.announcecast.podcast;
 import java.util.Stack;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
+import org.jetbrains.annotations.Nullable;
 
 public class Parser {
   private static boolean isChildOfChannel(Stack<String> elementStack) {
@@ -19,6 +20,16 @@ public class Parser {
     }
 
     return elementStack.peek().equals("item");
+  }
+
+  private static @Nullable String getAttribute(
+      XMLStreamReader xmlStreamReader, String attributeName) {
+    for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
+      if (xmlStreamReader.getAttributeLocalName(i).equals(attributeName)) {
+        return xmlStreamReader.getAttributeValue(i);
+      }
+    }
+    return null;
   }
 
   public Podcast processStreamReader(XMLStreamReader xmlStreamReader, int episodeCount) {
@@ -84,17 +95,19 @@ public class Parser {
               }
               break;
             case "image":
-              for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
-                if (xmlStreamReader.getAttributeLocalName(i).equals("href")) {
-                  if (isChildOfChannel(elementStack)) {
-                    podcast.setImageUrl(xmlStreamReader.getAttributeValue(i));
-                  } else if (isChildOfItem(elementStack)) {
-                    episode.setImageUrl(xmlStreamReader.getAttributeValue(i));
-                  }
-                  break;
+              String attributeText = getAttribute(xmlStreamReader, "href");
+              if (attributeText != null) {
+                if (isChildOfChannel(elementStack)) {
+                  podcast.setImageUrl(attributeText);
+                } else if (isChildOfItem(elementStack)) {
+                  episode.setImageUrl(attributeText);
                 }
               }
               elementStack.push(localElementName);
+              break;
+            case "thumbnail":
+              String thunbnailText = xmlStreamReader.getElementText();
+              episode.setThumbnailUrl(thunbnailText);
               break;
             case "season":
               String seasonText = xmlStreamReader.getElementText();
