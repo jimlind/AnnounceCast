@@ -52,7 +52,19 @@ public class EpisodeMessage {
   }
 
   private static String getEpisodeImage(Podcast podcast, Episode episode) {
-    return episode.getImageUrl() != null ? episode.getImageUrl() : podcast.getImageUrl();
+    String result = episode.getImageUrl();
+    if (result == null || result.isBlank()) {
+      result = episode.getThumbnailUrl();
+    }
+
+    if (result == null || result.isBlank()) {
+      result = podcast.getImageUrl();
+    }
+
+    if (result == null || result.isBlank()) {
+      return null;
+    }
+    return result;
   }
 
   private static String getDuration(Episode episode) {

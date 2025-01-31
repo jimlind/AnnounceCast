@@ -106,8 +106,11 @@ public class Parser {
               elementStack.push(localElementName);
               break;
             case "thumbnail":
-              String thunbnailText = xmlStreamReader.getElementText();
-              episode.setThumbnailUrl(thunbnailText);
+              String thumbnailText = getAttribute(xmlStreamReader, "url");
+              if (thumbnailText != null && isChildOfItem(elementStack)) {
+                episode.setThumbnailUrl(thumbnailText);
+              }
+              elementStack.push(localElementName);
               break;
             case "season":
               String seasonText = xmlStreamReader.getElementText();
