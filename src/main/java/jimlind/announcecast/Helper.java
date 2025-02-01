@@ -1,5 +1,6 @@
 package jimlind.announcecast;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.furstenheim.CopyDown;
 import io.github.furstenheim.Options;
 import io.github.furstenheim.OptionsBuilder;
@@ -20,5 +21,28 @@ public class Helper {
     String markdownText = new CopyDown(options).convert(document.body().toString());
 
     return markdownText + markdownSuffix;
+  }
+
+  public static String objectToString(Object input) {
+    if (input instanceof String
+        || input instanceof Integer
+        || input instanceof Long
+        || input instanceof Float
+        || input instanceof Double) {
+      return input.toString();
+    }
+
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      return objectMapper.writeValueAsString(input);
+    } catch (Exception e) {
+      // Do Nothing. This can fail for a multitude of reasonable reasons
+    }
+
+    try {
+      return input.toString();
+    } catch (Exception e) {
+      return e.toString();
+    }
   }
 }

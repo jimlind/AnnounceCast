@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import jimlind.announcecast.Helper;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
@@ -11,8 +12,10 @@ import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.PostedFeed;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
+@Slf4j
 public class Task {
   int PAGINATION_DELAY = 5000;
   int PAGINATION_SIZE = 20;
@@ -75,6 +78,9 @@ public class Task {
 
               MessageEmbed message = EpisodeMessage.build(podcast, 0);
               manager.sendMessage("1260736216568168519", message);
+
+              Object logMessage = Helper.objectToString(message);
+              log.atInfo().setMessage("Message Sent").addKeyValue("message", logMessage).log();
             }
           }
         };
