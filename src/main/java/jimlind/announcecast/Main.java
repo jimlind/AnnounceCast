@@ -21,7 +21,10 @@ public class Main {
     Injector injector =
         Guice.createInjector(
             new jimlind.announcecast.discord.BasicModule(),
-            new jimlind.announcecast.scraper.BasicModule());
+            new jimlind.announcecast.integration.BasicModule(),
+            new jimlind.announcecast.podcast.BasicModule(),
+            new jimlind.announcecast.scraper.BasicModule(),
+            new jimlind.announcecast.storage.BasicModule());
 
     // Start the Discord connection manager
     injector.getInstance(Manager.class).run(properties.getProperty("DISCORD_BOT_TOKEN"));

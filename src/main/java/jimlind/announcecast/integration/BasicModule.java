@@ -12,6 +12,7 @@ public class BasicModule extends AbstractModule {
     bind(FollowAction.class).in(Scopes.SINGLETON);
     bind(FollowingAction.class).in(Scopes.SINGLETON);
     bind(FollowRssAction.class).in(Scopes.SINGLETON);
+    bind(HelpAction.class).in(Scopes.SINGLETON);
     bind(SearchAction.class).in(Scopes.SINGLETON);
     bind(UnfollowAction.class).in(Scopes.SINGLETON);
   }
