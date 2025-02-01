@@ -2,8 +2,9 @@
 .env.development
 .env.production
 
-# Sqlite3 Database Files
+# Local Database Files and Logs
 db/*.db
+/log
 
 # Compilation Artifacts
 /target
@@ -15,5 +16,5 @@ db/*.db
 # IntelliJ
 .idea
 
-# Protecte Application Properties
+# Protect Application Properties
 /input/properties
