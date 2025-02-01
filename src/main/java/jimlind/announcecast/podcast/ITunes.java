@@ -2,7 +2,8 @@ package jimlind.announcecast.podcast;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
-import com.google.gson.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -37,14 +38,13 @@ public class ITunes {
               .GET()
               .build();
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-      // Parse Response
-      JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
-      JsonArray results = jsonObject.getAsJsonArray("results");
-      Stream<JsonElement> stream = StreamSupport.stream(results.spliterator(), false).limit(count);
-
-      return stream.map(element -> element.getAsJsonObject().get("feedUrl").getAsString()).toList();
-    } catch (Exception e) {
+      // Read into a Jackson JsonNode
+      JsonNode parentNode = new ObjectMapper().readTree(response.body());
+      JsonNode results = parentNode.get("results");
+      // Stream to easily map and grab feedUrl
+      Stream<JsonNode> nodeStream = StreamSupport.stream(results.spliterator(), false).limit(count);
+      return nodeStream.map(node -> node.get("feedUrl").asText()).toList();
+    } catch (Exception ignore) {
       return Collections.emptyList();
     }
   }
