@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import jimlind.announcecast.Helper;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
@@ -78,9 +77,6 @@ public class Task {
 
               MessageEmbed message = EpisodeMessage.build(podcast, 0);
               manager.sendMessage("1260736216568168519", message);
-
-              Object logMessage = Helper.objectToString(message);
-              log.atInfo().setMessage("Message Sent").addKeyValue("message", logMessage).log();
             }
           }
         };
