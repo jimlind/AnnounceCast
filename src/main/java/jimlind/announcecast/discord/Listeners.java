@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import org.jetbrains.annotations.NotNull;
 
 @Slf4j
@@ -13,14 +14,21 @@ public class Listeners extends ListenerAdapter {
   @Inject private SlashCommand slashCommandManager;
   @Inject private Task task;
 
+  private int readyCount = 0;
+
   @Override
   public void onReady(ReadyEvent e) {
+    readyCount++;
+
     log.atInfo()
         .setMessage("Manager client logged in on {} servers")
         .addArgument(e.getJDA().getGuildCache().size())
         .log();
 
-    this.task.run();
+    ShardManager shardManager = e.getJDA().getShardManager();
+    if (shardManager != null && readyCount == shardManager.getShardsTotal()) {
+      this.task.run();
+    }
   }
 
   @Override

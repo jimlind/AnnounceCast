@@ -3,6 +3,8 @@ package jimlind.announcecast.discord;
 import com.google.inject.Inject;
 import jimlind.announcecast.Helper;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -26,11 +28,32 @@ public class Manager {
     if (this.shardManager == null) {
       return;
     }
+
+    // If we can't locate the channel we should exit early
     GuildMessageChannel channel =
         this.shardManager.getChannelById(GuildMessageChannel.class, channelId);
     if (channel == null) {
       return;
     }
+
+    // Check access to channel viewing requirements
+    Member member = channel.getGuild().getSelfMember();
+    if (!member.hasPermission(channel, Permission.VIEW_CHANNEL)) {
+      return;
+    }
+
+    // Check access to thread or channel send message permissions
+    if (channel.getType().isThread()
+        ? !member.hasPermission(channel, Permission.MESSAGE_SEND_IN_THREADS)
+        : !member.hasPermission(channel, Permission.MESSAGE_SEND)) {
+      return;
+    }
+
+    // Check access to embed link permissions
+    if (!member.hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
+      return;
+    }
+
     channel
         .sendMessageEmbeds(message)
         .queue(m -> sendSuccess(m, message, channel), m -> sendFailure(message, channel));
