@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.util.Properties;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.ShutdownThread;
-import jimlind.announcecast.scraper.Task;
 
 public class Main {
   public static void main(String[] args) {
@@ -31,8 +30,5 @@ public class Main {
 
     // Register the shutdownThread to the shutdownHook
     Runtime.getRuntime().addShutdownHook(injector.getInstance(ShutdownThread.class));
-
-    // Run the Scraper task
-    injector.getInstance(Task.class).run();
   }
 }
