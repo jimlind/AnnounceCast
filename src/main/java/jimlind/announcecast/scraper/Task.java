@@ -25,61 +25,65 @@ public class Task {
   @Inject private Queue queue;
 
   public void run() {
-    TimerTask scrapingTask =
-        new TimerTask() {
-          private int paginationIndex = 0;
+    new Timer().schedule(this.scrapingTask(), 0, PAGINATION_DELAY);
+    new Timer().schedule(this.queuedTask(), 1000, 10);
+  }
 
-          @Override
-          public void run() {
-            List<PostedFeed> postedFeedList =
-                joined.getPaginatedPostedFeed(PAGINATION_SIZE, this.paginationIndex);
-            if (postedFeedList == null) {
-              this.paginationIndex = 0;
-              return;
-            }
-            this.paginationIndex++;
+  private TimerTask scrapingTask() {
+    return new TimerTask() {
+      private int paginationIndex = 0;
 
-            for (PostedFeed postedFeed : postedFeedList) {
-              Podcast podcast = client.createPodcastFromFeedUrl(postedFeed.getUrl(), 1);
-              if (podcast == null) {
-                continue;
-              }
+      @Override
+      public void run() {
+        List<PostedFeed> postedFeedList =
+            joined.getPaginatedPostedFeed(PAGINATION_SIZE, this.paginationIndex);
+        if (postedFeedList == null) {
+          this.paginationIndex = 0;
+          return;
+        }
+        this.paginationIndex++;
 
-              if (postedFeed.getGuid() == null || postedFeed.getGuid().isBlank()) {
-                queue.set(postedFeed.getUrl());
-                continue;
-              }
-
-              if (!postedFeed.getGuid().contains(podcast.getEpisodeList().getFirst().getGuid())) {
-                queue.set(postedFeed.getUrl());
-              }
-            }
+        for (PostedFeed postedFeed : postedFeedList) {
+          Podcast podcast = client.createPodcastFromFeedUrl(postedFeed.getUrl(), 1);
+          if (podcast == null) {
+            continue;
           }
-        };
-    new Timer().schedule(scrapingTask, 0, PAGINATION_DELAY);
 
-    TimerTask queuedTask =
-        new TimerTask() {
-          @Override
-          public void run() {
-            // Pull values from the queue
-            String url = queue.get();
-            if (url != null) {
-              Podcast podcast = client.createPodcastFromFeedUrl(url, 1);
-              if (podcast == null) {
-                return;
-              }
-
-              List<Episode> episodeList = podcast.getEpisodeList();
-              if (episodeList.isEmpty()) {
-                return;
-              }
-
-              MessageEmbed message = EpisodeMessage.build(podcast, 0);
-              manager.sendMessage("1260736216568168519", message);
-            }
+          if (postedFeed.getGuid() == null || postedFeed.getGuid().isBlank()) {
+            queue.set(postedFeed.getUrl());
+            continue;
           }
-        };
-    new Timer().schedule(queuedTask, 1000, 10);
+
+          if (!postedFeed.getGuid().contains(podcast.getEpisodeList().getFirst().getGuid())) {
+            queue.set(postedFeed.getUrl());
+          }
+        }
+      }
+    };
+  }
+
+  private TimerTask queuedTask() {
+    return new TimerTask() {
+
+      @Override
+      public void run() {
+        // Pull values from the queue, check if podcast with at least one episode exists
+        String url = queue.get();
+        if (url == null) {
+          return;
+        }
+        Podcast podcast = client.createPodcastFromFeedUrl(url, 1);
+        if (podcast == null) {
+          return;
+        }
+        List<Episode> episodeList = podcast.getEpisodeList();
+        if (episodeList.isEmpty()) {
+          return;
+        }
+
+        MessageEmbed message = EpisodeMessage.build(podcast, 0);
+        manager.sendMessage("1260736216568168519", message);
+      }
+    };
   }
 }
