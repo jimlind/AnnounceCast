@@ -7,6 +7,7 @@ import java.util.List;
 import jimlind.announcecast.storage.model.Feed;
 import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 
 @Slf4j
 public class Joined {
@@ -36,6 +37,25 @@ public class Joined {
     return feedList;
   }
 
+  public @Nullable PostedFeed getPostedFeedByUrl(String url) {
+    String sql =
+        "SELECT id, url, guid FROM feeds INNER JOIN posted ON feeds.id = posted.feed_id WHERE url = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, url);
+      ResultSet resultSet = statement.executeQuery();
+      resultSet.next();
+
+      PostedFeed postedFeed = new PostedFeed();
+      postedFeed.setId(resultSet.getString("id"));
+      postedFeed.setUrl(resultSet.getString("url"));
+      postedFeed.setGuid(resultSet.getString("guid"));
+
+      return postedFeed;
+    } catch (Exception ignore) {
+      return null;
+    }
+  }
+
   public List<PostedFeed> getPaginatedPostedFeed(int paginationSize, int paginationIndex) {
     List<PostedFeed> postedFeedList = new ArrayList<>();
 
@@ -52,6 +72,7 @@ public class Joined {
 
       while (resultSet.next()) {
         PostedFeed postedFeed = new PostedFeed();
+        postedFeed.setId(resultSet.getString("id"));
         postedFeed.setUrl(resultSet.getString("url"));
         postedFeed.setGuid(resultSet.getString("guid"));
 
