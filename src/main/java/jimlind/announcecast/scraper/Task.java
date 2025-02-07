@@ -9,6 +9,7 @@ import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
+import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ public class Task {
   int PAGINATION_DELAY = 5000;
   int PAGINATION_SIZE = 20;
 
+  @Inject private Channel channel;
   @Inject private Client client;
   @Inject private Joined joined;
   @Inject private Manager manager;
@@ -49,11 +51,6 @@ public class Task {
             continue;
           }
 
-          if (postedFeed.getGuid() == null || postedFeed.getGuid().isBlank()) {
-            queue.set(postedFeed.getUrl());
-            continue;
-          }
-
           if (!postedFeed.getGuid().contains(podcast.getEpisodeList().getFirst().getGuid())) {
             queue.set(postedFeed.getUrl());
           }
@@ -67,22 +64,27 @@ public class Task {
 
       @Override
       public void run() {
-        // Pull values from the queue, check if podcast with at least one episode exists
+        // Trying to get from the queue will return null if empty so exit early
         String url = queue.get();
         if (url == null) {
           return;
         }
-        Podcast podcast = client.createPodcastFromFeedUrl(url, 1);
-        if (podcast == null) {
-          return;
-        }
-        List<Episode> episodeList = podcast.getEpisodeList();
-        if (episodeList.isEmpty()) {
+        Podcast podcast = client.createPodcastFromFeedUrl(url, 4);
+        PostedFeed postedFeed = joined.getPostedFeedByUrl(url);
+        if (podcast == null || postedFeed == null) {
           return;
         }
 
-        MessageEmbed message = EpisodeMessage.build(podcast, 0);
-        manager.sendMessage("1260736216568168519", message);
+        int index = 0;
+        for (Episode episode : podcast.getEpisodeList()) {
+          if (!postedFeed.getGuid().contains(episode.getGuid())) {
+            MessageEmbed message = EpisodeMessage.build(podcast, index);
+            for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
+              manager.sendMessage(channelId, message);
+            }
+            index++;
+          }
+        }
       }
     };
   }
