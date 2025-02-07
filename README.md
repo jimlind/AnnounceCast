@@ -11,18 +11,25 @@ Follows some Podcasts on your server and lets you know when new episodes drop.
 
 ## Using the Hosted Bot
 
-It is likely that you want to figure out how to use my hosted bot on your Discord server. You can find [that documentation here](https://jimlind.github.io/AnnounceCast/). That documentation has an invitation link and a covers all the commands that the bot understands.
+It is likely that you want to figure out how to use my hosted bot on your Discord server. You can
+find [that documentation here](https://jimlind.github.io/AnnounceCast/). That documentation has an invitation link and a
+covers all the commands that the bot understands.
 
 ## Hosting Your Own Bot
 
-If you want to host your own version of the bot or use this code as a starting point for building your own bot that's what this whole GitHub repository is about. But you probably want to click the link above. Go ahead and browse the code or checkout my chaotic [notes on setting up a server to host a version of the bot.](https://github.com/jimlind/AnnounceCast/tree/main/docs/hosted)
+If you want to host your own version of the bot or use this code as a starting point for building your own bot that's
+what this whole GitHub repository is about. But you probably want to click the link above. Go ahead and browse the code
+or checkout my
+chaotic [notes on setting up a server to host a version of the bot.](https://github.com/jimlind/AnnounceCast/tree/main/docs/hosted)
 
 ## Some Great Podcasts to Experiment With
 
-If you aren't really sure what you should be doing with the bot you need to follow some podcasts and wait for them to release new episodes. You can use `/follow` and enter the name of the show or `/follow-rss` if you want to copy and paste the URL of the RSS feed. Both will work as expected.
+If you aren't really sure what you should be doing with the bot you need to follow some podcasts and wait for them to
+release new episodes. You can use `/follow` and enter the name of the show or `/follow-rss` if you want to copy and
+paste the URL of the RSS feed. Both will work as expected.
 
 | Podcast Title                                          | RSS Feed URL                             |
-| ------------------------------------------------------ | ---------------------------------------- |
+|--------------------------------------------------------|------------------------------------------|
 | [70mm](https://solo.to/70mm)                           | https://anchor.fm/s/12d1fabc/podcast/rss |
 | [Bat & Spider](https://flow.page/batandspider)         | https://anchor.fm/s/184b0a38/podcast/rss |
 | [Cinenauts](https://solo.to/cinenauts)                 | https://anchor.fm/s/3a0acd20/podcast/rss |
