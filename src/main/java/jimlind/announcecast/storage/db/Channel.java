@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,18 +39,34 @@ public class Channel {
     }
   }
 
-  public void removeChannel(String feedUrl, String channelId) {
+  public void removeChannel(String feedId, String channelId) {
     String deleteSql = "DELETE FROM channels WHERE feed_id = ? AND channel_id = ?";
     try (PreparedStatement statement = connection.prepareStatement(deleteSql)) {
-      statement.setString(1, feedUrl);
+      statement.setString(1, feedId);
       statement.setString(2, channelId);
       statement.executeUpdate();
     } catch (Exception ignore) {
       log.atWarn()
           .setMessage("Unable to remove a channel")
-          .addKeyValue("feedUrl", feedUrl)
+          .addKeyValue("feedId", feedId)
           .addKeyValue("channelId", channelId)
           .log();
     }
+  }
+
+  public List<String> getChannelsByFeedId(String feedId) {
+    List<String> results = new ArrayList<>();
+
+    String sql = "SELECT channel_id as id FROM channels WHERE feed_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, feedId);
+      ResultSet resultSet = statement.executeQuery();
+      while (resultSet.next()) {
+        results.add(resultSet.getString("id"));
+      }
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to load a channel list").addKeyValue("feedId", feedId).log();
+    }
+    return results;
   }
 }
