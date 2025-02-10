@@ -1,9 +1,7 @@
 package jimlind.announcecast.scraper;
 
 import com.google.inject.Inject;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
@@ -11,6 +9,7 @@ import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Joined;
+import jimlind.announcecast.storage.db.Posted;
 import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -24,6 +23,7 @@ public class Task {
   @Inject private Client client;
   @Inject private Joined joined;
   @Inject private Manager manager;
+  @Inject private Posted posted;
   @Inject private Queue queue;
 
   public void run() {
@@ -80,12 +80,30 @@ public class Task {
           if (!postedFeed.getGuid().contains(episode.getGuid())) {
             MessageEmbed message = EpisodeMessage.build(podcast, index);
             for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
-              manager.sendMessage(channelId, message);
+              manager.sendMessage(
+                  channelId, message, () -> recordSuccess(postedFeed.getId(), episode.getGuid()));
             }
             index++;
           }
         }
       }
     };
+  }
+
+  private synchronized void recordSuccess(String feedId, String guid) {
+    String separatedGuid = this.posted.getGuidByFeedId(feedId);
+    if (separatedGuid.contains(guid)) {
+      return;
+    }
+
+    String separator = "■■■■■■■■■■";
+    List<String> guidList = new ArrayList<>(List.of(separatedGuid.split(separator)));
+    guidList.add(guid);
+
+    List<String> guidSublist =
+        guidList.subList(guidList.size() - Math.min(guidList.size(), 5), guidList.size());
+    separatedGuid = String.join(separator, guidSublist);
+
+    this.posted.setGuidByFeed(feedId, separatedGuid);
   }
 }

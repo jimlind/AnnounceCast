@@ -24,7 +24,7 @@ public class Manager {
             .build();
   }
 
-  public void sendMessage(String channelId, MessageEmbed message) {
+  public void sendMessage(String channelId, MessageEmbed message, Runnable onSuccess) {
     if (this.shardManager == null) {
       return;
     }
@@ -56,7 +56,12 @@ public class Manager {
 
     channel
         .sendMessageEmbeds(message)
-        .queue(m -> sendSuccess(m, message, channel), m -> sendFailure(message, channel));
+        .queue(
+            m -> {
+              onSuccess.run();
+              sendSuccess(m, message, channel);
+            },
+            t -> sendFailure(message, channel));
   }
 
   public void sendSuccess(Message message, MessageEmbed messageEmbed, GuildMessageChannel channel) {
