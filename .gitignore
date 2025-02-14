@@ -1,9 +1,5 @@
-# Environment Variables
-.env.development
-.env.production
-
 # Local Database Files and Logs
-db/*.db
+/db/*.db
 /log
 
 # Compilation Artifacts
@@ -14,7 +10,8 @@ db/*.db
 .DS_Store
 
 # IntelliJ
-.idea
+/.idea
 
 # Protect Application Properties
 /input/properties
+/input/properties.production
