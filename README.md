@@ -1,4 +1,10 @@
-# AnnounceCast
+** ⚠️⚠️ Important Notice ⚠️⚠️ **
+This branch of the project is an archive of the original NodeJS version.
+It only exists for documentation purposes and in this format because it is easy to find branches in GitHub
+---
+
+
+# AnnounceCast (Archived NodeJS Version)
 
 A simple Discord Podcasts announcement bot.  
 Follows some Podcasts on your server and lets you know when new episodes drop.
