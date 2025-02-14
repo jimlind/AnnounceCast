@@ -19,3 +19,10 @@ dist
 
 # Maintenance Output
 src/tools/maintenance/output/*
+
+# Java Build Files
+/.idea
+/target
+/log
+dependency-reduced-pom.xml
+input/properties
