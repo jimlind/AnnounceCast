@@ -1,7 +1,8 @@
-** ⚠️⚠️ Important Notice ⚠️⚠️ **
-This branch of the project is an archive of the original NodeJS version.
-It only exists for documentation purposes and in this format because it is easy to find branches in GitHub
----
+⚠️⚠️ Important Notice ⚠️⚠️  
+This branch of the project is an archive of the original NodeJS version.  
+It only exists for documentation purposes and in this format because it is easy to find branches in GitHub  
+
+---  
 
 
 # AnnounceCast (Archived NodeJS Version)
