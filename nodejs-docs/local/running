@@ -1,7 +1,0 @@
-Locally I use nodenv to set the version of node that is used.
-
-> nodenv versions
-
-Run a local development verion of the bot
-
-> npm start
