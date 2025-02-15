@@ -32,11 +32,12 @@ public class Posted {
       statement.setString(3, guid);
       statement.setString(4, feedId);
       statement.execute();
-    } catch (Exception ignore) {
+    } catch (Exception exception) {
       log.atWarn()
           .setMessage("Unable to set guid")
           .addKeyValue("feedId", feedId)
           .addKeyValue("guid", guid)
+          .addKeyValue("exception", exception)
           .log();
     }
   }
