@@ -41,8 +41,8 @@ public class Main {
   private static Injector createDependencyInjector() {
     return Guice.createInjector(
         new jimlind.announcecast.administration.DependencyInjectionModule(),
-        new jimlind.announcecast.discord.BasicModule(),
-        new jimlind.announcecast.integration.BasicModule(),
+        new jimlind.announcecast.discord.DependencyInjectionModule(),
+        new jimlind.announcecast.integration.DependencyInjectionModule(),
         new jimlind.announcecast.podcast.BasicModule(),
         new jimlind.announcecast.scraper.BasicModule(),
         new jimlind.announcecast.storage.BasicModule());

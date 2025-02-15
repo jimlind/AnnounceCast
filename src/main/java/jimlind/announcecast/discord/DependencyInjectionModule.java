@@ -3,7 +3,7 @@ package jimlind.announcecast.discord;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
-public class BasicModule extends AbstractModule {
+public class DependencyInjectionModule extends AbstractModule {
 
   @Override
   protected void configure() {

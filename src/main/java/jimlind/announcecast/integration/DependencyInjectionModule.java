@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import jimlind.announcecast.integration.action.*;
 
-public class BasicModule extends AbstractModule {
+public class DependencyInjectionModule extends AbstractModule {
 
   @Override
   protected void configure() {
