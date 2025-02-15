@@ -1,28 +1,17 @@
-# Dependencies
-node_modules/
+# Local Database Files and Logs
+/db/*.db
+/log
 
-# Environment Variables
-.env.development
-.env.production
-
-# Sqlite3 Database Files
-db/*.db
-
-# Application Log File
-log/application.log*
-
-# Transpiled Application
-dist
+# Compilation Artifacts
+/target
+/dependency-reduced-pom.xml
 
 # MacOS System Files
 .DS_Store
 
-# Maintenance Output
-src/tools/maintenance/output/*
-
-# Java Build Files
+# IntelliJ
 /.idea
-/target
-/log
-dependency-reduced-pom.xml
-input/properties
+
+# Protect Application Properties
+/input/properties
+/input/properties.production

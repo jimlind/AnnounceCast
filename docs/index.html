@@ -1,305 +1,249 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="description" content="AnnounceCast Details and Documentation" />
-        <link rel="shortcut icon" href="favicon.ico" />
-        <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/flatly/bootstrap.min.css"
-        />
-        <script
-            src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
-            crossorigin="anonymous"
-        ></script>
-        <script src="https://kit.fontawesome.com/fb0723331c.js" crossorigin="anonymous"></script>
-        <title>AnnounceCast - Podcast New Release Announcement Bot for Discord</title>
-    </head>
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta content="AnnounceCast Details and Documentation" name="description"/>
+    <link href="favicon.ico" rel="shortcut icon"/>
+    <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+    <link href="favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/flatly/bootstrap.min.css" rel="stylesheet"/>
+    <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script crossorigin="anonymous"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+    <script crossorigin="anonymous" src="https://kit.fontawesome.com/fb0723331c.js"></script>
+    <title>AnnounceCast - Podcast New Release Announcement Bot for Discord</title>
+</head>
 
-    <body>
-        <div class="jumbotron text-center">
-            <h1>AnnounceCast</h1>
-            <p><strong>Podcast New Release Announcement Bot for Discord</strong></p>
-            <a class="btn btn-info m-2" href="https://www.patreon.com/AnnounceCast">
-                <i class="fab fa-patreon mx-1"></i>
-                Support the Patreon
-            </a>
-            <a class="btn btn-info m-2" href="https://github.com/jimlind/AnnounceCast">
-                <i class="fab fa-github mx-1"></i>
-                Read the Code
-            </a>
-            <a class="btn btn-info m-2" href="https://discord.gg/sEjJTTjG3M">
-                <i class="fab fa-discord mx-1"></i>
-                Join the Discord
-            </a>
-        </div>
+<body>
+<div class="jumbotron text-center">
+    <h1>AnnounceCast</h1>
+    <p><strong>Podcast New Release Announcement Bot for Discord</strong></p>
+    <a class="btn btn-info m-2" href="https://www.patreon.com/AnnounceCast">
+        <i class="fab fa-patreon mx-1"></i> Support the Patreon
+    </a>
+    <a class="btn btn-info m-2" href="https://github.com/jimlind/AnnounceCast">
+        <i class="fab fa-github mx-1"></i> Read the Code
+    </a>
+    <a class="btn btn-info m-2" href="https://discord.gg/sEjJTTjG3M">
+        <i class="fab fa-discord mx-1"></i> Join the Discord
+    </a>
+</div>
 
-        <div class="container">
-            <p>
-                This bot posts automated messages in your Discord server when a new podcast episode
-                is released. The bot can search for podcasts on Spotify, Apple, or use your RSS
-                feed. Check out the
-                <a href="https://discord.com/application-directory/839657120689684533"
-                    >AnnounceCast Discord Application Directory Entry</a
-                >
-                for the easiest way to setup the bot on your server. Otherwise, you can use the big
-                button below to setup your server.
-            </p>
+<div class="container">
+    <p>
+        This bot posts automated messages in your Discord server when a new podcast episode is released. The bot can
+        search for podcasts on Spotify, Apple, or use your RSS feed. Check out the <a
+            href="https://discord.com/application-directory/839657120689684533">AnnounceCast Discord Application
+        Directory Entry</a> for the easiest way to setup the bot on your server. Otherwise, you can use the big
+        button below to setup your server.
+    </p>
 
-            <h2 class="mt-5">Installation</h2>
-            <p>
-                <a
-                    class="btn btn-primary btn-lg px-5 py-3"
-                    href="https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=274877926400&scope=bot%20applications.commands"
-                >
-                    <i class="fas fa-robot mx-2"></i>
-                    Authorize the Bot</a
-                >
-            </p>
+    <h2 class="mt-5">Installation</h2>
+    <p>
+        <a class="btn btn-primary btn-lg px-5 py-3"
+           href="https://discord.com/oauth2/authorize?client_id=839657120689684533&permissions=274877926400&scope=bot%20applications.commands">
+            <i class="fas fa-robot mx-2"></i> Authorize the Bot
+        </a>
+    </p>
 
-            <h2 class="mt-5">Commands</h2>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Command</th>
-                        <th scope="col">Default Permission</th>
-                        <th scope="col">Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">/follow &lt;keywords&gt;</th>
-                        <td>🔒 Server Managers</td>
-                        <td>Follow a podcast in the channel matching the search keyword(s)</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">/follow-rss &lt;feed&gt;</th>
-                        <td>🔒 Server Managers</td>
-                        <td>Follow a podcast in the channel using an RSS feed</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">/unfollow &lt;id&gt;</th>
-                        <td>🔒 Server Managers</td>
-                        <td>Unfollow a podcast in the channel using a Podcast Id</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">/following</th>
-                        <td>Everyone</td>
-                        <td>Display a list of all podcasts followed in the channel</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">/search &lt;keywords&gt;</th>
-                        <td>Everyone</td>
-                        <td>Display up to 4 podcasts matching the search keyword(s)</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">/help [test]</th>
-                        <td>Everyone</td>
-                        <td>Display this help message, optionally sending test messages</td>
-                    </tr>
-                </tbody>
-            </table>
+    <h2 class="mt-5">Commands</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Command</th>
+            <th scope="col">Default Permission</th>
+            <th scope="col">Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th scope="row">/follow &lt;keywords&gt;</th>
+            <td>🔒 Server Managers</td>
+            <td>Follow a podcast in the channel matching the search keyword(s)</td>
+        </tr>
+        <tr>
+            <th scope="row">/follow-rss &lt;feed&gt;</th>
+            <td>🔒 Server Managers</td>
+            <td>Follow a podcast in the channel using an RSS feed</td>
+        </tr>
+        <tr>
+            <th scope="row">/unfollow &lt;id&gt;</th>
+            <td>🔒 Server Managers</td>
+            <td>Unfollow a podcast in the channel using a Podcast Id</td>
+        </tr>
+        <tr>
+            <th scope="row">/following</th>
+            <td>Everyone</td>
+            <td>Display a list of all podcasts followed in the channel</td>
+        </tr>
+        <tr>
+            <th scope="row">/search &lt;keywords&gt;</th>
+            <td>Everyone</td>
+            <td>Display up to 4 podcasts matching the search keyword(s)</td>
+        </tr>
+        <tr>
+            <th scope="row">/help [test]</th>
+            <td>Everyone</td>
+            <td>Display this help message, optionally sending test messages</td>
+        </tr>
+        </tbody>
+    </table>
 
-            <h2 class="mt-5">Frequently Asked Questions</h2>
+    <h2 class="mt-5">Frequently Asked Questions</h2>
 
-            <div id="accordion">
-                <div class="card">
-                    <div class="card-header" id="headingOne">
-                        <h5 class="mb-0">
-                            <button
-                                class="btn btn-link"
-                                data-toggle="collapse"
-                                data-target="#collapseOne"
-                            >
-                                Why isn't the most recent episode posting?
-                            </button>
-                        </h5>
-                    </div>
+    <div id="accordion">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-target="#collapseOne" data-toggle="collapse">
+                        Why isn't the most recent episode posting?
+                    </button>
+                </h5>
+            </div>
 
-                    <div id="collapseOne" class="collapse show" data-parent="#accordion">
-                        <div class="card-body">
-                            <p>
-                                It is likely a permissions issue. A bot can inherit multiple
-                                permissions based on the way other things have been configured for
-                                the server or the channel that it lives in.
-                            </p>
-                            <p>
-                                Use the <code>/help test=True</code> command to get the bot to post
-                                a variety of troubleshooting messages to confirm your settings.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header" id="headingPermission">
-                        <h5 class="mb-0">
-                            <button
-                                class="btn btn-link collapsed"
-                                data-toggle="collapse"
-                                data-target="#collapsePermission"
-                            >
-                                What permissions are required?
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapsePermission" class="collapse" data-parent="#accordion">
-                        <div class="card-body">
-                            <p>
-                                The invite link above includes the neccessary permissions. But if
-                                you are creating a custom permissions scheme the specifics that the
-                                bot needs to function in a channel are:
-                            </p>
-                            <ul>
-                                <li>View Channel</li>
-                                <li>Send Messages</li>
-                                <li>Send Messages in Threads</li>
-                                <li>Posting Embeds</li>
-                            </ul>
-                            <p>
-                                If you use Discord defaults the only thing special is the "Posting
-                                Embeds" permission.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header" id="headingAnnouncementChannels">
-                        <h5 class="mb-0">
-                            <button
-                                class="btn btn-link collapsed"
-                                data-toggle="collapse"
-                                data-target="#collapseAnnouncementChannels"
-                            >
-                                How do I get the bot to work in an Announcement Channel?
-                            </button>
-                        </h5>
-                    </div>
-                    <div
-                        id="collapseAnnouncementChannels"
-                        class="collapse"
-                        data-parent="#accordion"
-                    >
-                        <div class="card-body">
-                            <p>
-                                You will need to grant the bot special permissions to "Send
-                                Messages" (under Text Channel Permissions) in the channel. Discord
-                                defaults to not allowing @everyone to post in that channel and the
-                                bot is part of that group by default.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header" id="headingThree">
-                        <h5 class="mb-0">
-                            <button
-                                class="btn btn-link collapsed"
-                                data-toggle="collapse"
-                                data-target="#collapseThree"
-                            >
-                                Can I use your bot to play podcast audio in my server?
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapseThree" class="collapse" data-parent="#accordion">
-                        <div class="card-body">
-                            <p>
-                                Not right now. Join the Discord Server and let me know if that's a
-                                feature you'd like. It is a very possible feature but something I
-                                wouldn't want to build and support if it wasn't something that the
-                                community would value.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header" id="headingFour">
-                        <h5 class="mb-0">
-                            <button
-                                class="btn btn-link collapsed"
-                                data-toggle="collapse"
-                                data-target="#collapseFour"
-                            >
-                                How do I change default command permissions?
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapseFour" class="collapse" data-parent="#accordion">
-                        <div class="card-body">
-                            <p>
-                                If you want more than Server Managers to be able to use the follow
-                                command on your server under <code>Integrations</code> you can find
-                                the bot and change Command Permissions for each Command.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header" id="headingFive">
-                        <h5 class="mb-0">
-                            <button
-                                class="btn btn-link"
-                                data-toggle="collapse"
-                                data-target="#collapseFive"
-                            >
-                                Why should I join the Patreon?
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapseFive" class="collapse" data-parent="#accordion">
-                        <div class="card-body">
-                            <p>
-                                Because running this server isn't free and you have found the
-                                service to be helpful.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header" id="headingSix">
-                        <h5 class="mb-0">
-                            <button
-                                class="btn btn-link"
-                                data-toggle="collapse"
-                                data-target="#collapseSix"
-                            >
-                                What color is the primary green in the AnnounceCast logo?
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapseSix" class="collapse" data-parent="#accordion">
-                        <div class="card-body">
-                            <p>
-                                AnnounceCast Green is <code>#7ab87a</code> if you want to match a
-                                role color for the bot.
-                            </p>
-                        </div>
-                    </div>
+            <div class="collapse show" data-parent="#accordion" id="collapseOne">
+                <div class="card-body">
+                    <p>
+                        It is likely a permissions issue. A bot can inherit multiple permissions based on the way other
+                        things have been configured for the server or the channel that it lives in.
+                    </p>
+                    <p>
+                        Use the <code>/help test=True</code> command to get the bot to post a variety of troubleshooting
+                        messages to confirm your settings.
+                    </p>
                 </div>
             </div>
         </div>
-
-        <div class="container">
-            <footer class="py-3 my-4">
-                <ul class="nav justify-content-center pb-3 mb-3">
-                    <li class="nav-item">
-                        <a href="index.html" class="nav-link px-2 text-muted">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="privacy.html" class="nav-link px-2 text-muted">Privacy Policy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="tos.html" class="nav-link px-2 text-muted">Terms of Service</a>
-                    </li>
-                </ul>
-            </footer>
+        <div class="card">
+            <div class="card-header" id="headingPermission">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-target="#collapsePermission" data-toggle="collapse">
+                        What permissions are required?
+                    </button>
+                </h5>
+            </div>
+            <div class="collapse" data-parent="#accordion" id="collapsePermission">
+                <div class="card-body">
+                    <p>
+                        The invite link above includes the neccessary permissions. But if you are creating a custom
+                        permissions scheme the specifics that the bot needs to function in a channel are:
+                    </p>
+                    <ul>
+                        <li>View Channel</li>
+                        <li>Send Messages</li>
+                        <li>Send Messages in Threads</li>
+                        <li>Posting Embeds</li>
+                    </ul>
+                    <p>
+                        If you use Discord defaults the only thing special is the "Posting Embeds" permission.
+                    </p>
+                </div>
+            </div>
         </div>
-    </body>
+        <div class="card">
+            <div class="card-header" id="headingAnnouncementChannels">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-target="#collapseAnnouncementChannels"
+                            data-toggle="collapse">
+                        How do I get the bot to work in an Announcement Channel?
+                    </button>
+                </h5>
+            </div>
+            <div class="collapse" data-parent="#accordion" id="collapseAnnouncementChannels">
+                <div class="card-body">
+                    <p>
+                        You will need to grant the bot special permissions to "Send Messages" (under Text Channel
+                        Permissions) in the channel. Discord defaults to not allowing @everyone to post in that channel
+                        and the bot is part of that group by default.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingThree">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-target="#collapseThree" data-toggle="collapse">
+                        Can I use your bot to play podcast audio in my server?
+                    </button>
+                </h5>
+            </div>
+            <div class="collapse" data-parent="#accordion" id="collapseThree">
+                <div class="card-body">
+                    <p>
+                        Not right now. Join the Discord Server and let me know if that's a feature you'd like. It is a
+                        very possible feature but something I wouldn't want to build and support if it wasn't something
+                        that the community would value.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingFour">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-target="#collapseFour" data-toggle="collapse">
+                        How do I change default command permissions?
+                    </button>
+                </h5>
+            </div>
+            <div class="collapse" data-parent="#accordion" id="collapseFour">
+                <div class="card-body">
+                    <p>
+                        If you want more than Server Managers to be able to use the follow command on your server under
+                        <code>Integrations</code> you can find the bot and change Command Permissions for each Command.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingFive">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-target="#collapseFive" data-toggle="collapse">
+                        Why should I join the Patreon?
+                    </button>
+                </h5>
+            </div>
+            <div class="collapse" data-parent="#accordion" id="collapseFive">
+                <div class="card-body">
+                    <p>
+                        Because running this server isn't free and you have found the service to be helpful.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingSix">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-target="#collapseSix" data-toggle="collapse">
+                        What color is the primary green in the AnnounceCast logo?
+                    </button>
+                </h5>
+            </div>
+            <div class="collapse" data-parent="#accordion" id="collapseSix">
+                <div class="card-body">
+                    <p>
+                        AnnounceCast Green is <code>#7ab87a</code> if you want to match a role color for the bot.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <footer class="py-3 my-4">
+        <ul class="nav justify-content-center pb-3 mb-3">
+            <li class="nav-item">
+                <a class="nav-link px-2 text-muted" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-2 text-muted" href="privacy.html">Privacy Policy</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-2 text-muted" href="tos.html">Terms of Service</a>
+            </li>
+        </ul>
+    </footer>
+</div>
+</body>
 </html>
