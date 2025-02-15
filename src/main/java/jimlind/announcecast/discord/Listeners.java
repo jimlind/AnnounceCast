@@ -27,7 +27,7 @@ public class Listeners extends ListenerAdapter {
 
     ShardManager shardManager = e.getJDA().getShardManager();
     if (shardManager != null && readyCount == shardManager.getShardsTotal()) {
-      this.task.run();
+      this.task.startScrapeQueueRead();
     }
   }
 

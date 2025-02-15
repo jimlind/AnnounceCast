@@ -26,12 +26,15 @@ public class Task {
   @Inject private Posted posted;
   @Inject private Queue queue;
 
-  public void run() {
-    new Timer().schedule(this.scrapingTask(), 0, PAGINATION_DELAY);
-    new Timer().schedule(this.queuedTask(), 1000, 10);
+  public void startScrapeQueueWrite() {
+    new Timer().schedule(this.scrapeWriteTask(), 0, PAGINATION_DELAY);
   }
 
-  private TimerTask scrapingTask() {
+  public void startScrapeQueueRead() {
+    new Timer().schedule(this.scrapeReadTask(), 1000, 10);
+  }
+
+  private TimerTask scrapeWriteTask() {
     return new TimerTask() {
       private int paginationIndex = 0;
 
@@ -59,7 +62,7 @@ public class Task {
     };
   }
 
-  private TimerTask queuedTask() {
+  private TimerTask scrapeReadTask() {
     return new TimerTask() {
 
       @Override
