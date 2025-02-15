@@ -11,6 +11,8 @@ But you'll probably be reusing an existing one.
 `> mkdir -p /opt/bot/announcecast/db`
 `> scp db/podcasts.db vps:/opt/bot/announecast/db/podcasts.db`
 
+Make sure that the log and db directories (and any existing files) are writable by the bot user
+
 Create the encrypted properties file
 Assuming you have a file following the format in our input/properties.tmp file but is named `properties`
 Run this command on the VPS so that it can be decrypted on the same machine
