@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Slf4j
 public class Task {
-  int PAGINATION_DELAY = 5000;
+  int PAGINATION_DELAY = 1000;
   int PAGINATION_SIZE = 20;
 
   @Inject private Channel channel;
@@ -54,8 +54,8 @@ public class Task {
             continue;
           }
 
-          if (!postedFeed.getGuid().contains(podcast.getEpisodeList().getFirst().getGuid())) {
-            queue.set(postedFeed.getUrl());
+          if (episodeNotProcessed(podcast.getEpisodeList().getFirst(), postedFeed)) {
+            queue.setPodcast(postedFeed.getUrl());
           }
         }
       }
@@ -68,7 +68,7 @@ public class Task {
       @Override
       public void run() {
         // Trying to get from the queue will return null if empty so exit early
-        String url = queue.get();
+        String url = queue.getPodcast();
         if (url == null) {
           return;
         }
@@ -80,8 +80,9 @@ public class Task {
 
         int index = 0;
         for (Episode episode : podcast.getEpisodeList()) {
-          if (!postedFeed.getGuid().contains(episode.getGuid())) {
+          if (episodeNotProcessed(episode, postedFeed)) {
             MessageEmbed message = EpisodeMessage.build(podcast, index);
+            queue.setEpisode(postedFeed.getId(), episode.getGuid());
             for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
               manager.sendMessage(
                   channelId, message, () -> recordSuccess(postedFeed.getId(), episode.getGuid()));
@@ -91,6 +92,16 @@ public class Task {
         }
       }
     };
+  }
+
+  private boolean episodeNotProcessed(Episode episode, PostedFeed postedFeed) {
+    // Episode already posted and stored in database
+    if (postedFeed.getGuid().contains(episode.getGuid())) {
+      return false;
+    }
+
+    // Episode already queued to be posted
+    return !this.queue.isEpisodeQueued(postedFeed.getId(), episode.getGuid());
   }
 
   private synchronized void recordSuccess(String feedId, String guid) {
@@ -108,5 +119,6 @@ public class Task {
     separatedGuid = String.join(separator, guidSublist);
 
     this.posted.setGuidByFeed(feedId, separatedGuid);
+    this.queue.removeEpisode(feedId, guid);
   }
 }
