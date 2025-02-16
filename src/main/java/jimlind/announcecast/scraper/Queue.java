@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Queue {
+  private final int MAX_EPISODE_LIST_SIZE = 1000;
+
   private final LinkedList<String> podcastUrlList = new LinkedList<>();
   private final ArrayList<String> episodeHashList = new ArrayList<>();
 
@@ -23,8 +25,6 @@ public class Queue {
   }
 
   public boolean isEpisodeQueued(String feedId, String episodeGuid) {
-    System.out.println(this.episodeHashList.size());
-
     return this.episodeHashList.contains(hashString(feedId + episodeGuid));
   }
 
@@ -34,6 +34,9 @@ public class Queue {
 
   public void removeEpisode(String feedId, String episodeGuid) {
     this.episodeHashList.remove(hashString(feedId + episodeGuid));
+    if (this.episodeHashList.size() > MAX_EPISODE_LIST_SIZE) {
+      this.episodeHashList.subList(0, this.episodeHashList.size() - MAX_EPISODE_LIST_SIZE).clear();
+    }
     this.episodeHashList.trimToSize();
   }
 
