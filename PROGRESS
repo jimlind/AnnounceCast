@@ -1,6 +1,4 @@
 TODO:
-There's a problem where it feels like when a bunch of podcasts are all getting scraped that it repeats
- - I think that is because the discord message send queue has a long wait that is non-blocking
 Create the VIP status
 Proper documentation in the hosted README
-Observability on new VPS
+Address some warnings from the logger setup
