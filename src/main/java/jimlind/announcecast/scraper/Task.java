@@ -78,8 +78,8 @@ public class Task {
           return;
         }
 
-        int index = 0;
-        for (Episode episode : podcast.getEpisodeList()) {
+        int index = podcast.getEpisodeList().size() - 1;
+        for (Episode episode : podcast.getEpisodeList().reversed()) {
           if (episodeNotProcessed(episode, postedFeed)) {
             MessageEmbed message = EpisodeMessage.build(podcast, index);
             queue.setEpisode(postedFeed.getId(), episode.getGuid());
@@ -87,7 +87,7 @@ public class Task {
               manager.sendMessage(
                   channelId, message, () -> recordSuccess(postedFeed.getId(), episode.getGuid()));
             }
-            index++;
+            index--;
           }
         }
       }
