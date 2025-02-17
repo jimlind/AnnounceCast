@@ -60,7 +60,13 @@ public class Joined {
     List<PostedFeed> postedFeedList = new ArrayList<>();
 
     String selectSql =
-        "SELECT id, url, guid FROM feeds INNER JOIN posted ON feeds.id = posted.feed_id LIMIT ? OFFSET ?";
+        """
+        SELECT id, url, guid
+        FROM feeds
+        INNER JOIN posted ON feeds.id = posted.feed_id
+        WHERE EXISTS (SELECT 1 FROM channels WHERE channels.feed_id = feeds.id)
+        LIMIT ? OFFSET ?;
+        """;
     try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
       statement.setInt(1, paginationSize);
       statement.setInt(2, paginationIndex * paginationSize);
