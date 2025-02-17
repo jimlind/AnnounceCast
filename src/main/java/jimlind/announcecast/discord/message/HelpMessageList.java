@@ -74,7 +74,7 @@ public class HelpMessageList {
 
     List<Episode> episodeList = context.getPodcast().getEpisodeList();
     if (!episodeList.isEmpty()) {
-      messageList.add(EpisodeMessage.build(context.getPodcast(), 0));
+      messageList.add(EpisodeMessage.build(context.getPodcast(), episodeList.getFirst()));
     }
 
     return messageList;

@@ -54,6 +54,8 @@ public class Task {
             continue;
           }
 
+          // TODO: Sometimes this throws: Exception in thread "Timer-0"
+          // java.util.NoSuchElementException'
           if (episodeNotProcessed(podcast.getEpisodeList().getFirst(), postedFeed)) {
             queue.setPodcast(postedFeed.getUrl());
           }
@@ -78,16 +80,14 @@ public class Task {
           return;
         }
 
-        int index = podcast.getEpisodeList().size() - 1;
         for (Episode episode : podcast.getEpisodeList().reversed()) {
           if (episodeNotProcessed(episode, postedFeed)) {
-            MessageEmbed message = EpisodeMessage.build(podcast, index);
+            MessageEmbed message = EpisodeMessage.build(podcast, episode);
             queue.setEpisode(postedFeed.getId(), episode.getGuid());
             for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
               manager.sendMessage(
                   channelId, message, () -> recordSuccess(postedFeed.getId(), episode.getGuid()));
             }
-            index--;
           }
         }
       }
@@ -99,6 +99,13 @@ public class Task {
     if (postedFeed.getGuid().contains(episode.getGuid())) {
       return false;
     }
+
+    log.atInfo()
+        .setMessage("Guid Not Found")
+        .addKeyValue("episodeGuid", episode.getGuid())
+        .addKeyValue("postedGuid", postedFeed.getGuid())
+        .addKeyValue("postedUrl", postedFeed.getUrl())
+        .log();
 
     // Episode already queued to be posted
     return !this.queue.isEpisodeQueued(postedFeed.getId(), episode.getGuid());

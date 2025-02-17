@@ -11,9 +11,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 
 public class EpisodeMessage {
-  public static MessageEmbed build(Podcast podcast, int index) {
-    Episode episode = podcast.getEpisodeList().get(index);
-
+  public static MessageEmbed build(Podcast podcast, Episode episode) {
     EmbedBuilder embedBuilder = new EmbedBuilder();
     embedBuilder.setDescription(getDescriptionText(podcast.getDescription(), episode));
     embedBuilder.setTitle(episode.getTitle(), episode.getLink());
