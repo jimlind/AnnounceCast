@@ -15,8 +15,9 @@ public class Posted {
     try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
       statement.setString(1, feedId);
       ResultSet resultSet = statement.executeQuery();
-      resultSet.next();
-      guid = resultSet.getString("guid");
+      if (resultSet.next()) {
+        guid = resultSet.getString("guid");
+      }
     } catch (Exception ignore) {
       log.atWarn().setMessage("Unable to get feed guid").addKeyValue("feedId", feedId).log();
     }

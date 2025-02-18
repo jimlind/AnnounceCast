@@ -39,7 +39,12 @@ public class Joined {
 
   public @Nullable PostedFeed getPostedFeedByUrl(String url) {
     String sql =
-        "SELECT id, url, guid FROM feeds INNER JOIN posted ON feeds.id = posted.feed_id WHERE url = ?";
+        """
+        SELECT id, url, guid
+        FROM feeds
+        LEFT JOIN posted ON feeds.id = posted.feed_id
+        WHERE url = ?
+        """;
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, url);
       ResultSet resultSet = statement.executeQuery();
@@ -61,10 +66,10 @@ public class Joined {
 
     String selectSql =
         """
-        SELECT id, url, guid
+        SELECT feeds.id as id, feeds.url, feeds.title, posted.guid
         FROM feeds
-        INNER JOIN posted ON feeds.id = posted.feed_id
-        WHERE EXISTS (SELECT 1 FROM channels WHERE channels.feed_id = feeds.id)
+        LEFT JOIN posted ON feeds.id = posted.feed_id
+        INNER JOIN channels ON feeds.id = channels.feed_id
         LIMIT ? OFFSET ?;
         """;
     try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
