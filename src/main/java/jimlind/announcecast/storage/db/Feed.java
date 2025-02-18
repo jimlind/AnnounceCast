@@ -63,4 +63,14 @@ public class Feed {
 
     return feedId;
   }
+
+  public void deleteFeed(String feedId) {
+    String deleteSql = "DELETE FROM feeds WHERE id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(deleteSql)) {
+      statement.setString(1, feedId);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to delete feed").addKeyValue("feedId", feedId).log();
+    }
+  }
 }

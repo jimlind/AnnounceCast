@@ -41,4 +41,14 @@ public class Posted {
           .log();
     }
   }
+
+  public void deletePostedByFeedId(String feedId) {
+    String deleteSql = "DELETE FROM posted WHERE feed_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(deleteSql)) {
+      statement.setString(1, feedId);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to delete posted").addKeyValue("feedId", feedId).log();
+    }
+  }
 }

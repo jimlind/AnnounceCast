@@ -22,7 +22,7 @@ public class UnfollowAction {
     String feedId = idOption != null ? idOption.getAsString() : "";
 
     Podcast podcast = this.buildPodcast(feedId);
-    this.channel.removeChannel(feedId, event.getChannelId());
+    this.channel.deleteChannel(feedId, event.getChannelId());
 
     return new UnfollowContext(
         podcast, this.joined.getFeedsByChannelId(event.getChannel().getId()));

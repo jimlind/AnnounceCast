@@ -39,7 +39,7 @@ public class Channel {
     }
   }
 
-  public void removeChannel(String feedId, String channelId) {
+  public void deleteChannel(String feedId, String channelId) {
     String deleteSql = "DELETE FROM channels WHERE feed_id = ? AND channel_id = ?";
     try (PreparedStatement statement = connection.prepareStatement(deleteSql)) {
       statement.setString(1, feedId);
@@ -47,10 +47,20 @@ public class Channel {
       statement.executeUpdate();
     } catch (Exception ignore) {
       log.atWarn()
-          .setMessage("Unable to remove a channel")
+          .setMessage("Unable to delete channel")
           .addKeyValue("feedId", feedId)
           .addKeyValue("channelId", channelId)
           .log();
+    }
+  }
+
+  public void deleteChannelsByFeedId(String feedId) {
+    String deleteSql = "DELETE FROM channels WHERE feed_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(deleteSql)) {
+      statement.setString(1, feedId);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to delete channels").addKeyValue("feedId", feedId).log();
     }
   }
 
