@@ -80,14 +80,25 @@ public class Task {
           return;
         }
 
-        for (Episode episode : podcast.getEpisodeList().reversed()) {
+        ArrayList<Episode> episodeList = new ArrayList<>();
+        for (Episode episode : podcast.getEpisodeList()) {
+          // If episode is not processed add it to the list otherwise break the loop to avoid
+          // posting old episodes
           if (episodeNotProcessed(episode, postedFeed)) {
-            MessageEmbed message = EpisodeMessage.build(podcast, episode);
-            queue.setEpisode(postedFeed.getId(), episode.getGuid());
-            for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
-              manager.sendMessage(
-                  channelId, message, () -> recordSuccess(postedFeed.getId(), episode.getGuid()));
-            }
+            episodeList.add(episode);
+          } else break;
+          // If posted data is empty break here so only most recent episode is posted
+          if (postedFeed.getGuid().isBlank()) {
+            break;
+          }
+        }
+
+        for (Episode episode : episodeList.reversed()) {
+          MessageEmbed message = EpisodeMessage.build(podcast, episode);
+          queue.setEpisode(postedFeed.getId(), episode.getGuid());
+          for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
+            manager.sendMessage(
+                channelId, message, () -> recordSuccess(postedFeed.getId(), episode.getGuid()));
           }
         }
       }
