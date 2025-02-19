@@ -55,6 +55,17 @@ public class Parser {
                 episode.setLink(linkText);
               }
               continue;
+            case "enclosure":
+              String typeText = getAttribute(xmlStreamReader, "type");
+              String urlText = getAttribute(xmlStreamReader, "url");
+              if (typeText != null && typeText.equals("audio/mpeg")) {
+                episode.setMpegUrl(urlText);
+              }
+              if (typeText != null && typeText.equals("audio/x-m4a")) {
+                episode.setMpegUrl(urlText);
+              }
+              elementStack.push(qualifiedElementName);
+              continue;
           }
 
           switch (localElementName) {

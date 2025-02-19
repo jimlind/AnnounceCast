@@ -14,7 +14,7 @@ public class EpisodeMessage {
   public static MessageEmbed build(Podcast podcast, Episode episode) {
     EmbedBuilder embedBuilder = new EmbedBuilder();
     embedBuilder.setDescription(getDescriptionText(podcast.getDescription(), episode));
-    embedBuilder.setTitle(episode.getTitle(), episode.getLink());
+    embedBuilder.setTitle(episode.getTitle(), getTitleLink(episode));
     embedBuilder.setImage(getEpisodeImage(podcast, episode));
     embedBuilder.setAuthor(podcast.getTitle(), getUrl(podcast.getShowUrl()), podcast.getImageUrl());
     embedBuilder.setFooter(getFooterText(episode));
@@ -35,6 +35,17 @@ public class EpisodeMessage {
     }
 
     return markdownText.substring(0, newlineIndex);
+  }
+
+  private static @Nullable String getTitleLink(Episode episode) {
+    String link = episode.getLink();
+    if (link == null || link.isBlank()) {
+      link = episode.getMpegUrl();
+    }
+    if (link == null || link.isBlank()) {
+      link = episode.getM4aUrl();
+    }
+    return link;
   }
 
   private static @Nullable String getUrl(String input) {
