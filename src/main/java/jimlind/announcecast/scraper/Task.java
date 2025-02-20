@@ -1,7 +1,10 @@
 package jimlind.announcecast.scraper;
 
 import com.google.inject.Inject;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.*;
+import jimlind.announcecast.Helper;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
@@ -98,7 +101,7 @@ public class Task {
           queue.setEpisode(postedFeed.getId(), episode.getGuid());
           for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
             manager.sendMessage(
-                channelId, message, () -> recordSuccess(postedFeed.getId(), episode.getGuid()));
+                channelId, message, () -> recordSuccess(postedFeed.getId(), episode));
           }
         }
       }
@@ -122,8 +125,19 @@ public class Task {
     return !this.queue.isEpisodeQueued(postedFeed.getId(), episode.getGuid());
   }
 
-  private synchronized void recordSuccess(String feedId, String guid) {
+  private synchronized void recordSuccess(String feedId, Episode episode) {
+    Duration pubDateDifference =
+        Duration.between(Helper.stringToDate(episode.getPubDate()), ZonedDateTime.now());
+
+    log.atInfo()
+        .setMessage("Message Send Success Metadata")
+        .addKeyValue("pubDate", episode.getPubDate())
+        .addKeyValue("publishToPostDifference", pubDateDifference.getSeconds())
+        .addKeyValue("isVIP", false)
+        .log();
+
     String separatedGuid = this.posted.getGuidByFeedId(feedId);
+    String guid = episode.getGuid();
     if (separatedGuid.contains(guid)) {
       return;
     }

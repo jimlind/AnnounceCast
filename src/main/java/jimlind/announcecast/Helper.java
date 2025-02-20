@@ -4,6 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.furstenheim.CopyDown;
 import io.github.furstenheim.Options;
 import io.github.furstenheim.OptionsBuilder;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -44,5 +49,23 @@ public class Helper {
     } catch (Exception e) {
       return e.toString();
     }
+  }
+
+  public static ZonedDateTime stringToDate(String input) {
+    List<String> datePatterns =
+        Arrays.asList("EEE, dd MMM yyyy HH:mm:ss Z", "EEE, dd MMM yyyy HH:mm:ss z");
+
+    ZonedDateTime zonedDateTime = ZonedDateTime.now();
+    for (String pattern : datePatterns) {
+      try {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        zonedDateTime = ZonedDateTime.parse(input, formatter);
+        break; // Stop trying patterns once a successful parse is made
+      } catch (DateTimeParseException e) {
+        // Continue to the next pattern
+      }
+    }
+
+    return zonedDateTime;
   }
 }
