@@ -17,6 +17,7 @@ public class Episode {
   private @Nullable String seasonId;
   private @Nullable String episodeId;
   private @Nullable String duration;
+  private String pubDate;
   private @Nullable String explicit;
   private @Nullable String mpegUrl;
   private @Nullable String m4aUrl;

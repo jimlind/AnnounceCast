@@ -139,6 +139,10 @@ public class Parser {
               String explicitText = xmlStreamReader.getElementText();
               episode.setExplicit(explicitText);
               break;
+            case "pubDate":
+              String pubDateText = xmlStreamReader.getElementText();
+              episode.setPubDate(pubDateText);
+              break;
             case "item":
               // If we don't want any episodes return the podcast when first item is reached
               if (episodeCount == 0) {
