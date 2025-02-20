@@ -61,3 +61,35 @@ local.file_match "logs_integrations_integrations_node_exporter_direct_scrape" {
     }]
 }
 ```
+
+### Trying to Figure Out "Matches" in loki.souce.journal
+
+Documentation is here: https://grafana.com/docs/alloy/latest/reference/components/loki.source.journal/
+PR for code change (and tests) is here: https://github.com/grafana/agent/pull/2825/files
+
+From looking at the code and the test I sorted out that the intent is that the the format is FIELD=value but I couldn't
+really tell what it wanted in either of those fields. Through a bunch of trial and error I was able to sort out that it
+wants something like the string below. It has been commited to my reference config.alloy file.
+
+```
+matches = "_SYSTEMD_UNIT=announcecast.service"
+```
+
+When I get my real blog running I need to create an article about this because it wasn't really documented anywhere.
+
+### Allow Shortcuts
+
+Service Interaction
+
+```shell
+> systemctl start alloy
+> systemctl status alloy
+> systemctl restart alloy
+> systemctl stop alloy
+```
+
+Read the Logs
+
+```shell
+> journalctl -e -u alloy
+```
