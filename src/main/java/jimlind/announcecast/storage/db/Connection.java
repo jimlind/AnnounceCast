@@ -22,6 +22,8 @@ public class Connection {
           "CREATE TABLE IF NOT EXISTS feeds (id TEXT PRIMARY KEY, url TEXT UNIQUE, title TEXT)");
       statement.execute(
           "CREATE TABLE IF NOT EXISTS posted (feed_id TEXT PRIMARY KEY UNIQUE, guid TEXT)");
+      statement.execute(
+          "CREATE TABLE IF NOT EXISTS subscriber (feed_id TEXT PRIMARY KEY UNIQUE, active INTEGER NOT NULL CHECK (active IN (0, 1)))");
     } catch (SQLException e) {
       // If there isn't a database connection hard stop
       log.atError().setMessage("Setting Up SQLite failed").log();

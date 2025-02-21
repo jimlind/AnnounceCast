@@ -13,5 +13,6 @@ public class BasicModule extends AbstractModule {
     bind(Feed.class).in(Scopes.SINGLETON);
     bind(Joined.class).in(Scopes.SINGLETON);
     bind(Posted.class).in(Scopes.SINGLETON);
+    bind(Subscriber.class).in(Scopes.SINGLETON);
   }
 }
