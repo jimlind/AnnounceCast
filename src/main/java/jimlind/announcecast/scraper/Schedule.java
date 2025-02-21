@@ -10,6 +10,7 @@ import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
+import jimlind.announcecast.scraper.task.ScrapeSubscribers;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.db.Posted;
@@ -18,10 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Slf4j
-public class Task {
-  int PAGINATION_DELAY = 1000;
-  int PAGINATION_SIZE = 20;
+public class Schedule {
+  public static final int SINGLE_PODCAST_PERIOD = 1000;
 
+  private static final int SUBSCRIBE_REFRESH_DELAY = 10000;
+  private final int PAGINATION_DELAY = 1000;
+  private final int PAGINATION_SIZE = 20;
   @Inject private Channel channel;
   @Inject private Client client;
   @Inject private Joined joined;
@@ -29,12 +32,18 @@ public class Task {
   @Inject private Posted posted;
   @Inject private Queue queue;
 
+  @Inject private ScrapeSubscribers scrapeSubscribers;
+
   public void startScrapeQueueWrite() {
     new Timer().schedule(this.scrapeWriteTask(), 0, PAGINATION_DELAY);
   }
 
   public void startScrapeQueueRead() {
     new Timer().schedule(this.scrapeReadTask(), 1000, 10);
+  }
+
+  public void startSubscriberScrapeQueueWrite() {
+    new Timer().schedule(scrapeSubscribers, 0, SUBSCRIBE_REFRESH_DELAY);
   }
 
   private TimerTask scrapeWriteTask() {
@@ -53,12 +62,10 @@ public class Task {
 
         for (PostedFeed postedFeed : postedFeedList) {
           Podcast podcast = client.createPodcastFromFeedUrl(postedFeed.getUrl(), 1);
-          if (podcast == null) {
+          if (podcast == null || podcast.getEpisodeList().isEmpty()) {
             continue;
           }
 
-          // TODO: Sometimes this throws: Exception in thread "Timer-0"
-          // java.util.NoSuchElementException'
           if (episodeNotProcessed(podcast.getEpisodeList().getFirst(), postedFeed)) {
             queue.setPodcast(postedFeed.getUrl());
           }

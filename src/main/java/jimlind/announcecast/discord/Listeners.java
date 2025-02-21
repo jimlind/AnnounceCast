@@ -1,7 +1,7 @@
 package jimlind.announcecast.discord;
 
 import com.google.inject.Inject;
-import jimlind.announcecast.scraper.Task;
+import jimlind.announcecast.scraper.Schedule;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 @Slf4j
 public class Listeners extends ListenerAdapter {
   @Inject private SlashCommand slashCommandManager;
-  @Inject private Task task;
+  @Inject private Schedule schedule;
 
   private int readyCount = 0;
 
@@ -27,7 +27,7 @@ public class Listeners extends ListenerAdapter {
 
     ShardManager shardManager = e.getJDA().getShardManager();
     if (shardManager != null && readyCount == shardManager.getShardsTotal()) {
-      this.task.startScrapeQueueRead();
+      this.schedule.startScrapeQueueRead();
     }
   }
 

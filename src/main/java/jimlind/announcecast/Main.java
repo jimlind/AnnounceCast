@@ -8,7 +8,7 @@ import java.util.Properties;
 import jimlind.announcecast.administration.Command;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.ShutdownThread;
-import jimlind.announcecast.scraper.Task;
+import jimlind.announcecast.scraper.Schedule;
 
 public class Main {
   public static void main(String[] args) {
@@ -28,8 +28,9 @@ public class Main {
       System.exit(-1);
     }
 
-    // Start the Podcast Scraper
-    injector.getInstance(Task.class).startScrapeQueueWrite();
+    // Start the Podcast Scrapers
+    injector.getInstance(Schedule.class).startScrapeQueueWrite();
+    injector.getInstance(Schedule.class).startSubscriberScrapeQueueWrite();
 
     // Start the Discord connection manager
     injector.getInstance(Manager.class).run(properties.getProperty("DISCORD_BOT_TOKEN"));
