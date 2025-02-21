@@ -1,10 +1,8 @@
 package jimlind.announcecast.scraper;
 
 import com.google.inject.Inject;
-import java.time.Duration;
-import java.time.ZonedDateTime;
 import java.util.*;
-import jimlind.announcecast.Helper;
+import java.util.concurrent.TimeUnit;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
@@ -20,13 +18,14 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Slf4j
 public class Schedule {
-  public static final int SINGLE_PODCAST_PERIOD = 1000;
+  public static final long SINGLE_PODCAST_PERIOD = TimeUnit.MINUTES.toMillis(1);
+  public static final long SUBSCRIBER_SCRAPE_PERIOD = TimeUnit.HOURS.toMillis(2);
 
-  private static final int SUBSCRIBE_REFRESH_DELAY = 10000;
   private final int PAGINATION_DELAY = 1000;
   private final int PAGINATION_SIZE = 20;
   @Inject private Channel channel;
   @Inject private Client client;
+  @Inject private Helper helper;
   @Inject private Joined joined;
   @Inject private Manager manager;
   @Inject private Posted posted;
@@ -43,7 +42,7 @@ public class Schedule {
   }
 
   public void startSubscriberScrapeQueueWrite() {
-    new Timer().schedule(scrapeSubscribers, 0, SUBSCRIBE_REFRESH_DELAY);
+    new Timer().schedule(scrapeSubscribers, 0, SUBSCRIBER_SCRAPE_PERIOD);
   }
 
   private TimerTask scrapeWriteTask() {
@@ -66,7 +65,7 @@ public class Schedule {
             continue;
           }
 
-          if (episodeNotProcessed(podcast.getEpisodeList().getFirst(), postedFeed)) {
+          if (helper.episodeNotProcessed(podcast.getEpisodeList().getFirst(), postedFeed)) {
             queue.setPodcast(postedFeed.getUrl());
           }
         }
@@ -94,7 +93,7 @@ public class Schedule {
         for (Episode episode : podcast.getEpisodeList()) {
           // If episode is not processed add it to the list otherwise break the loop to avoid
           // posting old episodes
-          if (episodeNotProcessed(episode, postedFeed)) {
+          if (helper.episodeNotProcessed(episode, postedFeed)) {
             episodeList.add(episode);
           } else break;
           // If posted data is empty break here so only most recent episode is posted
@@ -108,56 +107,10 @@ public class Schedule {
           queue.setEpisode(postedFeed.getId(), episode.getGuid());
           for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
             manager.sendMessage(
-                channelId, message, () -> recordSuccess(postedFeed.getId(), episode));
+                channelId, message, () -> helper.recordSuccess(postedFeed.getId(), episode));
           }
         }
       }
     };
-  }
-
-  private boolean episodeNotProcessed(Episode episode, PostedFeed postedFeed) {
-    // Episode already posted and stored in database
-    if (postedFeed.getGuid().contains(episode.getGuid())) {
-      return false;
-    }
-
-    log.atInfo()
-        .setMessage("Guid Not Found")
-        .addKeyValue("episodeGuid", episode.getGuid())
-        .addKeyValue("postedGuid", postedFeed.getGuid())
-        .addKeyValue("postedUrl", postedFeed.getUrl())
-        .log();
-
-    // Episode already queued to be posted
-    return !this.queue.isEpisodeQueued(postedFeed.getId(), episode.getGuid());
-  }
-
-  private synchronized void recordSuccess(String feedId, Episode episode) {
-    Duration pubDateDifference =
-        Duration.between(Helper.stringToDate(episode.getPubDate()), ZonedDateTime.now());
-
-    log.atInfo()
-        .setMessage("Message Send Success Metadata")
-        .addKeyValue("pubDate", episode.getPubDate())
-        .addKeyValue("publishToPostDifference", pubDateDifference.getSeconds())
-        .addKeyValue("isVIP", false)
-        .log();
-
-    String separatedGuid = this.posted.getGuidByFeedId(feedId);
-    String guid = episode.getGuid();
-    if (separatedGuid.contains(guid)) {
-      return;
-    }
-
-    String separator = "■■■■■■■■■■";
-    List<String> guidList = new ArrayList<>(List.of(separatedGuid.split(separator)));
-    guidList.add(guid);
-
-    List<String> guidSublist =
-        guidList.subList(guidList.size() - Math.min(guidList.size(), 5), guidList.size());
-    separatedGuid = String.join(separator, guidSublist);
-
-    this.posted.setGuidByFeed(feedId, separatedGuid);
-    this.queue.removeEpisode(feedId, guid);
   }
 }
