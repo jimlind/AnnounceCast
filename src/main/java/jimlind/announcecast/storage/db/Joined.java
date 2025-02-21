@@ -99,4 +99,30 @@ public class Joined {
 
     return postedFeedList;
   }
+
+  public List<Feed> getPodcastsSubscribed() {
+    List<Feed> feedList = new ArrayList<>();
+
+    String sql =
+        """
+            SELECT id, url, title
+            FROM feeds
+            INNER JOIN subscriber ON feeds.id = subscriber.feed_id
+            WHERE active = 1
+            """;
+    try (Statement statement = connection.createStatement()) {
+      ResultSet resultSet = statement.executeQuery(sql);
+      while (resultSet.next()) {
+        Feed feed = new Feed();
+        feed.setId(resultSet.getString("id"));
+        feed.setUrl(resultSet.getString("url"));
+        feed.setTitle(resultSet.getString("title"));
+        feedList.add(feed);
+      }
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to get subscribed podcasts").log();
+    }
+
+    return feedList;
+  }
 }
