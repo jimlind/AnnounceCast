@@ -45,7 +45,7 @@ public class Main {
         new jimlind.announcecast.discord.DependencyInjectionModule(),
         new jimlind.announcecast.integration.DependencyInjectionModule(),
         new jimlind.announcecast.podcast.BasicModule(),
-        new jimlind.announcecast.scraper.BasicModule(),
+        new jimlind.announcecast.scraper.DependencyInjectionModule(),
         new jimlind.announcecast.storage.BasicModule());
   }
 }

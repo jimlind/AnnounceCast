@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import jimlind.announcecast.scraper.BasicModule;
+import jimlind.announcecast.scraper.DependencyInjectionModule;
 import jimlind.announcecast.scraper.Schedule;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.Feed;
@@ -19,7 +19,7 @@ public class ScrapeSubscribers extends TimerTask {
   @Override
   public void run() {
 
-    Injector injector = Guice.createInjector(new BasicModule());
+    Injector injector = Guice.createInjector(new DependencyInjectionModule());
     ScrapeSinglePodcastFactory factory = injector.getInstance(ScrapeSinglePodcastFactory.class);
 
     for (Timer timer : subscriberTimerList) {

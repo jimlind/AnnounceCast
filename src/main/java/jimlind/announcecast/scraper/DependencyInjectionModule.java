@@ -7,7 +7,7 @@ import jimlind.announcecast.scraper.task.ScrapeSinglePodcast;
 import jimlind.announcecast.scraper.task.ScrapeSinglePodcastFactory;
 import jimlind.announcecast.scraper.task.ScrapeSubscribers;
 
-public class BasicModule extends AbstractModule {
+public class DependencyInjectionModule extends AbstractModule {
 
   @Override
   protected void configure() {
