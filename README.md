@@ -1,4 +1,4 @@
-# AnnounceCast Java
+# AnnounceCast
 
 A simple Discord Podcasts announcement bot.  
 Follows some Podcasts on your server and lets you know when new episodes drop.
