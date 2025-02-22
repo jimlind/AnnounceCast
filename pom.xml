@@ -5,7 +5,7 @@
 
     <groupId>jimlind.announcecast</groupId>
     <artifactId>announcecast</artifactId>
-    <version>3.0.0-beta.5</version>
+    <version>3.0.0-beta.6</version>
     <packaging>jar</packaging>
 
     <name>Announcecast</name>
@@ -21,7 +21,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.11.0</version>
+                <version>5.11.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.2.1</version>
+            <version>5.3.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.47.1.0</version>
+            <version>3.49.1.0</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
@@ -108,7 +108,7 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.4.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -120,7 +120,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.5.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
