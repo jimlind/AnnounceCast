@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.storage.db.Posted;
+import jimlind.announcecast.storage.db.Subscriber;
 import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Helper {
   @Inject private Posted posted;
   @Inject private Queue queue;
+  @Inject private Subscriber subscriber;
 
   public boolean episodeNotProcessed(Episode episode, PostedFeed postedFeed) {
     // Episode already posted and stored in database
@@ -36,12 +38,13 @@ public class Helper {
     Duration pubDateDifference =
         Duration.between(
             jimlind.announcecast.Helper.stringToDate(episode.getPubDate()), ZonedDateTime.now());
+    boolean subscriber = this.subscriber.getActiveByFeed(feedId);
 
     log.atInfo()
         .setMessage("Message Send Success Metadata")
         .addKeyValue("pubDate", episode.getPubDate())
         .addKeyValue("publishToPostDifference", pubDateDifference.getSeconds())
-        .addKeyValue("isVIP", false)
+        .addKeyValue("subscriber", subscriber)
         .log();
 
     String separatedGuid = this.posted.getGuidByFeedId(feedId);
