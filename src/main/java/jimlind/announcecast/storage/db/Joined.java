@@ -69,7 +69,9 @@ public class Joined {
         SELECT feeds.id as id, feeds.url, feeds.title, posted.guid
         FROM feeds
         LEFT JOIN posted ON feeds.id = posted.feed_id
+        LEFT JOIN subscriber ON feeds.id = subscriber.feed_id
         INNER JOIN channels ON feeds.id = channels.feed_id
+        WHERE subscriber.active <> 1 OR subscriber.active IS NULL
         LIMIT ? OFFSET ?;
         """;
     try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
