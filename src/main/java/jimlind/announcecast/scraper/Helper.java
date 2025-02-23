@@ -23,13 +23,6 @@ public class Helper {
       return false;
     }
 
-    log.atInfo()
-        .setMessage("Guid Not Found")
-        .addKeyValue("episodeGuid", episode.getGuid())
-        .addKeyValue("postedGuid", postedFeed.getGuid())
-        .addKeyValue("postedUrl", postedFeed.getUrl())
-        .log();
-
     // Episode already queued to be posted
     return !this.queue.isEpisodeQueued(postedFeed.getId(), episode.getGuid());
   }
@@ -45,6 +38,8 @@ public class Helper {
         .addKeyValue("pubDate", episode.getPubDate())
         .addKeyValue("publishToPostDifference", pubDateDifference.getSeconds())
         .addKeyValue("subscriber", subscriber)
+        .addKeyValue("feedId", feedId)
+        .addKeyValue("episodeTitle", episode.getTitle())
         .log();
 
     String separatedGuid = this.posted.getGuidByFeedId(feedId);
