@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import jimlind.announcecast.Helper;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -21,6 +22,7 @@ public class Manager {
     this.shardManager =
         DefaultShardManagerBuilder.createLight(discordBotToken)
             .addEventListeners(listeners)
+            .setActivity(Activity.listening("Slash Commands"))
             .build();
   }
 
