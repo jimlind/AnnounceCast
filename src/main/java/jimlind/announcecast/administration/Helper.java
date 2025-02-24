@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -34,5 +38,28 @@ public class Helper {
     }
 
     return commandList;
+  }
+
+  public boolean hasCorrectPermissions(JDA jda, String channelId) {
+    // If we can't locate the channel we should exit early
+    GuildMessageChannel channel = jda.getChannelById(GuildMessageChannel.class, channelId);
+    if (channel == null) {
+      return false;
+    }
+
+    Member member = channel.getGuild().getSelfMember();
+    if (!member.hasPermission(channel, Permission.VIEW_CHANNEL)) {
+      return false;
+    }
+
+    boolean sendMessageEnabled =
+        channel.getType().isThread()
+            ? member.hasPermission(channel, Permission.MESSAGE_SEND_IN_THREADS)
+            : member.hasPermission(channel, Permission.MESSAGE_SEND);
+    if (!sendMessageEnabled) {
+      return false;
+    }
+
+    return member.hasPermission(channel, Permission.MESSAGE_EMBED_LINKS);
   }
 }

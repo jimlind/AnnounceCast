@@ -1,7 +1,12 @@
 package jimlind.announcecast.administration;
 
 import com.google.inject.Inject;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import jimlind.announcecast.storage.db.Channel;
@@ -131,7 +136,47 @@ public class Action {
   }
 
   private void deleteUnauthorizedChannels() {
-    System.out.println("Not yet.");
+    System.out.print("Bot Token? (0PFtbdlKtu...): ");
+    String botToken = this.scanner.nextLine();
+
+    try {
+      JDA jda = JDABuilder.createLight(botToken).build();
+      jda.awaitReady();
+
+      List<String> channelIdList = this.channel.getUniqueChannelIds();
+      for (int i = 0; i < 10; i++) {
+        Iterator<String> iterator = channelIdList.iterator();
+        while (iterator.hasNext()) {
+          boolean hasCorrectPermissions = this.helper.hasCorrectPermissions(jda, iterator.next());
+          if (hasCorrectPermissions) {
+            iterator.remove();
+          }
+        }
+      }
+      System.out.println("Found " + channelIdList.size() + " unauthorized channels");
+      System.out.print("Delete and archive them? (yes, no): ");
+      boolean delete = this.scanner.nextLine().equals("yes");
+      if (!delete) {
+        return;
+      }
+
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+      String outputFile = "channel_deletes_" + LocalDateTime.now().format(formatter) + ".txt";
+      BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+
+      for (String channelId : channelIdList) {
+        System.out.println(channelId);
+
+        for (String feedId : this.channel.getFeedsByChannelId(channelId)) {
+          channel.deleteChannel(feedId, channelId);
+          writer.write("feed:" + feedId + "|channel:" + channelId + "\n");
+        }
+      }
+      writer.close();
+
+    } catch (Exception ignore) {
+      System.out.print("FAILED");
+    }
   }
 
   private void deleteUselessFeeds() {

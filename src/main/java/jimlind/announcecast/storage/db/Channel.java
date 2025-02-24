@@ -12,12 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 public class Channel {
   private @Inject jimlind.announcecast.storage.db.Connection connection;
 
-  public List<Long> getUniqueChannelIds() {
-    List<Long> values = new ArrayList<Long>();
+  public List<String> getUniqueChannelIds() {
+    List<String> values = new ArrayList<String>();
     try (Statement statement = connection.createStatement()) {
       ResultSet resultSet = statement.executeQuery("SELECT DISTINCT channel_id FROM channels");
       while (resultSet.next()) {
-        values.add(resultSet.getLong("channel_id"));
+        values.add(resultSet.getString("channel_id"));
       }
     } catch (Exception ignore) {
       log.atWarn().setMessage("Unable to get all channel ids").log();
@@ -90,6 +90,25 @@ public class Channel {
       }
     } catch (Exception ignore) {
       log.atWarn().setMessage("Unable to load a channel list").addKeyValue("feedId", feedId).log();
+    }
+    return results;
+  }
+
+  public List<String> getFeedsByChannelId(String channelId) {
+    List<String> results = new ArrayList<>();
+
+    String sql = "SELECT feed_id as id FROM channels WHERE channel_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, channelId);
+      ResultSet resultSet = statement.executeQuery();
+      while (resultSet.next()) {
+        results.add(resultSet.getString("id"));
+      }
+    } catch (Exception ignore) {
+      log.atWarn()
+          .setMessage("Unable to load a feed list")
+          .addKeyValue("channelId", channelId)
+          .log();
     }
     return results;
   }
