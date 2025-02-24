@@ -12,6 +12,20 @@ import lombok.extern.slf4j.Slf4j;
 public class Channel {
   private @Inject jimlind.announcecast.storage.db.Connection connection;
 
+  public List<Long> getUniqueChannelIds() {
+    List<Long> values = new ArrayList<Long>();
+    try (Statement statement = connection.createStatement()) {
+      ResultSet resultSet = statement.executeQuery("SELECT DISTINCT channel_id FROM channels");
+      while (resultSet.next()) {
+        values.add(resultSet.getLong("channel_id"));
+      }
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to get all channel ids").log();
+    }
+
+    return values;
+  }
+
   public long getCount() {
     int countValue = 0;
     try (Statement statement = connection.createStatement()) {
