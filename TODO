@@ -1,2 +1,6 @@
 TODO:
-N/A
+Delete Subscriber Rows On Feed Purge
+New actions for the admin
+- https://github.com/jimlind/AnnounceCast/blob/nodejs/src/tools/maintenance/delete-bad-channels.ts
+- https://github.com/jimlind/AnnounceCast/blob/nodejs/src/tools/maintenance/delete-bad-feeds.ts
+- https://github.com/jimlind/AnnounceCast/blob/nodejs/src/tools/maintenance/delete-unused-feeds.ts
