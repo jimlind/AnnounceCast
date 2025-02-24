@@ -21,12 +21,11 @@ Everything related to observability (watching Grafana) is covered in the OBSERVA
 
 ## Publish Slash Commands
 
-The Discord servers need to know what slash commands they should use for the bot. I set this up for the NodeJS version
-of the bot and I haven't written a version for it in Java yet. The old command could probably be revived from the old
-branch if necessary
+The Discord servers need to know what slash commands they should use for the bot. The admin action menu has an option to
+write the slash commands and you can invoke that here.
 
 ```shell
-NODE_ENV=production node --import ./register.mjs ./src/tools/app-command/put-application-commands.ts
+> java -jar announcecast.jar admin
 ```
 
 ## Miscellaneous Shortcuts
