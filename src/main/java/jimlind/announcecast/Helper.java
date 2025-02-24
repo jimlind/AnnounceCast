@@ -60,9 +60,9 @@ public class Helper {
       try {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         zonedDateTime = ZonedDateTime.parse(input, formatter);
-        break; // Stop trying patterns once a successful parse is made
-      } catch (DateTimeParseException e) {
-        // Continue to the next pattern
+        break;
+      } catch (DateTimeParseException ignore) {
+        // Ignore, try next pattern
       }
     }
 
