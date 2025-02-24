@@ -7,7 +7,7 @@ public class DependencyInjectionModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(Command.class).in(Scopes.SINGLETON);
+    bind(Action.class).in(Scopes.SINGLETON);
     bind(Helper.class).in(Scopes.SINGLETON);
   }
 }

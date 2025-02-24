@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.Properties;
-import jimlind.announcecast.administration.Command;
+import jimlind.announcecast.administration.Action;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.ShutdownThread;
 import jimlind.announcecast.scraper.Schedule;
@@ -17,7 +17,7 @@ public class Main {
     Properties properties = new Properties();
     String argument = Arrays.stream(args).findFirst().orElse("");
     if (argument.equals("admin")) {
-      injector.getInstance(Command.class).run(args);
+      injector.getInstance(Action.class).run();
       System.exit(0);
     }
 

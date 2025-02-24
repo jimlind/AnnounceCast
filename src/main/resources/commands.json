@@ -1,0 +1,69 @@
+[
+  {
+    "name": "follow",
+    "description": "Follow a podcast in this channel matching the search keyword(s)",
+    "default_manage_permissions": true,
+    "options": [
+      {
+        "type": "string",
+        "name": "keywords",
+        "description": "Keyword(s) used to find podcast to follow",
+        "required": true
+      }
+    ]
+  },
+  {
+    "name": "follow-rss",
+    "description": "Follow a podcast in this channel using an RSS feed",
+    "default_manage_permissions": true,
+    "options": [
+      {
+        "type": "string",
+        "name": "feed",
+        "description": "RSS feed used to identified podcast to follow",
+        "required": true
+      }
+    ]
+  },
+  {
+    "name": "unfollow",
+    "description": "Unfollow a podcast in this channel using the Podcast Id",
+    "default_manage_permissions": true,
+    "options": [
+      {
+        "type": "string",
+        "name": "id",
+        "description": "Podcast Id used to identified podcast to unfollow",
+        "required": true
+      }
+    ]
+  },
+  {
+    "name": "following",
+    "description": "Replies with the list of all podcasts (Ids & Names) followed in this channel"
+  },
+  {
+    "name": "search",
+    "description": "Replies with up to 4 podcasts matching the search keyword(s)",
+    "options": [
+      {
+        "type": "string",
+        "name": "keywords",
+        "description": "Keyword(s) used to find podcasts",
+        "required": true
+      }
+    ]
+  },
+  {
+    "name": "help",
+    "description": "Replies with a some helpful information and links",
+    "options": [
+      {
+        "type": "boolean",
+        "name": "test",
+        "description": "Sends a series of test messages to validate permissions",
+        "required": false
+      }
+    ]
+  }
+]
