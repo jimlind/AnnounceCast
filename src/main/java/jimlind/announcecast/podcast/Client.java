@@ -5,15 +5,16 @@ import java.io.InputStream;
 import java.net.*;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import org.jetbrains.annotations.Nullable;
 
 public class Client {
-  int CONNECTION_CONNECT_TIMEOUT = 500; // 0.5s
-  int CONNECTION_READ_TIMEOUT = 500; // 0.5s
-  int XMLSTREAM_READ_TIMEOUT = 500; // 0.5s
+  int CONNECTION_CONNECT_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(1);
+  int CONNECTION_READ_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(2);
+  int XMLSTREAM_READ_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(1);
 
   @Inject private Parser parser;
 
