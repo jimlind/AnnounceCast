@@ -2,6 +2,8 @@ package jimlind.announcecast.storage.db;
 
 import com.google.inject.Inject;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,6 +34,27 @@ public class Feed {
       log.atWarn().setMessage("Unable to get the feed count").log();
     }
     return countValue;
+  }
+
+  public List<jimlind.announcecast.storage.model.Feed> getAllFeeds() {
+    List<jimlind.announcecast.storage.model.Feed> result = new ArrayList<>();
+    try (Statement statement = connection.createStatement()) {
+      ResultSet resultSet = statement.executeQuery("SELECT id, url, title FROM feeds");
+      while (resultSet.next()) {
+        jimlind.announcecast.storage.model.Feed feed =
+            new jimlind.announcecast.storage.model.Feed();
+        feed.setId(resultSet.getString("id"));
+        feed.setUrl(resultSet.getString("url"));
+        feed.setTitle(resultSet.getString("title"));
+
+        result.add(feed);
+      }
+    } catch (Exception ignore) {
+      System.out.println(ignore);
+      log.atWarn().setMessage("Unable to get all feeds").log();
+    }
+
+    return result;
   }
 
   public String addFeed(String feedUrl, String feedTitle) {
