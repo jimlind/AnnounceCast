@@ -19,6 +19,10 @@ public class Client {
   @Inject private Parser parser;
 
   public @Nullable Podcast createPodcastFromFeedUrl(String feed, int episodeCount) {
+    return this.createPodcastFromFeedUrl(feed, episodeCount, 1);
+  }
+
+  public @Nullable Podcast createPodcastFromFeedUrl(String feed, int episodeCount, int timeoutX) {
     String title = getClass().getPackage().getImplementationTitle();
     String version = getClass().getPackage().getImplementationVersion();
 
@@ -28,8 +32,8 @@ public class Client {
       connection = (HttpURLConnection) url.openConnection();
       connection.setRequestProperty("Host", url.getHost());
       connection.setRequestProperty("User-Agent", title + "/" + version);
-      connection.setConnectTimeout(CONNECTION_CONNECT_TIMEOUT);
-      connection.setReadTimeout(CONNECTION_READ_TIMEOUT);
+      connection.setConnectTimeout(CONNECTION_CONNECT_TIMEOUT * timeoutX);
+      connection.setReadTimeout(CONNECTION_READ_TIMEOUT * timeoutX);
     } catch (Exception ignored) {
       // Ignore any errors from attempting to build a URL or open a connection
       // It isn't my role to validate the whole Internet
@@ -39,7 +43,8 @@ public class Client {
     try {
       int responseCode = connection.getResponseCode();
       if (responseCode > 299 && responseCode < 400) {
-        return createPodcastFromFeedUrl(connection.getHeaderField("Location"), episodeCount);
+        return createPodcastFromFeedUrl(
+            connection.getHeaderField("Location"), episodeCount, timeoutX);
       }
     } catch (Exception ignored) {
       // Ignore any errors from trying to get a response code
@@ -82,7 +87,7 @@ public class Client {
             }
           }
         };
-    timer.schedule(task, XMLSTREAM_READ_TIMEOUT);
+    timer.schedule(task, (long) XMLSTREAM_READ_TIMEOUT * timeoutX);
 
     // This will never error out, and will always get some kind of Podcast/null object
     Podcast podcast = this.parser.processStreamReader(xmlStreamReader, episodeCount);
