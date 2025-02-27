@@ -6,9 +6,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import jimlind.announcecast.podcast.Client;
+import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Feed;
 import jimlind.announcecast.storage.db.Posted;
@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 public class Action {
   private final Channel channel;
+  private final Client client;
   private final Feed feed;
   private final Helper helper;
   private final Posted posted;
@@ -26,8 +27,15 @@ public class Action {
   private final Subscriber subscriber;
 
   @Inject
-  Action(Channel channel, Feed feed, Helper helper, Posted posted, Subscriber subscriber) {
+  Action(
+      Channel channel,
+      Client client,
+      Feed feed,
+      Helper helper,
+      Posted posted,
+      Subscriber subscriber) {
     this.channel = channel;
+    this.client = client;
     this.feed = feed;
     this.helper = helper;
     this.posted = posted;
@@ -47,34 +55,39 @@ public class Action {
     System.out.println(" > 7. Delete dead or empty feeds");
     System.out.println(" > 8. Delete feeds with no following");
 
-    switch (this.scanner.nextLine()) {
-      case "1":
-        setPostedAction();
-        break;
-      case "2":
-        setSubscriberAction();
-        break;
-      case "3":
-        purgeFeedAction();
-        break;
-      case "4":
-        writeSlashCommands();
-        break;
-      case "5":
-        deleteSlashCommands();
-        break;
-      case "6":
-        deleteUnauthorizedChannels();
-        break;
-      case "7":
-        deleteUselessFeeds();
-        break;
-      case "8":
-        deleteUnfollowedFeeds();
-        break;
-      default:
-        System.out.println("INVALID COMMAND");
-        break;
+    try {
+      switch (this.scanner.nextLine()) {
+        case "1":
+          setPostedAction();
+          break;
+        case "2":
+          setSubscriberAction();
+          break;
+        case "3":
+          purgeFeedAction();
+          break;
+        case "4":
+          writeSlashCommands();
+          break;
+        case "5":
+          deleteSlashCommands();
+          break;
+        case "6":
+          deleteUnauthorizedChannels();
+          break;
+        case "7":
+          deleteUselessFeeds();
+          break;
+        case "8":
+          deleteUnfollowedFeeds();
+          break;
+        default:
+          System.out.println("INVALID COMMAND");
+          break;
+      }
+    } catch (Exception e) {
+      System.out.println("FAILED!");
+      System.out.println(e);
     }
   }
 
@@ -107,80 +120,111 @@ public class Action {
     this.feed.deleteFeed(feedId);
   }
 
-  private void writeSlashCommands() {
+  private void writeSlashCommands() throws Exception {
     System.out.print("Bot Token? (0PFtbdlKtu...): ");
     String botToken = this.scanner.nextLine();
 
-    try {
-      JDA jda = JDABuilder.createLight(botToken).build();
-      jda.awaitReady();
-      File commandFile = new File("src/main/resources/commands.json");
-      List<SlashCommandData> commandList = this.helper.jsonToCommandDataList(commandFile);
-      jda.updateCommands().addCommands(commandList).queue();
-    } catch (Exception ignore) {
-      System.out.print("FAILED");
-    }
+    JDA jda = JDABuilder.createLight(botToken).build();
+    jda.awaitReady();
+    File commandFile = new File("src/main/resources/commands.json");
+    List<SlashCommandData> commandList = this.helper.jsonToCommandDataList(commandFile);
+    jda.updateCommands().addCommands(commandList).queue();
   }
 
-  private void deleteSlashCommands() {
+  private void deleteSlashCommands() throws Exception {
     System.out.print("Bot Token? (0PFtbdlKtu...): ");
     String botToken = this.scanner.nextLine();
 
-    try {
-      JDA jda = JDABuilder.createLight(botToken).build();
-      jda.awaitReady();
-      jda.updateCommands().complete();
-    } catch (Exception ignore) {
-      System.out.print("FAILED");
-    }
+    JDA jda = JDABuilder.createLight(botToken).build();
+    jda.awaitReady();
+    jda.updateCommands().complete();
   }
 
-  private void deleteUnauthorizedChannels() {
+  private void deleteUnauthorizedChannels() throws Exception {
     System.out.print("Bot Token? (0PFtbdlKtu...): ");
     String botToken = this.scanner.nextLine();
 
-    try {
-      JDA jda = JDABuilder.createLight(botToken).build();
-      jda.awaitReady();
+    JDA jda = JDABuilder.createLight(botToken).build();
+    jda.awaitReady();
 
-      List<String> channelIdList = this.channel.getUniqueChannelIds();
-      for (int i = 0; i < 10; i++) {
-        Iterator<String> iterator = channelIdList.iterator();
-        while (iterator.hasNext()) {
-          boolean hasCorrectPermissions = this.helper.hasCorrectPermissions(jda, iterator.next());
-          if (hasCorrectPermissions) {
-            iterator.remove();
-          }
+    List<String> channelIdList = this.channel.getUniqueChannelIds();
+    for (int i = 0; i < 10; i++) {
+      Iterator<String> iterator = channelIdList.iterator();
+      while (iterator.hasNext()) {
+        boolean hasCorrectPermissions = this.helper.hasCorrectPermissions(jda, iterator.next());
+        if (hasCorrectPermissions) {
+          iterator.remove();
         }
       }
-      System.out.println("Found " + channelIdList.size() + " unauthorized channels");
-      System.out.print("Delete and archive them? (yes, no): ");
-      boolean delete = this.scanner.nextLine().equals("yes");
-      if (!delete) {
-        return;
-      }
-
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-      String outputFile = "channel_deletes_" + LocalDateTime.now().format(formatter) + ".txt";
-      BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-
-      for (String channelId : channelIdList) {
-        System.out.println(channelId);
-
-        for (String feedId : this.channel.getFeedsByChannelId(channelId)) {
-          channel.deleteChannel(feedId, channelId);
-          writer.write("feed:" + feedId + "|channel:" + channelId + "\n");
-        }
-      }
-      writer.close();
-
-    } catch (Exception ignore) {
-      System.out.print("FAILED");
     }
+    System.out.println("Found " + channelIdList.size() + " unauthorized channels");
+    System.out.print("Delete and archive them? (yes, no): ");
+    boolean delete = this.scanner.nextLine().equals("yes");
+    if (!delete) {
+      return;
+    }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+    String outputFile = "channel_deletes_" + LocalDateTime.now().format(formatter) + ".txt";
+    BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+
+    for (String channelId : channelIdList) {
+      System.out.println(channelId);
+
+      for (String feedId : this.channel.getFeedsByChannelId(channelId)) {
+        channel.deleteChannel(feedId, channelId);
+        writer.write("feed:" + feedId + "|channel:" + channelId + "\n");
+      }
+    }
+    writer.close();
   }
 
-  private void deleteUselessFeeds() {
-    System.out.println("Not yet.");
+  private void deleteUselessFeeds() throws Exception {
+    List<jimlind.announcecast.storage.model.Feed> feedStorage = new ArrayList<>();
+    List<jimlind.announcecast.storage.model.Feed> feedList = this.feed.getAllFeeds();
+
+    for (int i = 0; i < 10; i++) {
+      feedStorage = new ArrayList<>();
+      for (jimlind.announcecast.storage.model.Feed feedModel : feedList) {
+        Podcast podcast = this.client.createPodcastFromFeedUrl(feedModel.getUrl(), 1, i);
+        System.out.print("Checking: `" + feedModel.getTitle() + "`...");
+        if (podcast == null) {
+          feedStorage.add(feedModel);
+          System.out.println(" ⛔ No Response (" + feedModel.getUrl() + ")");
+          continue;
+        }
+        if (podcast.getEpisodeList() == null) {
+          feedStorage.add(feedModel);
+          System.out.println(" ⛔ No Episode List (" + feedModel.getUrl() + ")");
+          continue;
+        }
+        if (podcast.getEpisodeList().isEmpty()) {
+          feedStorage.add(feedModel);
+          System.out.println(" ⛔ No Episodes (" + feedModel.getUrl() + ")");
+          continue;
+        }
+        System.out.println(" ✅");
+      }
+      feedList = new ArrayList<>(feedStorage);
+      System.out.println("---------");
+    }
+
+    System.out.println("Found " + feedList.size() + " unused feeds");
+    System.out.print("Delete and archive them? (yes, no): ");
+    boolean delete = this.scanner.nextLine().equals("yes");
+    if (!delete) {
+      return;
+    }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+    String outputFile = "channel_deletes_" + LocalDateTime.now().format(formatter) + ".txt";
+    BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+
+    for (jimlind.announcecast.storage.model.Feed feedModel : feedList) {
+      this.feed.deleteFeed(feedModel.getId());
+      writer.write("id:" + feedModel.getId() + "|url:" + feedModel.getUrl() + "\n");
+    }
+    writer.close();
   }
 
   private void deleteUnfollowedFeeds() {
