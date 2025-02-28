@@ -1,7 +1,5 @@
 TODO:
 What happens when trying to post to channel without permissions?
 - Maybe centralize some logic
-
 Add indexes to SQLite rows
 Test on all feeds in production - routing messages to new testing channel.
-GitHub action to stop the bot
