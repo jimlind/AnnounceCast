@@ -17,9 +17,9 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-      - name: Restart via SSH
+      - name: Stop via SSH
         env:
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }} "systemctl restart announcecast"
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOSTNAME }} "systemctl stop announcecast"
