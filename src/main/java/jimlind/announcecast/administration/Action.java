@@ -122,6 +122,7 @@ public class Action {
     this.posted.deletePostedByFeedId(feedId);
     this.channel.deleteChannelsByFeedId(feedId);
     this.feed.deleteFeed(feedId);
+    this.subscriber.deleteSubscriberByFeedId(feedId);
   }
 
   private void writeSlashCommands() throws Exception {

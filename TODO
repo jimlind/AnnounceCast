@@ -1,7 +1,6 @@
 TODO:
 What happens when trying to post to channel without permissions?
 - Maybe centralize some logic
-Delete Subscriber Rows On Feed Purge
 
 Add indexes to SQLite rows
 Test on all feeds in production - routing messages to new testing channel.

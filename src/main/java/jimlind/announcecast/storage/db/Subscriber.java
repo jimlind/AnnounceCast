@@ -46,4 +46,14 @@ public class Subscriber {
           .log();
     }
   }
+
+  public void deleteSubscriberByFeedId(String feedId) {
+    String sql = "DELETE FROM subscriber WHERE feed_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, feedId);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to delete subscriber").addKeyValue("feedId", feedId).log();
+    }
+  }
 }
