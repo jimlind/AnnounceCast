@@ -102,6 +102,30 @@ public class Joined {
     return postedFeedList;
   }
 
+  public List<Feed> getFeedsWithoutChannels() {
+    List<Feed> feedList = new ArrayList<>();
+    String sql =
+        """
+        SELECT f.id, f.url, f.title
+        FROM feeds AS f
+        LEFT JOIN channels AS c ON f.id = c.feed_id
+        WHERE c.feed_id IS NULL;
+        """;
+    try (Statement statement = connection.createStatement()) {
+      ResultSet resultSet = statement.executeQuery(sql);
+      while (resultSet.next()) {
+        Feed feed = new Feed();
+        feed.setId(resultSet.getString("id"));
+        feed.setUrl(resultSet.getString("url"));
+        feed.setTitle(resultSet.getString("title"));
+        feedList.add(feed);
+      }
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to get feeds without channels").log();
+    }
+    return feedList;
+  }
+
   public List<Feed> getPodcastsSubscribed() {
     List<Feed> feedList = new ArrayList<>();
 

@@ -11,6 +11,7 @@ import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Feed;
+import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.db.Posted;
 import jimlind.announcecast.storage.db.Subscriber;
 import net.dv8tion.jda.api.JDA;
@@ -22,6 +23,7 @@ public class Action {
   private final Client client;
   private final Feed feed;
   private final Helper helper;
+  private final Joined joined;
   private final Posted posted;
   private final Scanner scanner;
   private final Subscriber subscriber;
@@ -32,12 +34,14 @@ public class Action {
       Client client,
       Feed feed,
       Helper helper,
+      Joined joined,
       Posted posted,
       Subscriber subscriber) {
     this.channel = channel;
     this.client = client;
     this.feed = feed;
     this.helper = helper;
+    this.joined = joined;
     this.posted = posted;
     this.subscriber = subscriber;
 
@@ -165,7 +169,8 @@ public class Action {
     }
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-    String outputFile = "channel_deletes_" + LocalDateTime.now().format(formatter) + ".txt";
+    String outputFile =
+        "log/deletes/channel_deletes_" + LocalDateTime.now().format(formatter) + ".txt";
     BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 
     for (String channelId : channelIdList) {
@@ -180,11 +185,10 @@ public class Action {
   }
 
   private void deleteUselessFeeds() throws Exception {
-    List<jimlind.announcecast.storage.model.Feed> feedStorage = new ArrayList<>();
     List<jimlind.announcecast.storage.model.Feed> feedList = this.feed.getAllFeeds();
 
     for (int i = 0; i < 10; i++) {
-      feedStorage = new ArrayList<>();
+      List<jimlind.announcecast.storage.model.Feed> feedStorage = new ArrayList<>();
       for (jimlind.announcecast.storage.model.Feed feedModel : feedList) {
         Podcast podcast = this.client.createPodcastFromFeedUrl(feedModel.getUrl(), 1, i);
         System.out.print("Checking: `" + feedModel.getTitle() + "`...");
@@ -217,7 +221,8 @@ public class Action {
     }
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-    String outputFile = "channel_deletes_" + LocalDateTime.now().format(formatter) + ".txt";
+    String outputFile =
+        "log/deletes/feed_deletes_invalid_" + LocalDateTime.now().format(formatter) + ".txt";
     BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 
     for (jimlind.announcecast.storage.model.Feed feedModel : feedList) {
@@ -227,7 +232,18 @@ public class Action {
     writer.close();
   }
 
-  private void deleteUnfollowedFeeds() {
-    System.out.println("Not yet.");
+  private void deleteUnfollowedFeeds() throws Exception {
+    List<jimlind.announcecast.storage.model.Feed> feedList = this.joined.getFeedsWithoutChannels();
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+    String outputFile =
+        "log/deletes/feed_deletes_unfollowed_" + LocalDateTime.now().format(formatter) + ".txt";
+    BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+
+    for (jimlind.announcecast.storage.model.Feed feedModel : feedList) {
+      //      this.feed.deleteFeed(feedModel.getId());
+      writer.write("id:" + feedModel.getId() + "|url:" + feedModel.getUrl() + "\n");
+    }
+    writer.close();
   }
 }
