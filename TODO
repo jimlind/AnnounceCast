@@ -1,5 +1,3 @@
 TODO:
-What happens when trying to post to channel without permissions?
-- Maybe centralize some logic
 Test on all feeds in production - routing messages to new testing channel.
 Run commands to add indexes on all hosted databases

@@ -56,14 +56,18 @@ public class Manager {
       return;
     }
 
-    channel
-        .sendMessageEmbeds(message)
-        .queue(
-            m -> {
-              onSuccess.run();
-              sendSuccess(m, message, channel);
-            },
-            t -> sendFailure(message, channel));
+    try {
+      channel
+          .sendMessageEmbeds(message)
+          .queue(
+              m -> {
+                onSuccess.run();
+                sendSuccess(m, message, channel);
+              },
+              t -> sendFailure(message, channel));
+    } catch (Exception e) {
+      log.atWarn().setMessage("Message Send Exception").addKeyValue("exception", e).log();
+    }
   }
 
   public void sendSuccess(Message message, MessageEmbed messageEmbed, GuildMessageChannel channel) {
