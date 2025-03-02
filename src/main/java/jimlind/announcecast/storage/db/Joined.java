@@ -66,7 +66,7 @@ public class Joined {
 
     String selectSql =
         """
-        SELECT feeds.id as id, feeds.url, feeds.title, posted.guid
+        SELECT DISTINCT feeds.id as id, feeds.url, feeds.title, posted.guid
         FROM feeds
         LEFT JOIN posted ON feeds.id = posted.feed_id
         LEFT JOIN subscriber ON feeds.id = subscriber.feed_id
