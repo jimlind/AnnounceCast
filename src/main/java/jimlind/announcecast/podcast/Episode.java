@@ -10,7 +10,7 @@ public class Episode {
   private String title;
   private String guid;
   private @Nullable String description;
-  private String summary;
+  private @Nullable String summary;
   private @Nullable String link;
   private @Nullable String imageUrl;
   private @Nullable String thumbnailUrl;

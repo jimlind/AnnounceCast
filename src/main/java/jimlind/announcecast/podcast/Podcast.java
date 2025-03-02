@@ -4,12 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @Setter
 public class Podcast {
   private String title;
-  private String description;
+  private @Nullable String description;
   private String summary;
   private String feedUrl;
   private String showUrl;
