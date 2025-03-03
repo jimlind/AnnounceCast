@@ -7,11 +7,12 @@ import java.io.FileWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import jimlind.announcecast.administration.run.DeleteUnfollowedFeeds;
+import jimlind.announcecast.administration.run.SendAllFeeds;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Feed;
-import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.db.Posted;
 import jimlind.announcecast.storage.db.Subscriber;
 import net.dv8tion.jda.api.JDA;
@@ -19,30 +20,33 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 public class Action {
+  private final DeleteUnfollowedFeeds deleteUnfollowedFeeds;
   private final Channel channel;
   private final Client client;
   private final Feed feed;
   private final Helper helper;
-  private final Joined joined;
   private final Posted posted;
   private final Scanner scanner;
+  private final SendAllFeeds sendAllFeeds;
   private final Subscriber subscriber;
 
   @Inject
   Action(
+      DeleteUnfollowedFeeds deleteUnfollowedFeeds,
       Channel channel,
       Client client,
       Feed feed,
       Helper helper,
-      Joined joined,
       Posted posted,
+      SendAllFeeds sendAllFeeds,
       Subscriber subscriber) {
+    this.deleteUnfollowedFeeds = deleteUnfollowedFeeds;
     this.channel = channel;
     this.client = client;
     this.feed = feed;
     this.helper = helper;
-    this.joined = joined;
     this.posted = posted;
+    this.sendAllFeeds = sendAllFeeds;
     this.subscriber = subscriber;
 
     this.scanner = new Scanner(System.in);
@@ -58,6 +62,7 @@ public class Action {
     System.out.println(" > 6. Delete channels without proper permissions");
     System.out.println(" > 7. Delete dead or empty feeds");
     System.out.println(" > 8. Delete feeds with no following");
+    System.out.println(" > 9. Test sending all feeds");
 
     try {
       switch (this.scanner.nextLine()) {
@@ -83,7 +88,10 @@ public class Action {
           deleteUselessFeeds();
           break;
         case "8":
-          deleteUnfollowedFeeds();
+          this.deleteUnfollowedFeeds.run();
+          break;
+        case "9":
+          this.sendAllFeeds.run();
           break;
         default:
           System.out.println("INVALID COMMAND");
@@ -228,21 +236,6 @@ public class Action {
 
     for (jimlind.announcecast.storage.model.Feed feedModel : feedList) {
       this.feed.deleteFeed(feedModel.getId());
-      writer.write("id:" + feedModel.getId() + "|url:" + feedModel.getUrl() + "\n");
-    }
-    writer.close();
-  }
-
-  private void deleteUnfollowedFeeds() throws Exception {
-    List<jimlind.announcecast.storage.model.Feed> feedList = this.joined.getFeedsWithoutChannels();
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-    String outputFile =
-        "log/deletes/feed_deletes_unfollowed_" + LocalDateTime.now().format(formatter) + ".txt";
-    BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-
-    for (jimlind.announcecast.storage.model.Feed feedModel : feedList) {
-      //      this.feed.deleteFeed(feedModel.getId());
       writer.write("id:" + feedModel.getId() + "|url:" + feedModel.getUrl() + "\n");
     }
     writer.close();
