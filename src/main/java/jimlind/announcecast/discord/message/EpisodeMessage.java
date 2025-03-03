@@ -1,7 +1,12 @@
 package jimlind.announcecast.discord.message;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import jimlind.announcecast.Helper;
 import jimlind.announcecast.podcast.Episode;
@@ -12,20 +17,28 @@ import org.jetbrains.annotations.Nullable;
 
 public class EpisodeMessage {
   public static MessageEmbed build(Podcast podcast, Episode episode) {
+    String authorUrl = createValidUrl(podcast.getShowUrl());
+    String authorImageUrl = getAuthorImage(podcast, episode);
+
     EmbedBuilder embedBuilder = new EmbedBuilder();
     embedBuilder.setDescription(getDescriptionText(podcast.getDescription(), episode));
     embedBuilder.setTitle(episode.getTitle(), getTitleLink(episode));
     embedBuilder.setImage(getEpisodeImage(podcast, episode));
-    embedBuilder.setAuthor(podcast.getTitle(), getUrl(podcast.getShowUrl()), podcast.getImageUrl());
+    embedBuilder.setAuthor(podcast.getTitle(), authorUrl, authorImageUrl);
     embedBuilder.setFooter(getFooterText(episode));
 
     return embedBuilder.build();
   }
 
   private static String getDescriptionText(String defaultValue, Episode episode) {
-    // Prefer description over summary over default value
-    String description = episode.getSummary() != null ? episode.getSummary() : defaultValue;
-    description = episode.getDescription() != null ? episode.getDescription() : description;
+    String description = episode.getPubDate();
+    if (episode.getDescription() != null) {
+      description = episode.getDescription();
+    } else if (episode.getSummary() != null) {
+      description = episode.getSummary();
+    } else if (defaultValue != null) {
+      description = defaultValue;
+    }
 
     String markdownText = Helper.htmlToMarkdown(description, 512);
 
@@ -38,40 +51,38 @@ public class EpisodeMessage {
   }
 
   private static @Nullable String getTitleLink(Episode episode) {
-    String link = episode.getLink();
+    String link = createValidUrl(episode.getLink());
     if (link == null || link.isBlank()) {
-      link = episode.getMpegUrl();
+      link = createValidUrl(episode.getMpegUrl());
     }
     if (link == null || link.isBlank()) {
-      link = episode.getM4aUrl();
+      link = createValidUrl(episode.getM4aUrl());
+    }
+    if (link == null || link.isBlank()) {
+      return null;
     }
     return link;
   }
 
-  private static @Nullable String getUrl(String input) {
-    if (input == null || input.isBlank()) {
-      return null;
+  private static @Nullable String getEpisodeImage(Podcast podcast, Episode episode) {
+    String result = createValidUrl(episode.getImageUrl());
+    if (result == null) {
+      result = createValidUrl(episode.getThumbnailUrl());
+    }
+    if (result == null) {
+      result = createValidUrl(podcast.getImageUrl());
     }
 
-    if (!input.startsWith("http")) {
-      input = "https://" + input;
-    }
-
-    return input;
+    return result;
   }
 
-  private static String getEpisodeImage(Podcast podcast, Episode episode) {
-    String result = episode.getImageUrl();
-    if (result == null || result.isBlank()) {
-      result = episode.getThumbnailUrl();
+  private static @Nullable String getAuthorImage(Podcast podcast, Episode episode) {
+    String result = createValidUrl(podcast.getImageUrl());
+    if (result == null) {
+      result = createValidUrl(episode.getImageUrl());
     }
-
-    if (result == null || result.isBlank()) {
-      result = podcast.getImageUrl();
-    }
-
-    if (result == null || result.isBlank()) {
-      return null;
+    if (result == null) {
+      result = createValidUrl(episode.getThumbnailUrl());
     }
     return result;
   }
@@ -134,5 +145,47 @@ public class EpisodeMessage {
       return false;
     }
     return !input.isBlank();
+  }
+
+  private static @Nullable String createValidUrl(@Nullable String input) {
+    if (input == null) {
+      return null;
+    }
+
+    String shortUrl = input.trim();
+    if (shortUrl.isBlank()) {
+      return null;
+    }
+
+    String urlPattern = "^(https?)://([^/]+)(/.*)?$";
+    Pattern pattern = Pattern.compile(urlPattern, Pattern.CASE_INSENSITIVE);
+    Matcher matcher = pattern.matcher(shortUrl);
+
+    if (matcher.matches()) {
+      String protocol = matcher.group(1);
+      String host = matcher.group(2);
+      // Various DNS services allow underscores but Discord does not
+      if (host.contains("_")) {
+        return null;
+      }
+
+      String path = matcher.group(3) != null ? matcher.group(3) : "";
+
+      return protocol + "://" + host + encodePath(path);
+    } else {
+      return null;
+    }
+  }
+
+  private static String encodePath(String path) {
+    StringBuilder result = new StringBuilder();
+    for (char ch : path.toCharArray()) {
+      if (Arrays.asList('/', '?', ',', '=', ':').contains(ch)) {
+        result.append(ch);
+      } else {
+        result.append(URLEncoder.encode(String.valueOf(ch), StandardCharsets.UTF_8));
+      }
+    }
+    return result.toString().replace("+", "%20");
   }
 }
