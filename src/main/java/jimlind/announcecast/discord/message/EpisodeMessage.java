@@ -178,9 +178,13 @@ public class EpisodeMessage {
   }
 
   private static String encodePath(String path) {
+    // Some odd feeds give us garbage that we need to correct
+    path = path.replace("&amp;", "&");
+    path = path.replace("%3D", "=");
+
     StringBuilder result = new StringBuilder();
     for (char ch : path.toCharArray()) {
-      if (Arrays.asList('/', '?', ',', '=', ':').contains(ch)) {
+      if (Arrays.asList('/', '?', ',', '=', ':', '&').contains(ch)) {
         result.append(ch);
       } else {
         result.append(URLEncoder.encode(String.valueOf(ch), StandardCharsets.UTF_8));
