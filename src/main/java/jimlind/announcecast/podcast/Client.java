@@ -12,9 +12,9 @@ import javax.xml.stream.XMLStreamReader;
 import org.jetbrains.annotations.Nullable;
 
 public class Client {
-  int CONNECTION_CONNECT_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(1);
-  int CONNECTION_READ_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(2);
-  int XMLSTREAM_READ_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(1);
+  int CONNECTION_CONNECT_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(2);
+  int CONNECTION_READ_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(3);
+  int XMLSTREAM_READ_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(2);
 
   @Inject private Parser parser;
 
