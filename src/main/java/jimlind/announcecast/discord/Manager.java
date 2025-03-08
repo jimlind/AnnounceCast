@@ -64,7 +64,7 @@ public class Manager {
                 onSuccess.run();
                 sendSuccess(m, message, channel);
               },
-              t -> sendFailure(message, channel));
+              t -> sendFailure(t, message, channel));
     } catch (Exception e) {
       log.atWarn().setMessage("Message Send Exception").addKeyValue("exception", e).log();
     }
@@ -79,9 +79,10 @@ public class Manager {
         .log();
   }
 
-  public void sendFailure(MessageEmbed message, GuildMessageChannel channel) {
+  public void sendFailure(Throwable throwable, MessageEmbed message, GuildMessageChannel channel) {
     log.atInfo()
         .setMessage("Message Send Failure")
+        .addKeyValue("throwable", throwable)
         .addKeyValue("message", Helper.objectToString(message))
         .addKeyValue("channel", Helper.objectToString(channel))
         .log();
