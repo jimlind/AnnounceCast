@@ -102,6 +102,21 @@ public class Feed {
     }
   }
 
+  public void setUrlByFeedId(String feedId, String url) {
+    String updateSql = "UPDATE feeds SET url = ? WHERE id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(updateSql)) {
+      statement.setString(1, url);
+      statement.setString(2, feedId);
+      statement.executeUpdate();
+    } catch (Exception e) {
+      log.atWarn()
+          .setMessage("Unable to set url")
+          .addKeyValue("feedId", feedId)
+          .addKeyValue("feedUrl", url)
+          .log();
+    }
+  }
+
   public void deleteFeed(String feedId) {
     String deleteSql = "DELETE FROM feeds WHERE id = ?";
     try (PreparedStatement statement = connection.prepareStatement(deleteSql)) {
