@@ -4,18 +4,15 @@ import com.google.inject.Inject;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Feed;
-import jimlind.announcecast.storage.db.Subscriber;
 
 public class UpdateTitles {
   private final Client client;
   private final Feed feed;
-  private final Subscriber subscriber;
 
   @Inject
-  public UpdateTitles(Client client, Feed feed, Subscriber subscriber) {
+  public UpdateTitles(Client client, Feed feed) {
     this.client = client;
     this.feed = feed;
-    this.subscriber = subscriber;
   }
 
   public void run() throws Exception {
@@ -25,11 +22,7 @@ public class UpdateTitles {
         continue;
       }
       String updatedTitle = podcast.getTitle() == null ? feed.getUrl() : podcast.getTitle().trim();
-
-      System.out.println("----------");
-      System.out.println(feed.getId());
-      System.out.println(updatedTitle);
-      //      this.feed.setTitleByFeedId(feed.getId(), updatedTitle);
+      this.feed.setTitleByFeedId(feed.getId(), updatedTitle);
     }
   }
 }
