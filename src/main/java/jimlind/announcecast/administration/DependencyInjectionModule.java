@@ -24,6 +24,7 @@ public class DependencyInjectionModule extends AbstractModule {
     bind(DeleteUnauthorizedChannels.class).in(Scopes.SINGLETON);
     bind(DeleteUnfollowedFeeds.class).in(Scopes.SINGLETON);
     bind(DeleteUselessFeeds.class).in(Scopes.SINGLETON);
+    bind(UpdateFeedUrls.class).in(Scopes.SINGLETON);
     bind(UpdateTitles.class).in(Scopes.SINGLETON);
   }
 }
