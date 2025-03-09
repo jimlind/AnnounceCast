@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 public class Podcast {
-  private String title;
+  private @Nullable String title;
   private @Nullable String description;
   private String summary;
   private String feedUrl;
