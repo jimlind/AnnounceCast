@@ -87,6 +87,21 @@ public class Feed {
     return feedId;
   }
 
+  public void setTitleByFeedId(String feedId, String title) {
+    String updateSql = "UPDATE feeds SET title = ? WHERE id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(updateSql)) {
+      statement.setString(1, title);
+      statement.setString(2, feedId);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      log.atWarn()
+          .setMessage("Unable to set title")
+          .addKeyValue("feedId", feedId)
+          .addKeyValue("feedTitle", title)
+          .log();
+    }
+  }
+
   public void deleteFeed(String feedId) {
     String deleteSql = "DELETE FROM feeds WHERE id = ?";
     try (PreparedStatement statement = connection.prepareStatement(deleteSql)) {
