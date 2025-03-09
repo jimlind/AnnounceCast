@@ -2,6 +2,4 @@ TODO:
 * Follow NPR News feed posted all 4 episodes.. it shouldn't have
  - Maybe this was because it had old data but was not actively subscribed
  - Need to double check that a fresh subscribe doesn't trigger it
-* Need a task to update the title of podcasts
-* Need a way to see the subscribers
 * GitHub actions for subscriber methods
