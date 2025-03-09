@@ -3,3 +3,4 @@ TODO:
  - Maybe this was because it had old data but was not actively subscribed
  - Need to double check that a fresh subscribe doesn't trigger it
 * GitHub actions for subscriber methods
+* The GitHub action from softprops isn't totally trusted
