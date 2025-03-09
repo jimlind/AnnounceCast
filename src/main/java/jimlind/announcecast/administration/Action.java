@@ -29,9 +29,11 @@ public class Action {
   private final Scanner scanner;
   private final SendAllFeeds sendAllFeeds;
   private final Subscriber subscriber;
+  private final jimlind.announcecast.administration.run.subscriber.Action subscriberAction;
 
   @Inject
   Action(
+      jimlind.announcecast.administration.run.subscriber.Action subscriberAction,
       DeleteUnfollowedFeeds deleteUnfollowedFeeds,
       Channel channel,
       Client client,
@@ -40,6 +42,7 @@ public class Action {
       Posted posted,
       SendAllFeeds sendAllFeeds,
       Subscriber subscriber) {
+    this.subscriberAction = subscriberAction;
     this.deleteUnfollowedFeeds = deleteUnfollowedFeeds;
     this.channel = channel;
     this.client = client;
@@ -54,8 +57,8 @@ public class Action {
 
   public void run() {
     System.out.println("Input Number to Choose an Action:");
-    System.out.println(" > 1. Set the guid value in a feed's posted row");
-    System.out.println(" > 2. Set the active value in a feed's subscriber row");
+    System.out.println(" > 1. Subscriber submenu");
+    System.out.println(" > 2. Set the guid value in a feed's posted row");
     System.out.println(" > 3. Purge a feed from the database completely");
     System.out.println(" > 4. Write application's slash commands to Discord");
     System.out.println(" > 5. Delete application's slash commands from Discord");
@@ -67,10 +70,10 @@ public class Action {
     try {
       switch (this.scanner.nextLine()) {
         case "1":
-          setPostedAction();
+          this.subscriberAction.run();
           break;
         case "2":
-          setSubscriberAction();
+          setPostedAction();
           break;
         case "3":
           purgeFeedAction();
@@ -111,16 +114,6 @@ public class Action {
     String guid = this.scanner.nextLine();
 
     this.posted.setGuidByFeed(feedId, guid);
-  }
-
-  private void setSubscriberAction() {
-    System.out.print("Podcast Feed Id? (8c4aa4, eb1eab, ...): ");
-    String feedId = this.scanner.nextLine();
-
-    System.out.print("Subscribed? (yes, no): ");
-    boolean subscribed = this.scanner.nextLine().equals("yes");
-
-    this.subscriber.setActiveByFeed(feedId, subscribed);
   }
 
   private void purgeFeedAction() {
