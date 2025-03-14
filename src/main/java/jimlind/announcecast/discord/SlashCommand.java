@@ -14,6 +14,7 @@ public class SlashCommand {
   @Inject private FollowingAction followingAction;
   @Inject private FollowRssAction followRssAction;
   @Inject private HelpAction helpAction;
+  @Inject private Manager manager;
   @Inject private SearchAction searchAction;
   @Inject private UnfollowAction unfollowAction;
 
@@ -36,10 +37,11 @@ public class SlashCommand {
     }
 
     event.getHook().sendMessageEmbeds(messageList.getFirst()).queue();
-    messageList.stream()
-        .skip(1)
-        .forEach(message -> event.getChannel().sendMessageEmbeds(message).queue());
-
+    messageList.stream().skip(1).forEach(m -> sendMessage(event, m));
     return true;
+  }
+
+  private void sendMessage(SlashCommandInteractionEvent event, MessageEmbed message) {
+    this.manager.sendMessage(event.getChannelId(), message, () -> {});
   }
 }
