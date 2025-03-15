@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 public class Helper {
@@ -26,12 +27,25 @@ public class Helper {
 
       if (node.has("options")) {
         for (JsonNode option : node.path("options")) {
-          boolean optionIsBoolean = option.path("type").asText().equals("boolean");
-          commandData.addOption(
-              optionIsBoolean ? OptionType.BOOLEAN : OptionType.STRING,
-              option.path("name").asText(),
-              option.path("description").asText(),
-              option.path("required").asBoolean(false));
+          OptionType type =
+              switch (option.path("type").asText()) {
+                case "boolean" -> OptionType.BOOLEAN;
+                case "role" -> OptionType.ROLE;
+                default -> OptionType.STRING;
+              };
+          OptionData optionData =
+              new OptionData(
+                  type,
+                  option.path("name").asText(),
+                  option.path("description").asText(),
+                  option.path("required").asBoolean(false));
+
+          if (option.has("choices")) {
+            for (JsonNode choice : option.path("choices")) {
+              optionData.addChoice(choice.path("label").asText(), choice.path("value").asText());
+            }
+          }
+          commandData.addOptions(optionData);
         }
       }
       commandList.add(commandData);
