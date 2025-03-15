@@ -1,6 +1,18 @@
 TODO:
-* Follow NPR News feed posted all 4 episodes.. it shouldn't have
- - Maybe this was because it had old data but was not actively subscribed
- - Need to double check that a fresh subscribe doesn't trigger it
-* GitHub actions for subscriber methods
-* The GitHub action from softprops isn't totally trusted
+New Feature: Admin Slash Command to Set Prioritized Podcast
+* How to store the data?
+* Command to write and delete data to ensure only 1 podcast is prioritized
+* Allow overrides by system owner
+* Update ScrapeSubscribers to use the new data structures
+* Ensure subscriber who set priority has the active role in the channel
+
+New Feature: Admin Slash Command to Set Announce Role
+* How to store the data?
+* Command to write data
+* Update ReadQueue to send more data to message builder
+* Update EpisodeMessage to post using the role
+* Ensure subscriber who set role has the active role in the channel
+
+New Feature: Admin Slash Command to Post Subscriber's Data
+* Show prioritized podcast
+* Show all roles
