@@ -23,6 +23,7 @@ public class SlashCommand {
 
     List<MessageEmbed> messageList =
         switch (event.getName()) {
+          case "admin" -> AdminMessageList.build();
           case "follow" -> FollowMessageList.build(this.followAction.run(event));
           case "follow-rss" -> FollowMessageList.build(this.followRssAction.run(event));
           case "following" -> FollowingMessageList.build(this.followingAction.run(event));
