@@ -4,18 +4,18 @@ import com.google.inject.Inject;
 import jimlind.announcecast.integration.context.UnfollowContext;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
-import jimlind.announcecast.storage.db.Channel;
-import jimlind.announcecast.storage.db.Feed;
-import jimlind.announcecast.storage.db.Joined;
+import jimlind.announcecast.storage.db.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.Nullable;
 
 public class UnfollowAction {
-  @Inject Client client;
-  @Inject Channel channel;
-  @Inject Feed feed;
+  @Inject private Channel channel;
+  @Inject private Client client;
+  @Inject private Feed feed;
   @Inject private Joined joined;
+  @Inject private Posted posted;
+  @Inject private Subscriber subscriber;
 
   public UnfollowContext run(SlashCommandInteractionEvent event) {
     OptionMapping idOption = event.getInteraction().getOption("id");
@@ -23,6 +23,13 @@ public class UnfollowAction {
 
     Podcast podcast = this.buildPodcast(feedId);
     this.channel.deleteChannel(feedId, event.getChannelId());
+
+    // Purge feed from all database tables if there are no more channels
+    if (this.channel.getChannelsByFeedId(feedId).isEmpty()) {
+      this.feed.deleteFeed(feedId);
+      this.posted.deletePostedByFeedId(feedId);
+      this.subscriber.deleteSubscriberByFeedId(feedId);
+    }
 
     return new UnfollowContext(
         podcast, this.joined.getFeedsByChannelId(event.getChannel().getId()));
