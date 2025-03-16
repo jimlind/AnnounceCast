@@ -24,6 +24,20 @@ public class Feed {
     return url;
   }
 
+  public String getId(String feedUrl) {
+    String feedId = "";
+    String selectSql = "SELECT id FROM feeds WHERE url = ? LIMIT 1";
+    try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
+      statement.setString(1, feedUrl);
+      ResultSet resultSet = statement.executeQuery();
+      resultSet.next();
+      feedId = resultSet.getString("id");
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to get feed id").addKeyValue("feedUrl", feedUrl).log();
+    }
+    return feedId;
+  }
+
   public long getCount() {
     int countValue = 0;
     try (Statement statement = connection.createStatement()) {

@@ -112,4 +112,30 @@ public class Channel {
     }
     return results;
   }
+
+  public void updateFeedIdByFeedId(String oldFeedId, String newFeedId) {
+    String updateSql =
+        """
+        UPDATE channels
+        SET feed_id = ?
+        WHERE feed_id = ?
+        AND NOT EXISTS (
+            SELECT 1
+            FROM channels AS existing_channel
+            WHERE existing_channel.feed_id = ? AND existing_channel.channel_id = channels.channel_id
+        );
+        """;
+    try (PreparedStatement statement = connection.prepareStatement(updateSql)) {
+      statement.setString(1, newFeedId);
+      statement.setString(2, oldFeedId);
+      statement.setString(3, newFeedId);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      log.atWarn()
+          .setMessage("Unable to update feed id by feed id")
+          .addKeyValue("oldFeedId", oldFeedId)
+          .addKeyValue("newFeedId", newFeedId)
+          .log();
+    }
+  }
 }

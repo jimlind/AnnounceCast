@@ -4,17 +4,23 @@ import com.google.inject.Inject;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import jimlind.announcecast.podcast.Client;
+import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Feed;
+import jimlind.announcecast.storage.db.Posted;
+import jimlind.announcecast.storage.db.Subscriber;
 
 public class UpdateFeedUrls {
-  private final Client client;
+  private final Channel channel;
   private final Feed feed;
+  private final Posted posted;
+  private final Subscriber subscriber;
 
   @Inject
-  public UpdateFeedUrls(Client client, Feed feed) {
-    this.client = client;
+  public UpdateFeedUrls(Channel channel, Feed feed, Posted posted, Subscriber subscriber) {
+    this.channel = channel;
     this.feed = feed;
+    this.posted = posted;
+    this.subscriber = subscriber;
   }
 
   public void run() throws Exception {
@@ -28,7 +34,20 @@ public class UpdateFeedUrls {
         int responseCode = connection.getResponseCode();
         if (responseCode == java.net.HttpURLConnection.HTTP_MOVED_PERM) {
           String newUrl = connection.getHeaderField("Location");
-          this.feed.setUrlByFeedId(feed.getId(), newUrl);
+          String newFeedId = this.feed.getId(newUrl);
+          if (newFeedId.isBlank()) {
+            this.feed.setUrlByFeedId(feed.getId(), newUrl);
+            continue;
+          }
+
+          // Set the new feed id as the source of truth for channels using the old feed id
+          this.channel.updateFeedIdByFeedId(feed.getId(), newFeedId);
+
+          // Delete all references to the old feed
+          this.feed.deleteFeed(feed.getId());
+          this.channel.deleteChannelsByFeedId(feed.getId());
+          this.posted.deletePostedByFeedId(feed.getId());
+          this.subscriber.deleteSubscriberByFeedId(feed.getId());
         }
       } catch (Exception ignore) {
         // Do nothing
