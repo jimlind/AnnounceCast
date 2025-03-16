@@ -43,7 +43,7 @@ public class HelpMessageList {
     embedBuilder.addField(
         "/search <keywords>", "Display up to 4 podcasts matching the search keyword(s)", false);
     embedBuilder.addField(
-        "/admin <action> <id> <role>", "Admin commands only available for subscribers", false);
+        "/admin <action> <id> <role> 🔒", "Admin commands only available for subscribers", false);
     embedBuilder.addField(
         "/help [test]", "Display this help message optionally sending test message", false);
 
