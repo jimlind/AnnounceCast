@@ -1,0 +1,24 @@
+.btn-primary, .bg-primary {
+    background-color: #7ab87a !important;
+    border-color: #7ab87a !important;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #6ba06b !important;
+    border-color: #6ba06b !important;
+}
+#accordion .accordion-button {
+    background-color: #7ab87a;
+    color: white;
+    border-color: #6ba06b;
+}
+#accordion .accordion-button:not(.collapsed) {
+    background-color: #6ba06b;
+    color: white;
+    border-color: #5d9f5d;
+}
+#accordion .accordion-button:hover {
+    background-color: #5d9f5d;
+}
+#accordion .accordion-body {
+    background-color: #f0f7f0;
+}

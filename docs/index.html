@@ -7,38 +7,47 @@
     <link href="favicon.ico" rel="shortcut icon"/>
     <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
     <link href="favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/flatly/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5/dist/litera/bootstrap.min.css" rel="stylesheet"/>
+    <link href="style.css" rel="stylesheet">
     <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
-    <script crossorigin="anonymous"
-            src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>
     <script crossorigin="anonymous" src="https://kit.fontawesome.com/fb0723331c.js"></script>
     <title>AnnounceCast - Podcast New Release Announcement Bot for Discord</title>
 </head>
 
 <body>
-<div class="jumbotron text-center">
-    <h1>AnnounceCast</h1>
-    <p><strong>Podcast New Release Announcement Bot for Discord</strong></p>
-    <a class="btn btn-info m-2" href="https://www.patreon.com/AnnounceCast">
-        <i class="fab fa-patreon mx-1"></i> Support the Patreon
-    </a>
-    <a class="btn btn-info m-2" href="https://github.com/jimlind/AnnounceCast">
-        <i class="fab fa-github mx-1"></i> Read the Code
-    </a>
-    <a class="btn btn-info m-2" href="https://discord.gg/sEjJTTjG3M">
-        <i class="fab fa-discord mx-1"></i> Join the Discord
-    </a>
+<div class="m-4 p-2 bg-primary rounded-4 text-center">
+    <img alt="AnnounceCast Logo: The letter 'A' that looks like a radio tower"
+         src="imagery/discord-bot-icon.png"
+         style="max-width: 100px;"/>
+    <h1 style="color: black">AnnounceCast</h1>
+    <div class="mb-2 text-light">Podcast New Release Announcement Bot for
+        Discord
+    </div>
 </div>
 
-<div class="container">
-    <p>
+<div>
+    <div class="text-center mb-4">
+        <a class="btn btn-primary m-2" href="https://www.patreon.com/AnnounceCast">
+            <i class="fab fa-patreon mx-1"></i> Support the Patreon
+        </a>
+        <a class="btn btn-primary m-2" href="https://discord.gg/sEjJTTjG3M">
+            <i class="fab fa-discord mx-1"></i> Join the Discord
+        </a>
+        <a class="btn btn-primary m-2" href="https://github.com/jimlind/AnnounceCast">
+            <i class="fab fa-github mx-1"></i> Read the Code
+        </a>
+    </div>
+    <div class="container">
         This bot posts automated messages in your Discord server when a new podcast episode is released. The bot can
         search for podcasts on Spotify, Apple, or use your RSS feed. Check out the <a
             href="https://discord.com/application-directory/839657120689684533">AnnounceCast Discord Application
         Directory Entry</a> for the easiest way to setup the bot on your server. Otherwise, you can use the big
         button below to setup your server.
-    </p>
+    </div>
+</div>
 
+<div class="text-center">
     <h2 class="mt-5">Installation</h2>
     <p>
         <a class="btn btn-primary btn-lg px-5 py-3"
@@ -46,7 +55,8 @@
             <i class="fas fa-robot mx-2"></i> Authorize the Bot
         </a>
     </p>
-
+</div>
+<div class="container">
     <h2 class="mt-5">Commands</h2>
     <table class="table table-striped">
         <thead>
@@ -83,6 +93,11 @@
             <td>Display up to 4 podcasts matching the search keyword(s)</td>
         </tr>
         <tr>
+            <th scope="row">/admin &lt;action&gt; &lt;id&gt; &lt;role&gt;</th>
+            <td>🔒 Server Managers</td>
+            <td>Admin commands only available for subscribers giving access to set prioritized podcast and add tags</td>
+        </tr>
+        <tr>
             <th scope="row">/help [test]</th>
             <td>Everyone</td>
             <td>Display this help message, optionally sending test messages</td>
@@ -92,39 +107,45 @@
 
     <h2 class="mt-5">Frequently Asked Questions</h2>
 
-    <div id="accordion">
-        <div class="card">
-            <div class="card-header" id="headingOne">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-target="#collapseOne" data-toggle="collapse">
-                        Why isn't the most recent episode posting?
-                    </button>
-                </h5>
-            </div>
-
-            <div class="collapse show" data-parent="#accordion" id="collapseOne">
-                <div class="card-body">
+    <div class="accordion" id="accordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button aria-controls="collapseOne" aria-expanded="true" class="accordion-button"
+                        data-bs-target="#collapseOne"
+                        data-bs-toggle="collapse" type="button">
+                    Why isn't the most recent episode posting?
+                </button>
+            </h2>
+            <div aria-labelledby="headingOne" class="accordion-collapse collapse show"
+                 data-bs-parent="#accordion"
+                 id="collapseOne">
+                <div class="accordion-body">
                     <p>
                         It is likely a permissions issue. A bot can inherit multiple permissions based on the way other
-                        things have been configured for the server or the channel that it lives in.
-                    </p>
-                    <p>
-                        Use the <code>/help</code> and <code>/help test=True</code> commands to see the permissions that
-                        the bot has and have the bot post a test message.
+                        things have been configured for the server or the channel that it lives in. Use the
+                        <code>/help</code> and <code>/help test=True</code> commands to see the permissions that the bot
+                        has and have the bot post a test message.
+
+                        When attempting to troubleshoot permission issues I like to create a specific channel and give
+                        specific roles escalated permissions in that channel and see how the bot reacts. Join the
+                        Discord channel if you continue to have issues.
                     </p>
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header" id="headingPermission">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-target="#collapsePermission" data-toggle="collapse">
-                        What permissions are required?
-                    </button>
-                </h5>
-            </div>
-            <div class="collapse" data-parent="#accordion" id="collapsePermission">
-                <div class="card-body">
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button aria-controls="collapseTwo" aria-expanded="true" class="accordion-button collapsed"
+                        data-bs-target="#collapseTwo"
+                        data-bs-toggle="collapse" type="button">
+                    What permissions are required?
+                </button>
+            </h2>
+            <div aria-labelledby="headingTwo" class="accordion-collapse collapse"
+                 data-bs-parent="#accordion"
+                 id="collapseTwo">
+                <div class="accordion-body">
                     <p>
                         The invite link above includes the necessary permissions. But if you are creating a custom
                         permissions scheme the specifics that the bot needs to function in a channel are:
@@ -141,53 +162,61 @@
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header" id="headingAnnouncementChannels">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-target="#collapseAnnouncementChannels"
-                            data-toggle="collapse">
-                        How do I get the bot to work in an Announcement Channel?
-                    </button>
-                </h5>
-            </div>
-            <div class="collapse" data-parent="#accordion" id="collapseAnnouncementChannels">
-                <div class="card-body">
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+                <button aria-controls="collapseThree" aria-expanded="true" class="accordion-button collapsed"
+                        data-bs-target="#collapseThree"
+                        data-bs-toggle="collapse" type="button">
+                    How do I get the bot to work in an Announcement Channel?
+                </button>
+            </h2>
+            <div aria-labelledby="headingThree" class="accordion-collapse collapse"
+                 data-bs-parent="#accordion"
+                 id="collapseThree">
+                <div class="accordion-body">
                     <p>
                         You will need to grant the bot special permissions to "Send Messages" (under Text Channel
-                        Permissions) in the channel. Discord defaults to not allowing @everyone to post in that channel
-                        and the bot is part of that group by default.
+                        Permissions) in the channel. Discord defaults to not allowing <code>@everyone</code> to post in
+                        that channel and the bot is part of that group by default.
                     </p>
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header" id="headingThree">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-target="#collapseThree" data-toggle="collapse">
-                        Can I use your bot to play podcast audio in my server?
-                    </button>
-                </h5>
-            </div>
-            <div class="collapse" data-parent="#accordion" id="collapseThree">
-                <div class="card-body">
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFour">
+                <button aria-controls="collapseFour" aria-expanded="true" class="accordion-button collapsed"
+                        data-bs-target="#collapseFour"
+                        data-bs-toggle="collapse" type="button">
+                    Can I use your bot to play podcast audio in my server?
+                </button>
+            </h2>
+            <div aria-labelledby="headingFour" class="accordion-collapse collapse"
+                 data-bs-parent="#accordion"
+                 id="collapseFour">
+                <div class="accordion-body">
                     <p>
-                        Not right now. Join the Discord Server and let me know if that's a feature you'd like. It is a
-                        very possible feature but something I wouldn't want to build and support if it wasn't something
-                        that the community would value.
+                        Not right now. Join the Discord Server and post in the <code>#ideas-and-feedback</code> channel
+                        if it is something you would use. It is a very possible feature but something I wouldn't want to
+                        build and support if it wasn't something that the community would value.
                     </p>
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header" id="headingFour">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-target="#collapseFour" data-toggle="collapse">
-                        How do I change default command permissions?
-                    </button>
-                </h5>
-            </div>
-            <div class="collapse" data-parent="#accordion" id="collapseFour">
-                <div class="card-body">
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFive">
+                <button aria-controls="collapseFive" aria-expanded="true" class="accordion-button collapsed"
+                        data-bs-target="#collapseFive"
+                        data-bs-toggle="collapse" type="button">
+                    How do I change default command permissions?
+                </button>
+            </h2>
+            <div aria-labelledby="headingFive" class="accordion-collapse collapse"
+                 data-bs-parent="#accordion"
+                 id="collapseFive">
+                <div class="accordion-body">
                     <p>
                         If you want more than Server Managers to be able to use the follow command on your server under
                         <code>Integrations</code> you can find the bot and change Command Permissions for each Command.
@@ -195,35 +224,48 @@
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header" id="headingFive">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-target="#collapseFive" data-toggle="collapse">
-                        Why should I join the Patreon?
-                    </button>
-                </h5>
-            </div>
-            <div class="collapse" data-parent="#accordion" id="collapseFive">
-                <div class="card-body">
-                    <p>
-                        Because running this server isn't free and you have found the service to be helpful.
-                    </p>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSix">
+                <button aria-controls="collapseSix" aria-expanded="true" class="accordion-button collapsed"
+                        data-bs-target="#collapseSix"
+                        data-bs-toggle="collapse" type="button">
+                    What benefits do I get for joining the Patreon?
+                </button>
+            </h2>
+            <div aria-labelledby="headingSix" class="accordion-collapse collapse"
+                 data-bs-parent="#accordion"
+                 id="collapseSix">
+                <div class="accordion-body">
+                    <ol>
+                        <li>My Thanks! Running this server isn't free. I've spent a lot of time building the bot and
+                            hopefully it is something that you find valuable to your community.
+                        </li>
+                        <li>Faster podcast announcing. If the normal turnaround for podcast announcing isn't fast
+                            enough for you, subscribers can set a podcast to have a prioritized process specifically
+                            created for them.
+                        </li>
+                        <li>Tagging ability. If you want to tag a role in your podcast announcements this will make it
+                            easier for you to let everybody in your server know the news.
+                        </li>
+                    </ol>
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header" id="headingSix">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-target="#collapseSix" data-toggle="collapse">
-                        What color is the primary green in the AnnounceCast logo?
-                    </button>
-                </h5>
-            </div>
-            <div class="collapse" data-parent="#accordion" id="collapseSix">
-                <div class="card-body">
-                    <p>
-                        AnnounceCast Green is <code>#7ab87a</code> if you want to match a role color for the bot.
-                    </p>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSeven">
+                <button aria-controls="collapseSeven" aria-expanded="true" class="accordion-button collapsed"
+                        data-bs-target="#collapseSeven"
+                        data-bs-toggle="collapse" type="button">
+                    What color is the primary green in the AnnounceCast logo?
+                </button>
+            </h2>
+            <div aria-labelledby="headingSeven" class="accordion-collapse collapse"
+                 data-bs-parent="#accordion"
+                 id="collapseSeven">
+                <div class="accordion-body">
+                    AnnounceCast Green is <code>#7ab87a</code> if you want to match a role color for the bot.
                 </div>
             </div>
         </div>
@@ -245,5 +287,7 @@
         </ul>
     </footer>
 </div>
+
+<div style="background-image: url('imagery/discord-bot-banner.png'); min-height: 100px;"></div>
 </body>
 </html>
