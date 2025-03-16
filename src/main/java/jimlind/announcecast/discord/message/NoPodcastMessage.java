@@ -1,6 +1,6 @@
 package jimlind.announcecast.discord.message;
 
-import net.dv8tion.jda.api.EmbedBuilder;
+import jimlind.announcecast.discord.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class NoPodcastMessage {

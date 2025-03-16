@@ -2,8 +2,8 @@ package jimlind.announcecast.discord.message;
 
 import java.util.ArrayList;
 import java.util.List;
+import jimlind.announcecast.discord.EmbedBuilder;
 import jimlind.announcecast.integration.context.FollowingContext;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class FollowingMessageList {

@@ -1,7 +1,7 @@
 package jimlind.announcecast.discord.message;
 
 import jimlind.announcecast.Helper;
-import net.dv8tion.jda.api.EmbedBuilder;
+import jimlind.announcecast.discord.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class PodcastMessage {

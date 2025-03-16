@@ -9,9 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import jimlind.announcecast.Helper;
+import jimlind.announcecast.discord.EmbedBuilder;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 
