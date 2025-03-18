@@ -7,8 +7,8 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 public class Episode {
-  private String title;
-  private String guid;
+  private @Nullable String title;
+  private @Nullable String guid;
   private @Nullable String description;
   private @Nullable String summary;
   private @Nullable String link;
@@ -17,8 +17,14 @@ public class Episode {
   private @Nullable String seasonId;
   private @Nullable String episodeId;
   private @Nullable String duration;
-  private String pubDate;
+  private @Nullable String pubDate;
   private @Nullable String explicit;
   private @Nullable String mpegUrl;
   private @Nullable String m4aUrl;
+
+  public boolean isValid() {
+    return (title != null && !title.isBlank())
+        && (guid != null && !guid.isBlank())
+        && (pubDate != null && !pubDate.isBlank());
+  }
 }

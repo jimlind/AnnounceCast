@@ -102,6 +102,10 @@ public class Client {
       // They only happen if something is already closed or cancelled
     }
 
+    if (!podcast.isValid()) {
+      return null;
+    }
+
     return podcast;
   }
 }

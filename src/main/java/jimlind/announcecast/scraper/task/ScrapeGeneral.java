@@ -31,8 +31,6 @@ public class ScrapeGeneral extends TimerTask {
     this.paginationIndex++;
 
     for (PostedFeed postedFeed : postedFeedList) {
-      log.atInfo().setMessage("General Podcast").addKeyValue("url", postedFeed.getUrl()).log();
-
       Podcast podcast = client.createPodcastFromFeedUrl(postedFeed.getUrl(), 1);
       if (podcast == null || podcast.getEpisodeList().isEmpty()) {
         continue;

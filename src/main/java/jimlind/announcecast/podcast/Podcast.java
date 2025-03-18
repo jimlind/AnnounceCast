@@ -21,4 +21,13 @@ public class Podcast {
   public void addEpisode(Episode episode) {
     this.episodeList.add(episode);
   }
+
+  public boolean isValid() {
+    for (Episode episode : episodeList) {
+      if (!episode.isValid()) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
