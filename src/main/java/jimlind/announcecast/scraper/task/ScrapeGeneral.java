@@ -9,7 +9,9 @@ import jimlind.announcecast.scraper.Helper;
 import jimlind.announcecast.scraper.Queue;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.PostedFeed;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ScrapeGeneral extends TimerTask {
   private static final int PAGINATION_SIZE = 20;
   @Inject private Client client;
@@ -29,6 +31,8 @@ public class ScrapeGeneral extends TimerTask {
     this.paginationIndex++;
 
     for (PostedFeed postedFeed : postedFeedList) {
+      log.atInfo().setMessage("General Podcast").addKeyValue("url", postedFeed.getUrl()).log();
+
       Podcast podcast = client.createPodcastFromFeedUrl(postedFeed.getUrl(), 1);
       if (podcast == null || podcast.getEpisodeList().isEmpty()) {
         continue;
