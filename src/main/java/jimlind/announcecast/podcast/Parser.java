@@ -70,7 +70,7 @@ public class Parser {
 
           switch (localElementName) {
             case "title":
-              String titleText = xmlStreamReader.getElementText();
+              String titleText = xmlStreamReader.getElementText().replaceAll("\\s+", " ");
               if (isChildOfChannel(elementStack)) {
                 podcast.setTitle(titleText);
               } else if (isChildOfItem(elementStack)) {
