@@ -24,6 +24,8 @@ public class Connection {
           "CREATE TABLE IF NOT EXISTS posted (feed_id TEXT PRIMARY KEY UNIQUE, guid TEXT)");
       statement.execute(
           "CREATE TABLE IF NOT EXISTS subscriber (feed_id TEXT PRIMARY KEY UNIQUE, active INTEGER NOT NULL CHECK (active IN (0, 1)), user_id TEXT)");
+      statement.execute(
+          "CREATE TABLE IF NOT EXISTS patreon (patreon_id TEXT PRIMARY KEY UNIQUE, user_id TEXT)");
     } catch (SQLException ignore) {
       // If there isn't a database connection hard stop
       log.atError().setMessage("Setting Up SQLite failed").log();
@@ -36,6 +38,7 @@ public class Connection {
       indexStatement.execute("CREATE INDEX idx_feeds_id ON feeds(id)");
       indexStatement.execute("CREATE UNIQUE INDEX idx_posted_feed_id ON posted(feed_id)");
       indexStatement.execute("CREATE UNIQUE INDEX idx_subscriber_feed_id ON subscriber(feed_id)");
+      indexStatement.execute("CREATE UNIQUE INDEX idx_patreon_user_id ON patreon(user_id)");
     } catch (SQLException ignore) {
       // Do nothing if there is an issue creating indexes
     }
