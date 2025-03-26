@@ -37,6 +37,11 @@ public class Main {
 
     // Register the shutdownThread to the shutdownHook
     Runtime.getRuntime().addShutdownHook(injector.getInstance(ShutdownThread.class));
+
+    // Start the Patreon Updaters
+    injector
+        .getInstance(jimlind.announcecast.patreon.Schedule.class)
+        .startMemberUpdate(properties.getProperty("PATREON_ACCESS_TOKEN"));
   }
 
   private static Injector createDependencyInjector() {
@@ -44,6 +49,7 @@ public class Main {
         new jimlind.announcecast.administration.DependencyInjectionModule(),
         new jimlind.announcecast.discord.DependencyInjectionModule(),
         new jimlind.announcecast.integration.DependencyInjectionModule(),
+        new jimlind.announcecast.patreon.DependencyInjectionModule(),
         new jimlind.announcecast.podcast.BasicModule(),
         new jimlind.announcecast.scraper.DependencyInjectionModule(),
         new jimlind.announcecast.storage.BasicModule());

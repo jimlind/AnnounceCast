@@ -9,6 +9,7 @@ public class DependencyInjectionModule extends AbstractModule {
   @Override
   protected void configure() {
     // Actions
+    bind(AdminAction.class).in(Scopes.SINGLETON);
     bind(FollowAction.class).in(Scopes.SINGLETON);
     bind(FollowingAction.class).in(Scopes.SINGLETON);
     bind(FollowRssAction.class).in(Scopes.SINGLETON);
