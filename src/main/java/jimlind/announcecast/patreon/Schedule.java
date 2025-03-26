@@ -1,7 +1,7 @@
 package jimlind.announcecast.patreon;
 
 import com.google.inject.Inject;
-import java.util.*;
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 
