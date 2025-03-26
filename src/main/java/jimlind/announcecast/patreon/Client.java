@@ -63,10 +63,8 @@ public class Client {
 
       Member memberObject = new Member();
       memberObject.setFullName(attributes.get("full_name").toString());
-      memberObject.setUserId(member.get("id").toString());
-      memberObject.setPatreonId(
-          attributes.get("social_connections").get("discord").get("user_id").toString());
-
+      memberObject.setPatreonId(member.get("id").toString());
+      memberObject.setUserId(userId.toString());
       memberList.add(memberObject);
     }
 
