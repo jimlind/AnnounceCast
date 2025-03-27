@@ -13,6 +13,21 @@ import lombok.extern.slf4j.Slf4j;
 public class Patreon {
   private @Inject Connection connection;
 
+  public boolean userIdExists(String userId) {
+    String sql = "SELECT COUNT(user_id) as value FROM patreon WHERE user_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, userId);
+      ResultSet resultSet = statement.executeQuery();
+      resultSet.next();
+      int count = resultSet.getInt("value");
+      System.out.println(count);
+      return count > 0;
+    } catch (Exception ignore) {
+      log.atWarn().setMessage("Unable to check user id existence").log();
+    }
+    return false;
+  }
+
   public List<Member> getAllMembers() {
     List<Member> result = new ArrayList<>();
     try (Statement statement = connection.createStatement()) {
@@ -32,8 +47,8 @@ public class Patreon {
   }
 
   public void insertMember(String patreonId, String userId) {
-    String insertMember = "INSERT OR IGNORE INTO patreon (patreon_id, user_id) VALUES (?, ?)";
-    try (PreparedStatement statement = connection.prepareStatement(insertMember)) {
+    String sql = "INSERT OR IGNORE INTO patreon (patreon_id, user_id) VALUES (?, ?)";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, patreonId);
       statement.setString(2, userId);
       statement.executeUpdate();
