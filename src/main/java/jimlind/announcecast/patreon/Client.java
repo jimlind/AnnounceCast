@@ -62,9 +62,9 @@ public class Client {
       }
 
       Member memberObject = new Member();
-      memberObject.setFullName(attributes.get("full_name").toString());
-      memberObject.setPatreonId(member.get("id").toString());
-      memberObject.setUserId(userId.toString());
+      memberObject.setFullName(attributes.get("full_name").textValue());
+      memberObject.setPatreonId(member.get("id").textValue());
+      memberObject.setUserId(userId.textValue());
       memberList.add(memberObject);
     }
 
