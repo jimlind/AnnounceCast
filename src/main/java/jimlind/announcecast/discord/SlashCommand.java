@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 @Slf4j
 public class SlashCommand {
+  @Inject private AdminAction adminAction;
   @Inject private FollowAction followAction;
   @Inject private FollowingAction followingAction;
   @Inject private FollowRssAction followRssAction;
@@ -23,7 +24,7 @@ public class SlashCommand {
 
     List<MessageEmbed> messageList =
         switch (event.getName()) {
-          case "admin" -> AdminMessageList.build();
+          case "admin" -> AdminMessageList.build(this.adminAction.run(event));
           case "follow" -> FollowMessageList.build(this.followAction.run(event));
           case "follow-rss" -> FollowMessageList.build(this.followRssAction.run(event));
           case "following" -> FollowingMessageList.build(this.followingAction.run(event));
