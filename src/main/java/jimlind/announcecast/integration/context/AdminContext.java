@@ -6,8 +6,10 @@ import lombok.Getter;
 public class AdminContext {
 
   private final boolean isSubscriber;
+  private final String action;
 
-  public AdminContext(boolean isSubscriber) {
+  public AdminContext(boolean isSubscriber, String action) {
     this.isSubscriber = isSubscriber;
+    this.action = action;
   }
 }
