@@ -20,7 +20,6 @@ public class Patreon {
       ResultSet resultSet = statement.executeQuery();
       resultSet.next();
       int count = resultSet.getInt("value");
-      System.out.println(count);
       return count > 0;
     } catch (Exception ignore) {
       log.atWarn().setMessage("Unable to check user id existence").log();
