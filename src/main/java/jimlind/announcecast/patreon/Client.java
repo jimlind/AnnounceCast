@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Client {
 
-  public List<Member> createMemberList(String patreonAccessToken) {
+  public List<PatreonMember> createMemberList(String patreonAccessToken) {
     // TODO: There is a lot of hardcoded stuff here. Maybe break some of it out?
     String apiUrl =
         "https://www.patreon.com/api/oauth2/v2/campaigns/11731092/members?include=user&fields[user]=full_name,social_connections";
@@ -52,7 +52,7 @@ public class Client {
     }
 
     // Build out the Member List
-    List<Member> memberList = new ArrayList<>();
+    List<PatreonMember> memberList = new ArrayList<>();
     for (Iterator<JsonNode> it = jsonNode.elements(); it.hasNext(); ) {
       JsonNode member = it.next();
       JsonNode attributes = member.get("attributes");
@@ -61,7 +61,7 @@ public class Client {
         continue;
       }
 
-      Member memberObject = new Member();
+      PatreonMember memberObject = new PatreonMember();
       memberObject.setFullName(attributes.get("full_name").textValue());
       memberObject.setPatreonId(member.get("id").textValue());
       memberObject.setUserId(userId.textValue());

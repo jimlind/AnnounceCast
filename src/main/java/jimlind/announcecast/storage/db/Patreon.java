@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import jimlind.announcecast.patreon.Member;
+import jimlind.announcecast.patreon.PatreonMember;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,12 +27,12 @@ public class Patreon {
     return false;
   }
 
-  public List<Member> getAllMembers() {
-    List<Member> result = new ArrayList<>();
+  public List<PatreonMember> getAllMembers() {
+    List<PatreonMember> result = new ArrayList<>();
     try (Statement statement = connection.createStatement()) {
       ResultSet resultSet = statement.executeQuery("SELECT patreon_id, user_id FROM patreon");
       while (resultSet.next()) {
-        Member member = new Member();
+        PatreonMember member = new PatreonMember();
         member.setPatreonId(resultSet.getString("patreon_id"));
         member.setUserId(resultSet.getString("user_id"));
         member.setFullName("N/A");

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Member {
+public class PatreonMember {
   private String fullName;
   private String patreonId;
   private String userId;

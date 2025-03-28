@@ -14,14 +14,14 @@ public class UpdateMembers extends TimerTask {
 
   @Override
   public void run() {
-    List<Member> memberList = this.client.createMemberList(this.patreonAccessToken);
+    List<PatreonMember> memberList = this.client.createMemberList(this.patreonAccessToken);
     List<String> patreonIdList = new ArrayList<>();
-    for (Member member : memberList) {
+    for (PatreonMember member : memberList) {
       this.patreon.insertMember(member.getPatreonId(), member.getUserId());
       patreonIdList.add(member.getPatreonId());
     }
 
-    for (Member member : this.patreon.getAllMembers()) {
+    for (PatreonMember member : this.patreon.getAllMembers()) {
       if (!patreonIdList.contains(member.getPatreonId())) {
         this.patreon.deleteMemberByPatreonId(member.getPatreonId());
       }
