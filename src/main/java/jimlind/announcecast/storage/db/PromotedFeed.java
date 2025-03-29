@@ -39,6 +39,18 @@ public class PromotedFeed {
     }
   }
 
+  public String getPromotedFeedIdByUserId(String userId) {
+    String sql = "SELECT feed_id FROM promoted_feed WHERE user_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, userId);
+      ResultSet resultSet = statement.executeQuery();
+      resultSet.next();
+      return resultSet.getString("feed_id");
+    } catch (Exception ignore) {
+      return "";
+    }
+  }
+
   public void deletePromotedFeedByFeedId(String feedId) {
     String sql = "DELETE FROM promoted_feed WHERE feed_id = ?";
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
