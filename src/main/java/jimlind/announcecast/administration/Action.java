@@ -47,7 +47,7 @@ public class Action {
 
   public void run() {
     System.out.println("Input Number to Choose an Action:");
-    System.out.println(" > 1. Promoted Feed submenu");
+    System.out.println(" > 1. Promoted feed submenu");
     System.out.println(" > 2. Maintenance submenu");
     System.out.println(" > 3. Set the guid value in a feed's posted row");
     System.out.println(" > 4. Purge a feed from the database completely");
