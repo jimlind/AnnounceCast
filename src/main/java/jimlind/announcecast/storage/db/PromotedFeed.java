@@ -30,7 +30,6 @@ public class PromotedFeed {
       statement.setString(2, userId);
       statement.execute();
     } catch (Exception exception) {
-      System.out.println(exception);
       log.atWarn()
           .setMessage("Unable to set promoted feed")
           .addKeyValue("feedId", feedId)
@@ -46,7 +45,23 @@ public class PromotedFeed {
       statement.setString(1, feedId);
       statement.executeUpdate();
     } catch (Exception ignore) {
-      log.atWarn().setMessage("Unable to delete promoted_feed").addKeyValue("feedId", feedId).log();
+      log.atWarn()
+          .setMessage("Unable to delete promoted_feed by feed id")
+          .addKeyValue("feedId", feedId)
+          .log();
+    }
+  }
+
+  public void deletePromotedFeedByUserId(String userId) {
+    String sql = "DELETE FROM promoted_feed WHERE user_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, userId);
+      statement.executeUpdate();
+    } catch (Exception ignore) {
+      log.atWarn()
+          .setMessage("Unable to delete promoted_feed by user id")
+          .addKeyValue("userId", userId)
+          .log();
     }
   }
 }
