@@ -15,7 +15,7 @@ public class DependencyInjectionModule extends AbstractModule {
 
     bind(ReadQueue.class).in(Scopes.SINGLETON);
     bind(ScrapeGeneral.class).in(Scopes.SINGLETON);
-    bind(ScrapeSubscribers.class).in(Scopes.SINGLETON);
+    bind(ScrapePromoted.class).in(Scopes.SINGLETON);
 
     install(
         new FactoryModuleBuilder()

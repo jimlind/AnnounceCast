@@ -30,7 +30,7 @@ public class Main {
 
     // Start the Podcast Scrapers
     injector.getInstance(Schedule.class).startScrapeQueueWrite();
-    injector.getInstance(Schedule.class).startSubscriberScrapeQueueWrite();
+    injector.getInstance(Schedule.class).startPromotedScrapeQueueWrite();
 
     // Start the Discord connection manager
     injector.getInstance(Manager.class).run(properties.getProperty("DISCORD_BOT_TOKEN"));

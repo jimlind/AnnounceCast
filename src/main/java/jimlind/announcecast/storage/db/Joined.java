@@ -69,9 +69,9 @@ public class Joined {
         SELECT DISTINCT feeds.id as id, feeds.url, feeds.title, posted.guid
         FROM feeds
         LEFT JOIN posted ON feeds.id = posted.feed_id
-        LEFT JOIN subscriber ON feeds.id = subscriber.feed_id
+        LEFT JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
         INNER JOIN channels ON feeds.id = channels.feed_id
-        WHERE subscriber.active <> 1 OR subscriber.active IS NULL
+        WHERE promoted_feed.active <> 1 OR promoted_feed.active IS NULL
         LIMIT ? OFFSET ?;
         """;
     try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
@@ -126,14 +126,14 @@ public class Joined {
     return feedList;
   }
 
-  public List<Feed> getPodcastsSubscribed() {
+  public List<Feed> getPromotedPodcasts() {
     List<Feed> feedList = new ArrayList<>();
 
     String sql =
         """
             SELECT id, url, title
             FROM feeds
-            INNER JOIN subscriber ON feeds.id = subscriber.feed_id
+            INNER JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
             WHERE active = 1
             """;
     try (Statement statement = connection.createStatement()) {
@@ -146,7 +146,7 @@ public class Joined {
         feedList.add(feed);
       }
     } catch (Exception ignore) {
-      log.atWarn().setMessage("Unable to get subscribed podcasts").log();
+      log.atWarn().setMessage("Unable to get promoted podcasts").log();
     }
 
     return feedList;

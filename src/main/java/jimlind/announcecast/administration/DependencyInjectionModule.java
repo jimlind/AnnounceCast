@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import jimlind.announcecast.administration.run.SendAllFeeds;
 import jimlind.announcecast.administration.run.maintenance.*;
-import jimlind.announcecast.administration.run.subscriber.*;
+import jimlind.announcecast.administration.run.promotedFeed.*;
 
 public class DependencyInjectionModule extends AbstractModule {
 
@@ -16,9 +16,9 @@ public class DependencyInjectionModule extends AbstractModule {
     bind(DeleteUnfollowedFeeds.class).in(Scopes.SINGLETON);
     bind(SendAllFeeds.class).in(Scopes.SINGLETON);
 
-    bind(jimlind.announcecast.administration.run.subscriber.Action.class).in(Scopes.SINGLETON);
-    bind(GetSubscribers.class).in(Scopes.SINGLETON);
-    bind(SetSubscriber.class).in(Scopes.SINGLETON);
+    bind(jimlind.announcecast.administration.run.promotedFeed.Action.class).in(Scopes.SINGLETON);
+    bind(GetPromoted.class).in(Scopes.SINGLETON);
+    bind(SetPromoted.class).in(Scopes.SINGLETON);
 
     bind(jimlind.announcecast.administration.run.maintenance.Action.class).in(Scopes.SINGLETON);
     bind(DeleteUnauthorizedChannels.class).in(Scopes.SINGLETON);

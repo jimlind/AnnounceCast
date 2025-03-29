@@ -15,7 +15,7 @@ public class UnfollowAction {
   @Inject private Feed feed;
   @Inject private Joined joined;
   @Inject private Posted posted;
-  @Inject private Subscriber subscriber;
+  @Inject private PromotedFeed promotedFeed;
 
   public UnfollowContext run(SlashCommandInteractionEvent event) {
     OptionMapping idOption = event.getInteraction().getOption("id");
@@ -28,7 +28,7 @@ public class UnfollowAction {
     if (this.channel.getChannelsByFeedId(feedId).isEmpty()) {
       this.feed.deleteFeed(feedId);
       this.posted.deletePostedByFeedId(feedId);
-      this.subscriber.deleteSubscriberByFeedId(feedId);
+      this.promotedFeed.deletePromotedFeedByFeedId(feedId);
     }
 
     return new UnfollowContext(

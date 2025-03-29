@@ -7,20 +7,20 @@ import java.net.URL;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Feed;
 import jimlind.announcecast.storage.db.Posted;
-import jimlind.announcecast.storage.db.Subscriber;
+import jimlind.announcecast.storage.db.PromotedFeed;
 
 public class UpdateFeedUrls {
   private final Channel channel;
   private final Feed feed;
   private final Posted posted;
-  private final Subscriber subscriber;
+  private final PromotedFeed promotedFeed;
 
   @Inject
-  public UpdateFeedUrls(Channel channel, Feed feed, Posted posted, Subscriber subscriber) {
+  public UpdateFeedUrls(Channel channel, Feed feed, Posted posted, PromotedFeed promotedFeed) {
     this.channel = channel;
     this.feed = feed;
     this.posted = posted;
-    this.subscriber = subscriber;
+    this.promotedFeed = promotedFeed;
   }
 
   public void run() throws Exception {
@@ -47,7 +47,7 @@ public class UpdateFeedUrls {
           this.feed.deleteFeed(feed.getId());
           this.channel.deleteChannelsByFeedId(feed.getId());
           this.posted.deletePostedByFeedId(feed.getId());
-          this.subscriber.deleteSubscriberByFeedId(feed.getId());
+          this.promotedFeed.deletePromotedFeedByFeedId(feed.getId());
         }
       } catch (Exception ignore) {
         // Do nothing

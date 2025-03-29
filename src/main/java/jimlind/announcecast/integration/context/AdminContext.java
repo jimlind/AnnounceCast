@@ -5,11 +5,11 @@ import lombok.Getter;
 @Getter
 public class AdminContext {
 
-  private final boolean isSubscriber;
+  private final boolean isPatreonMember;
   private final String action;
 
-  public AdminContext(boolean isSubscriber, String action) {
-    this.isSubscriber = isSubscriber;
+  public AdminContext(boolean isPatreonMember, String action) {
+    this.isPatreonMember = isPatreonMember;
     this.action = action;
   }
 }

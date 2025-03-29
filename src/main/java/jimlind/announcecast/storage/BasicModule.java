@@ -12,7 +12,8 @@ public class BasicModule extends AbstractModule {
     bind(Connection.class).in(Scopes.SINGLETON);
     bind(Feed.class).in(Scopes.SINGLETON);
     bind(Joined.class).in(Scopes.SINGLETON);
+    bind(Patreon.class).in(Scopes.SINGLETON);
     bind(Posted.class).in(Scopes.SINGLETON);
-    bind(Subscriber.class).in(Scopes.SINGLETON);
+    bind(PromotedFeed.class).in(Scopes.SINGLETON);
   }
 }

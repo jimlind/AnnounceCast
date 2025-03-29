@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.storage.db.Posted;
-import jimlind.announcecast.storage.db.Subscriber;
+import jimlind.announcecast.storage.db.PromotedFeed;
 import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,11 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 public class Helper {
   @Inject private Posted posted;
   @Inject private Queue queue;
-  @Inject private Subscriber subscriber;
+  @Inject private PromotedFeed promotedFeed;
 
   public boolean episodeNotProcessed(Episode episode, PostedFeed postedFeed) {
     // Episode already posted and stored in database
-    if (postedFeed.getGuid().contains(episode.getGuid())) {
+    if (postedFeed.getGuid().contains(episode.getGuid() != null ? episode.getGuid() : "")) {
       return false;
     }
 
@@ -31,20 +31,20 @@ public class Helper {
     Duration pubDateDifference =
         Duration.between(
             jimlind.announcecast.Helper.stringToDate(episode.getPubDate()), ZonedDateTime.now());
-    boolean subscriber = this.subscriber.getActiveByFeed(feedId);
+    boolean isPromoted = this.promotedFeed.getActiveByFeed(feedId);
 
     log.atInfo()
         .setMessage("Message Send Success Metadata")
         .addKeyValue("pubDate", episode.getPubDate())
         .addKeyValue("publishToPostDifference", pubDateDifference.getSeconds())
-        .addKeyValue("subscriber", subscriber)
+        .addKeyValue("isPromoted", isPromoted)
         .addKeyValue("feedId", feedId)
         .addKeyValue("episodeTitle", episode.getTitle())
         .log();
 
     String separatedGuid = this.posted.getGuidByFeedId(feedId);
     String guid = episode.getGuid();
-    if (separatedGuid.contains(guid)) {
+    if (separatedGuid.contains(guid != null ? guid : "")) {
       return;
     }
 

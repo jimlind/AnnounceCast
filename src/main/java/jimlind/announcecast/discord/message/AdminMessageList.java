@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class AdminMessageList {
   public static List<MessageEmbed> build(AdminContext context) {
-    if (!context.isSubscriber()) {
+    if (!context.isPatreonMember()) {
       return noAccessMessage();
     }
 
@@ -19,7 +19,7 @@ public class AdminMessageList {
     EmbedBuilder embedBuilder = new EmbedBuilder();
     String message =
         """
-            You must be a subscriber to access this menu.
+            You must be a patreon member to access this menu.
             :clap: [Join the Patreon](https://www.patreon.com/AnnounceCast)
             """;
     return List.of(embedBuilder.setDescription(message).build());
@@ -27,7 +27,7 @@ public class AdminMessageList {
 
   private static List<MessageEmbed> helpMessage() {
     EmbedBuilder embedBuilder = new EmbedBuilder();
-    embedBuilder.setTitle("Subscriber Only Menu");
+    embedBuilder.setTitle("Member Only Menu");
     embedBuilder.setDescription("There are 4 possible actions you can take using this menu");
     embedBuilder.addField(
         "/admin action:`Set Priority` <id>",
@@ -38,9 +38,7 @@ public class AdminMessageList {
         "Set a feed to tag a role using a Podcast Id and Discord Role",
         false);
     embedBuilder.addField(
-        "/admin action:`Display Subscriber Data`",
-        "Show the data you have saved as a Subscriber",
-        false);
+        "/admin action:`Display Member Data`", "Show the data you have saved as a Member", false);
     embedBuilder.addField("/admin action:`Help`", "Show this help message", false);
 
     return List.of(embedBuilder.build());

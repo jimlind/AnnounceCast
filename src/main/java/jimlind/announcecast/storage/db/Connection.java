@@ -4,6 +4,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -21,26 +23,30 @@ public class Connection {
       statement.execute(
           "CREATE TABLE IF NOT EXISTS feeds (id TEXT PRIMARY KEY, url TEXT UNIQUE, title TEXT)");
       statement.execute(
+          "CREATE TABLE IF NOT EXISTS patreon (patreon_id TEXT PRIMARY KEY UNIQUE, user_id TEXT)");
+      statement.execute(
           "CREATE TABLE IF NOT EXISTS posted (feed_id TEXT PRIMARY KEY UNIQUE, guid TEXT)");
       statement.execute(
-          "CREATE TABLE IF NOT EXISTS subscriber (feed_id TEXT PRIMARY KEY UNIQUE, active INTEGER NOT NULL CHECK (active IN (0, 1)), user_id TEXT)");
-      statement.execute(
-          "CREATE TABLE IF NOT EXISTS patreon (patreon_id TEXT PRIMARY KEY UNIQUE, user_id TEXT)");
+          "CREATE TABLE IF NOT EXISTS promoted_feed (feed_id TEXT PRIMARY KEY UNIQUE, active INTEGER NOT NULL CHECK (active IN (0, 1)), user_id TEXT)");
     } catch (SQLException ignore) {
       // If there isn't a database connection hard stop
       log.atError().setMessage("Setting Up SQLite failed").log();
       System.exit(-1);
     }
 
-    try {
-      Statement indexStatement = this.connection.createStatement();
-      indexStatement.execute("CREATE INDEX idx_channels_feed_id ON channels(feed_id)");
-      indexStatement.execute("CREATE INDEX idx_feeds_id ON feeds(id)");
-      indexStatement.execute("CREATE UNIQUE INDEX idx_posted_feed_id ON posted(feed_id)");
-      indexStatement.execute("CREATE UNIQUE INDEX idx_subscriber_feed_id ON subscriber(feed_id)");
-      indexStatement.execute("CREATE UNIQUE INDEX idx_patreon_user_id ON patreon(user_id)");
-    } catch (SQLException ignore) {
-      // Do nothing if there is an issue creating indexes
+    List<String> indexSqlList = new ArrayList<>();
+    indexSqlList.add("CREATE INDEX idx_channels_feed_id ON channels(feed_id)");
+    indexSqlList.add("CREATE INDEX idx_feeds_id ON feeds(id)");
+    indexSqlList.add("CREATE UNIQUE INDEX idx_patreon_user_id ON patreon(user_id)");
+    indexSqlList.add("CREATE UNIQUE INDEX idx_posted_feed_id ON posted(feed_id)");
+    indexSqlList.add("CREATE UNIQUE INDEX idx_promoted_feed_user_id ON promoted_feed(user_id)");
+
+    for (String sql : indexSqlList) {
+      try {
+        this.connection.createStatement().execute(sql);
+      } catch (SQLException ignore) {
+        // Do nothing if there is an issue creating indexes
+      }
     }
   }
 

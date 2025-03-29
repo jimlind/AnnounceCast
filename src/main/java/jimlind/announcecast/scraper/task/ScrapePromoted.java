@@ -9,22 +9,22 @@ import jimlind.announcecast.scraper.Schedule;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.Feed;
 
-public class ScrapeSubscribers extends TimerTask {
-  private final LinkedList<Timer> subscriberTimerList = new LinkedList<>();
+public class ScrapePromoted extends TimerTask {
+  private final LinkedList<Timer> promotedTimerList = new LinkedList<>();
   @Inject private Joined joined;
   @Inject private ScrapeSinglePodcastFactory scrapeSinglePodcast;
 
   @Override
   public void run() {
-    while (!subscriberTimerList.isEmpty()) {
-      subscriberTimerList.pop().cancel();
+    while (!promotedTimerList.isEmpty()) {
+      promotedTimerList.pop().cancel();
     }
 
-    List<Feed> feedList = joined.getPodcastsSubscribed();
+    List<Feed> feedList = joined.getPromotedPodcasts();
     for (Feed feed : feedList) {
       Timer timer = new Timer();
       timer.schedule(scrapeSinglePodcast.create(feed.getUrl()), 0, Schedule.SINGLE_PODCAST_PERIOD);
-      subscriberTimerList.push(timer);
+      promotedTimerList.push(timer);
     }
   }
 }

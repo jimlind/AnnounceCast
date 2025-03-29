@@ -56,13 +56,13 @@
   },
   {
     "name": "admin",
-    "description": "Allows subscribers to set priority podcast and set podcast tags",
+    "description": "Allows Patreon members to set priority podcast and set podcast tags",
     "default_manage_permissions": true,
     "options": [
       {
         "type": "string",
         "name": "action",
-        "description": "Subscriber action to perform",
+        "description": "Member action to perform",
         "choices": [
           {
             "label": "Set Priority",
@@ -73,7 +73,7 @@
             "value": "set-tag"
           },
           {
-            "label": "Display Subscriber Data",
+            "label": "Display Member Data",
             "value": "display"
           },
           {

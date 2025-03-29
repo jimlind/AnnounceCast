@@ -7,7 +7,7 @@ import jimlind.announcecast.administration.run.SendAllFeeds;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Feed;
 import jimlind.announcecast.storage.db.Posted;
-import jimlind.announcecast.storage.db.Subscriber;
+import jimlind.announcecast.storage.db.PromotedFeed;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -19,35 +19,35 @@ public class Action {
   private final Posted posted;
   private final Scanner scanner;
   private final SendAllFeeds sendAllFeeds;
-  private final Subscriber subscriber;
+  private final PromotedFeed promotedFeed;
   private final jimlind.announcecast.administration.run.maintenance.Action maintenanceAction;
-  private final jimlind.announcecast.administration.run.subscriber.Action subscriberAction;
+  private final jimlind.announcecast.administration.run.promotedFeed.Action promotedFeedAction;
 
   @Inject
   Action(
       jimlind.announcecast.administration.run.maintenance.Action maintenanceAction,
-      jimlind.announcecast.administration.run.subscriber.Action subscriberAction,
+      jimlind.announcecast.administration.run.promotedFeed.Action promotedFeedAction,
       Channel channel,
       Feed feed,
       Helper helper,
       Posted posted,
       SendAllFeeds sendAllFeeds,
-      Subscriber subscriber) {
+      PromotedFeed promotedFeed) {
     this.maintenanceAction = maintenanceAction;
-    this.subscriberAction = subscriberAction;
+    this.promotedFeedAction = promotedFeedAction;
     this.channel = channel;
     this.feed = feed;
     this.helper = helper;
     this.posted = posted;
     this.sendAllFeeds = sendAllFeeds;
-    this.subscriber = subscriber;
+    this.promotedFeed = promotedFeed;
 
     this.scanner = new Scanner(System.in);
   }
 
   public void run() {
     System.out.println("Input Number to Choose an Action:");
-    System.out.println(" > 1. Subscriber submenu");
+    System.out.println(" > 1. Promoted Feed submenu");
     System.out.println(" > 2. Maintenance submenu");
     System.out.println(" > 3. Set the guid value in a feed's posted row");
     System.out.println(" > 4. Purge a feed from the database completely");
@@ -58,7 +58,7 @@ public class Action {
     try {
       switch (this.scanner.nextLine()) {
         case "1":
-          this.subscriberAction.run();
+          this.promotedFeedAction.run();
           break;
         case "2":
           this.maintenanceAction.run();
@@ -105,7 +105,7 @@ public class Action {
     this.posted.deletePostedByFeedId(feedId);
     this.channel.deleteChannelsByFeedId(feedId);
     this.feed.deleteFeed(feedId);
-    this.subscriber.deleteSubscriberByFeedId(feedId);
+    this.promotedFeed.deletePromotedFeedByFeedId(feedId);
   }
 
   private void writeSlashCommands() throws Exception {
