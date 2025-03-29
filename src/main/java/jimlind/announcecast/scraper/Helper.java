@@ -31,7 +31,7 @@ public class Helper {
     Duration pubDateDifference =
         Duration.between(
             jimlind.announcecast.Helper.stringToDate(episode.getPubDate()), ZonedDateTime.now());
-    boolean isPromoted = this.promotedFeed.getActiveByFeed(feedId);
+    boolean isPromoted = this.promotedFeed.promotedFeedExists(feedId);
 
     log.atInfo()
         .setMessage("Message Send Success Metadata")

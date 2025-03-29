@@ -69,9 +69,8 @@ public class Joined {
         SELECT DISTINCT feeds.id as id, feeds.url, feeds.title, posted.guid
         FROM feeds
         LEFT JOIN posted ON feeds.id = posted.feed_id
-        LEFT JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
+        INNER JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
         INNER JOIN channels ON feeds.id = channels.feed_id
-        WHERE promoted_feed.active <> 1 OR promoted_feed.active IS NULL
         LIMIT ? OFFSET ?;
         """;
     try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
@@ -134,7 +133,6 @@ public class Joined {
             SELECT id, url, title
             FROM feeds
             INNER JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
-            WHERE active = 1
             """;
     try (Statement statement = connection.createStatement()) {
       ResultSet resultSet = statement.executeQuery(sql);

@@ -9,39 +9,32 @@ import lombok.extern.slf4j.Slf4j;
 public class PromotedFeed {
   private @Inject Connection connection;
 
-  public boolean getActiveByFeed(String feedId) {
-    boolean result = false;
-    String selectSql = "SELECT active FROM promoted_feed WHERE feed_id = ? LIMIT 1";
-    try (PreparedStatement statement = connection.prepareStatement(selectSql)) {
+  public boolean promotedFeedExists(String feedId) {
+    String sql = "SELECT COUNT(user_id) as value FROM promoted_feed WHERE feed_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, feedId);
       ResultSet resultSet = statement.executeQuery();
-      if (resultSet.next()) {
-        result = resultSet.getInt("active") == 1;
-      }
+      resultSet.next();
+      int count = resultSet.getInt("value");
+      return count > 0;
     } catch (Exception ignore) {
-      log.atWarn().setMessage("Unable to get active").addKeyValue("feedId", feedId).log();
+      log.atWarn().setMessage("Unable to check promoted feed id existence").log();
     }
-    return result;
+    return false;
   }
 
-  public void setActiveByFeed(String feedId, boolean active) {
-    String upsertSql =
-        """
-        INSERT INTO promoted_feed(feed_id, active) VALUES(?, ?)
-        ON CONFLICT(feed_id) DO UPDATE
-        SET active=? WHERE feed_id = ?
-        """;
-    try (PreparedStatement statement = connection.prepareStatement(upsertSql)) {
+  public void addPromotedFeed(String feedId, String userId) {
+    String sql = "INSERT INTO promoted_feed (feed_id, user_id) VALUES (?, ?)";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, feedId);
-      statement.setInt(2, active ? 1 : 0);
-      statement.setInt(3, active ? 1 : 0);
-      statement.setString(4, feedId);
+      statement.setString(2, userId);
       statement.execute();
     } catch (Exception exception) {
+      System.out.println(exception);
       log.atWarn()
-          .setMessage("Unable to set active")
+          .setMessage("Unable to set promoted feed")
           .addKeyValue("feedId", feedId)
-          .addKeyValue("active", active)
+          .addKeyValue("userId", userId)
           .addKeyValue("exception", exception)
           .log();
     }

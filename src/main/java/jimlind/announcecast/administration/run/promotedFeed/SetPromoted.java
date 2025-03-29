@@ -20,7 +20,10 @@ public class SetPromoted {
 
     System.out.print("Promoted? (yes, no): ");
     boolean promoted = this.scanner.nextLine().equals("yes");
-
-    this.promotedFeed.setActiveByFeed(feedId, promoted);
+    if (promoted) {
+      this.promotedFeed.addPromotedFeed(feedId, "OVERRIDE");
+    } else {
+      this.promotedFeed.deletePromotedFeedByFeedId(feedId);
+    }
   }
 }
