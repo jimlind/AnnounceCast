@@ -23,3 +23,6 @@ Copy the systemd files and start the system.
 `> systemctl daemon-reload && systemctl start announcecast.service` will start it.
 `> systemctl status announcecast.service` to check the status of it
 `> journalctl -e -u announcecast.service` to view the logs from it (jumping to the end).
+
+Enable starting the service on reboot.
+`> systemctl enable announcecast.service`
