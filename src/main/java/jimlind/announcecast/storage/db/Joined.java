@@ -130,10 +130,13 @@ public class Joined {
 
     String sql =
         """
-            SELECT id, url, title
-            FROM feeds
-            INNER JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
-            """;
+        SELECT id, url, title
+        FROM feeds
+        INNER JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
+        LEFT JOIN patreon ON promoted_feed.user_id = patreon.user_id
+        WHERE promoted_feed.user_id = 'OVERRIDE'
+        OR patreon.user_id IS NOT NULL;
+        """;
     try (Statement statement = connection.createStatement()) {
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {

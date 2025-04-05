@@ -1,0 +1,1 @@
+Set the user_id in promoted_feed row to be "OVERRIDE" and it won't check for a patreon subscriber
