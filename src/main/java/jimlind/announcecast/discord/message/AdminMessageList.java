@@ -3,6 +3,7 @@ package jimlind.announcecast.discord.message;
 import java.util.List;
 import jimlind.announcecast.discord.EmbedBuilder;
 import jimlind.announcecast.integration.context.AdminContext;
+import jimlind.announcecast.podcast.Podcast;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class AdminMessageList {
@@ -11,18 +12,39 @@ public class AdminMessageList {
       return noAccessMessage();
     }
 
-    // If there is no data to return
-    return helpMessage();
+    if (context.isOnlyHelpMessage()) {
+      return helpMessage();
+    }
+
+    return dataMessage(context.getPodcast());
   }
 
   private static List<MessageEmbed> noAccessMessage() {
     EmbedBuilder embedBuilder = new EmbedBuilder();
     String message =
         """
-            You must be a patreon member to access this menu.
-            :clap: [Join the Patreon](https://www.patreon.com/AnnounceCast)
-            """;
+        You must be a patreon member to access this menu.
+        :clap: [Join the Patreon](https://www.patreon.com/AnnounceCast)
+        """;
     return List.of(embedBuilder.setDescription(message).build());
+  }
+
+  private static List<MessageEmbed> dataMessage(Podcast podcast) {
+    EmbedBuilder embedBuilder = new EmbedBuilder();
+    embedBuilder.setTitle("Stored Member Data");
+
+    String description = "";
+    if (podcast == null) {
+      description = "You have not prioritized any podcasts.\n\n";
+    } else {
+      description =
+          "You have prioritized the %s Podcast from %s.\n\n"
+              .formatted(podcast.getTitle(), podcast.getAuthor());
+    }
+    description += "You have not tagged any podcasts.";
+    embedBuilder.setDescription(description);
+
+    return List.of(embedBuilder.build());
   }
 
   private static List<MessageEmbed> helpMessage() {
