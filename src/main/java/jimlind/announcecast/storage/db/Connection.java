@@ -26,8 +26,7 @@ public class Connection {
           "CREATE TABLE IF NOT EXISTS patreon (patreon_id TEXT PRIMARY KEY UNIQUE, user_id TEXT)");
       statement.execute(
           "CREATE TABLE IF NOT EXISTS posted (feed_id TEXT PRIMARY KEY UNIQUE, guid TEXT)");
-      statement.execute(
-          "CREATE TABLE IF NOT EXISTS promoted_feed (feed_id TEXT PRIMARY KEY UNIQUE, user_id TEXT)");
+      statement.execute("CREATE TABLE IF NOT EXISTS promoted_feed (feed_id TEXT, user_id TEXT)");
     } catch (SQLException ignore) {
       // If there isn't a database connection hard stop
       log.atError().setMessage("Setting Up SQLite failed").log();
@@ -39,7 +38,7 @@ public class Connection {
     indexSqlList.add("CREATE INDEX idx_feeds_id ON feeds(id)");
     indexSqlList.add("CREATE UNIQUE INDEX idx_patreon_user_id ON patreon(user_id)");
     indexSqlList.add("CREATE UNIQUE INDEX idx_posted_feed_id ON posted(feed_id)");
-    indexSqlList.add("CREATE UNIQUE INDEX idx_promoted_feed_feed_id ON promoted_feed(feed_id)");
+    indexSqlList.add("CREATE INDEX idx_promoted_feed_feed_id ON promoted_feed(feed_id)");
 
     for (String sql : indexSqlList) {
       try {
