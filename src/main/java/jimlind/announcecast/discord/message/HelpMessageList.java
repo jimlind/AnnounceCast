@@ -43,9 +43,9 @@ public class HelpMessageList {
     embedBuilder.addField(
         "/search <keywords>", "Display up to 4 podcasts matching the search keyword(s)", false);
     embedBuilder.addField(
-        "/admin <action> [id] [role] 🔒",
-        "Admin commands only available for Patreon members",
-        false);
+        "/prioritize <id> 🅿️", "Prioritize podcast for fastest episode processing", false);
+    embedBuilder.addField("/tag <id> <role> 🔒🅿️", "Tag role for episode announcements", false);
+    embedBuilder.addField("/settings 🔒🅿️", "Displays prioritization and tags", false);
     embedBuilder.addField(
         "/help [test]", "Display this help message optionally sending test message", false);
 
