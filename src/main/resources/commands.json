@@ -55,45 +55,37 @@
     ]
   },
   {
-    "name": "admin",
-    "description": "Allows Patreon members to set priority podcast and set podcast tags",
+    "name": "settings",
+    "description": "Displays prioritization and tags (Patreon member exclusive)"
+  },
+  {
+    "name": "prioritize",
+    "description": "Prioritize podcast for fastest episode processing (Patreon member exclusive)",
+    "options": [
+      {
+        "type": "string",
+        "name": "id",
+        "description": "Podcast Id of podcast to prioritize",
+        "required": true
+      }
+    ]
+  },
+  {
+    "name": "tag",
+    "description": "Tag role for episode announcements (Patreon member exclusive)",
     "default_manage_permissions": true,
     "options": [
       {
         "type": "string",
-        "name": "action",
-        "description": "Member action to perform",
-        "choices": [
-          {
-            "label": "Set Priority",
-            "value": "set-priority"
-          },
-          {
-            "label": "Set Tag",
-            "value": "set-tag"
-          },
-          {
-            "label": "Display Member Data",
-            "value": "display"
-          },
-          {
-            "label": "Help",
-            "value": "help"
-          }
-        ],
-        "required": true
-      },
-      {
-        "type": "string",
         "name": "id",
-        "description": "Podcast Id to perform action on",
-        "required": false
+        "description": "Podcast Id of podcast to tag",
+        "required": true
       },
       {
         "type": "role",
         "name": "role",
-        "description": "Role to perform action with",
-        "required": false
+        "description": "Role to tag episode announcements with",
+        "required": true
       }
     ]
   },
