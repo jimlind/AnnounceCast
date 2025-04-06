@@ -14,7 +14,9 @@ public class DependencyInjectionModule extends AbstractModule {
     bind(FollowingAction.class).in(Scopes.SINGLETON);
     bind(FollowRssAction.class).in(Scopes.SINGLETON);
     bind(HelpAction.class).in(Scopes.SINGLETON);
+    bind(PrioritizeAction.class).in(Scopes.SINGLETON);
     bind(SearchAction.class).in(Scopes.SINGLETON);
+    bind(SettingsAction.class).in(Scopes.SINGLETON);
     bind(UnfollowAction.class).in(Scopes.SINGLETON);
   }
 }
