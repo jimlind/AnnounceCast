@@ -15,5 +15,6 @@ public class BasicModule extends AbstractModule {
     bind(Patreon.class).in(Scopes.SINGLETON);
     bind(Posted.class).in(Scopes.SINGLETON);
     bind(PromotedFeed.class).in(Scopes.SINGLETON);
+    bind(Tag.class).in(Scopes.SINGLETON);
   }
 }
