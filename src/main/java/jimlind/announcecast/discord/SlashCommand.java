@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 @Slf4j
 public class SlashCommand {
-  @Inject private AdminAction adminAction;
   @Inject private FollowAction followAction;
   @Inject private FollowingAction followingAction;
   @Inject private FollowRssAction followRssAction;
