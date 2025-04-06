@@ -63,6 +63,7 @@
         <tr>
             <th scope="col">Command</th>
             <th scope="col">Default Permission</th>
+            <th scope="col">Patreon Exclusive</th>
             <th scope="col">Description</th>
         </tr>
         </thead>
@@ -70,38 +71,55 @@
         <tr>
             <th scope="row">/follow &lt;keywords&gt;</th>
             <td>🔒 Server Managers</td>
+            <td>-</td>
             <td>Follow a podcast in the channel matching the search keyword(s)</td>
         </tr>
         <tr>
             <th scope="row">/follow-rss &lt;feed&gt;</th>
             <td>🔒 Server Managers</td>
+            <td>-</td>
             <td>Follow a podcast in the channel using an RSS feed</td>
         </tr>
         <tr>
             <th scope="row">/unfollow &lt;id&gt;</th>
             <td>🔒 Server Managers</td>
+            <td>-</td>
             <td>Unfollow a podcast in the channel using a Podcast Id</td>
         </tr>
         <tr>
             <th scope="row">/following</th>
             <td>Everyone</td>
+            <td>-</td>
             <td>Display a list of all podcasts followed in the channel</td>
         </tr>
         <tr>
             <th scope="row">/search &lt;keywords&gt;</th>
             <td>Everyone</td>
+            <td>-</td>
             <td>Display up to 4 podcasts matching the search keyword(s)</td>
         </tr>
         <tr>
-            <th scope="row">/admin &lt;action&gt; [id] [role]</th>
+            <th scope="row">/prioritize &lt;id&gt;</th>
+            <td>Everyone</td>
+            <td>🅿️</td>
+            <td>Prioritize podcast for fastest episode processing</td>
+        </tr>
+        <tr>
+            <th scope="row">/tag &lt;id&gt; &lt;role&gt;</th>
             <td>🔒 Server Managers</td>
-            <td>Admin commands only available for Patreon members giving access to set prioritized podcast and add
-                tags
-            </td>
+            <td>🅿️</td>
+            <td>Tag role for episode announcements</td>
+        </tr>
+        <tr>
+            <th scope="row">/settings</th>
+            <td>Everyone</td>
+            <td>🅿️</td>
+            <td>Displays prioritization and tags</td>
         </tr>
         <tr>
             <th scope="row">/help [test]</th>
             <td>Everyone</td>
+            <td>-</td>
             <td>Display this help message, optionally sending test messages</td>
         </tr>
         </tbody>
