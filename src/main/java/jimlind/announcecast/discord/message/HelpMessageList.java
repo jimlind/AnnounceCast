@@ -61,7 +61,7 @@ public class HelpMessageList {
 
     // Set fields for support links
     embedBuilder.addField(
-        ":clap: Patreon", "[Support on Patreon](https://www.patreon.com/AnnounceCast)", true);
+        ":parking: Patreon", "[Support on Patreon](https://www.patreon.com/AnnounceCast)", true);
     embedBuilder.addField(
         ":left_speech_bubble: Discord", "[Join the Discord](https://discord.gg/sEjJTTjG3M)", true);
 
