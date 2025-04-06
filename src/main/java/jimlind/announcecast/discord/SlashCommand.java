@@ -16,7 +16,10 @@ public class SlashCommand {
   @Inject private FollowRssAction followRssAction;
   @Inject private HelpAction helpAction;
   @Inject private Manager manager;
+  @Inject private PrioritizeAction prioritizeAction;
   @Inject private SearchAction searchAction;
+  @Inject private SettingsAction settingsAction;
+  @Inject private TagAction tagAction;
   @Inject private UnfollowAction unfollowAction;
 
   public boolean process(SlashCommandInteractionEvent event) {
@@ -24,12 +27,17 @@ public class SlashCommand {
 
     List<MessageEmbed> messageList =
         switch (event.getName()) {
-          case "admin" -> AdminMessageList.build(this.adminAction.run(event));
+          // Public
           case "follow" -> FollowMessageList.build(this.followAction.run(event));
           case "follow-rss" -> FollowMessageList.build(this.followRssAction.run(event));
           case "following" -> FollowingMessageList.build(this.followingAction.run(event));
           case "search" -> SearchMessageList.build(this.searchAction.run(event));
           case "unfollow" -> UnfollowMessageList.build(this.unfollowAction.run(event));
+          // Member Exclusive
+          case "settings" -> SettingsMessageList.build(this.settingsAction.run(event));
+          case "prioritize" -> SettingsMessageList.build(this.prioritizeAction.run(event));
+          case "tag" -> SettingsMessageList.build(this.tagAction.run(event));
+          // Help
           default -> HelpMessageList.build(this.helpAction.run(event));
         };
 
