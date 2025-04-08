@@ -69,7 +69,6 @@ public class Joined {
         SELECT DISTINCT feeds.id as id, feeds.url, feeds.title, posted.guid
         FROM feeds
         LEFT JOIN posted ON feeds.id = posted.feed_id
-        INNER JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
         INNER JOIN channels ON feeds.id = channels.feed_id
         LIMIT ? OFFSET ?;
         """;
