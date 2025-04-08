@@ -26,7 +26,8 @@ public class Manager {
             .build();
   }
 
-  public void sendMessage(String channelId, MessageEmbed message, Runnable onSuccess) {
+  public void sendMessage(
+      String channelId, String message, MessageEmbed embed, Runnable onSuccess) {
     if (this.shardManager == null) {
       return;
     }
@@ -58,13 +59,14 @@ public class Manager {
 
     try {
       channel
-          .sendMessageEmbeds(message)
+          .sendMessage(message)
+          .setEmbeds(embed)
           .queue(
               m -> {
                 onSuccess.run();
-                sendSuccess(m, message, channel);
+                sendSuccess(m, embed, channel);
               },
-              t -> sendFailure(t, message, channel));
+              t -> sendFailure(t, embed, channel));
     } catch (Exception e) {
       log.atWarn().setMessage("Message Send Exception").addKeyValue("exception", e).log();
     }

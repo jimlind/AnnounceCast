@@ -46,15 +46,16 @@ public class SendAllFeeds {
       }
 
       for (PostedFeed postedFeed : postedFeedList) {
-        MessageEmbed urlMessage = new EmbedBuilder().setDescription(postedFeed.getUrl()).build();
-        manager.sendMessage(channelId, urlMessage, () -> {});
+        MessageEmbed urlEmbed = new EmbedBuilder().setDescription(postedFeed.getUrl()).build();
+        manager.sendMessage(channelId, "", urlEmbed, () -> {});
 
         Podcast podcast = client.createPodcastFromFeedUrl(postedFeed.getUrl(), 1);
         if (podcast == null || podcast.getEpisodeList().isEmpty()) {
           continue;
         }
-        MessageEmbed message = EpisodeMessage.build(podcast, podcast.getEpisodeList().getFirst());
-        manager.sendMessage(channelId, message, () -> {});
+        MessageEmbed podcastEmbed =
+            EpisodeMessage.build(podcast, podcast.getEpisodeList().getFirst());
+        manager.sendMessage(channelId, "", podcastEmbed, () -> {});
       }
     }
   }

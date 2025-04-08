@@ -50,7 +50,7 @@ public class SlashCommand {
     return true;
   }
 
-  private void sendMessage(SlashCommandInteractionEvent event, MessageEmbed message) {
-    this.manager.sendMessage(event.getChannelId(), message, () -> {});
+  private void sendMessage(SlashCommandInteractionEvent event, MessageEmbed embed) {
+    this.manager.sendMessage(event.getChannelId(), "", embed, () -> {});
   }
 }

@@ -12,6 +12,7 @@ import jimlind.announcecast.scraper.Helper;
 import jimlind.announcecast.scraper.Queue;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Joined;
+import jimlind.announcecast.storage.db.Tag;
 import jimlind.announcecast.storage.model.PostedFeed;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -22,6 +23,7 @@ public class ReadQueue extends TimerTask {
   @Inject private Manager manager;
   @Inject private Joined joined;
   @Inject private Queue queue;
+  @Inject private Tag tag;
 
   @Override
   public void run() {
@@ -50,11 +52,13 @@ public class ReadQueue extends TimerTask {
     }
 
     for (Episode episode : episodeList.reversed()) {
-      MessageEmbed message = EpisodeMessage.build(podcast, episode);
       queue.setEpisode(postedFeed.getId(), episode.getGuid());
       for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
+        String role = this.tag.getTagByFeedId(postedFeed.getId(), channelId));
+        String message = role == null ? "" : String.format("<@&%s>", role);
+        MessageEmbed embed = EpisodeMessage.build(podcast, episode);
         manager.sendMessage(
-            channelId, message, () -> helper.recordSuccess(postedFeed.getId(), episode));
+            channelId, message, embed, () -> helper.recordSuccess(postedFeed.getId(), episode));
       }
     }
   }

@@ -28,4 +28,29 @@ public class Tag {
           .log();
     }
   }
+
+  public String getTagByFeedId(String feedId, String channelId) {
+    String sql =
+        """
+        SELECT tag.role_id FROM tag
+        INNER JOIN patreon ON tag.user_id = patreon.user_id
+        WHERE tag.feed_id = ? AND tag.channel_id = ?
+        """;
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, feedId);
+      statement.setString(2, channelId);
+      var result = statement.executeQuery();
+      if (result.next()) {
+        return result.getString("role_id");
+      }
+    } catch (Exception exception) {
+      log.atWarn()
+          .setMessage("Unable to get tag")
+          .addKeyValue("feedId", feedId)
+          .addKeyValue("channelId", channelId)
+          .addKeyValue("exception", exception)
+          .log();
+    }
+    return null;
+  }
 }
