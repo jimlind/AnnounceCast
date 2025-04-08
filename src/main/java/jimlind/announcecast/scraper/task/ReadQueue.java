@@ -2,7 +2,10 @@ package jimlind.announcecast.scraper.task;
 
 import com.google.inject.Inject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
@@ -54,8 +57,9 @@ public class ReadQueue extends TimerTask {
     for (Episode episode : episodeList.reversed()) {
       queue.setEpisode(postedFeed.getId(), episode.getGuid());
       for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
-        String role = this.tag.getTagByFeedId(postedFeed.getId(), channelId));
-        String message = role == null ? "" : String.format("<@&%s>", role);
+        List<String> role = this.tag.getTagsByFeedIdAndChannelId(postedFeed.getId(), channelId);
+        Stream<String> stream = role.stream().map(input -> String.format("<@&%s>", input));
+        String message = stream.collect(Collectors.joining(","));
         MessageEmbed embed = EpisodeMessage.build(podcast, episode);
         manager.sendMessage(
             channelId, message, embed, () -> helper.recordSuccess(postedFeed.getId(), episode));

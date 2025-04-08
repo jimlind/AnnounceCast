@@ -2,6 +2,8 @@ package jimlind.announcecast.storage.db;
 
 import com.google.inject.Inject;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,7 +31,9 @@ public class Tag {
     }
   }
 
-  public String getTagByFeedId(String feedId, String channelId) {
+  public List<String> getTagsByFeedIdAndChannelId(String feedId, String channelId) {
+    List<String> results = new ArrayList<>();
+
     String sql =
         """
         SELECT tag.role_id FROM tag
@@ -39,9 +43,9 @@ public class Tag {
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, feedId);
       statement.setString(2, channelId);
-      var result = statement.executeQuery();
-      if (result.next()) {
-        return result.getString("role_id");
+      var resultSet = statement.executeQuery();
+      while (resultSet.next()) {
+        results.add(resultSet.getString("role_id"));
       }
     } catch (Exception exception) {
       log.atWarn()
@@ -51,6 +55,7 @@ public class Tag {
           .addKeyValue("exception", exception)
           .log();
     }
-    return null;
+
+    return results;
   }
 }
