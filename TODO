@@ -1,18 +1,39 @@
 TODO:
+
+New Feature: Admin Slash Command to Post Patreon Member's Data
+- Show prioritized podcast
+- Show all roles
+New Feature: Allow Clearing Tags on an episode post.
+
+DONE:
+
+How to store the data?
+ - ALTER TABLE promoted_feed ADD COLUMN user_id TEXT;
+Ensure that admin commands can only be used by Patreon Members
+ - This is going to require special permissions to check discord roles. I don't want to do that.
+ - I can probably get it directly from Patreon instead. Getting the data from their API.
+ - Create a task that updates the local patreon membership regularly.
 New Feature: Admin Slash Command to Set Prioritized Podcast
-* How to store the data?
-* Command to write and delete data to ensure only 1 podcast is prioritized
-* Allow overrides by system owner
-* Update ScrapeSubscribers to use the new data structures
-* Ensure subscriber who set priority has the active role in the channel
-
-New Feature: Admin Slash Command to Set Announce Role
-* How to store the data?
-* Command to write data
-* Update ReadQueue to send more data to message builder
-* Update EpisodeMessage to post using the role
-* Ensure subscriber who set role has the active role in the channel
-
-New Feature: Admin Slash Command to Post Subscriber's Data
-* Show prioritized podcast
-* Show all roles
+ - Write data from the command
+ - Delete other data when using command
+ - Command to write and delete data to ensure only 1 podcast is prioritized
+ - Allow overrides by system owner
+ - Update ScrapePromoted to use the new data structures
+ Tag Data Structure:
+ - User Input: Feed ID & Role
+ - New Table: feed_id, role_id, user_id
+ Cleanup
+ - Move all the commands to new commands instead of trying to bundle them.
+ - Document them in the help. Use the :parking: emoji.
+ - Delete all the "Admin" classes that won't be needed.
+ New Feature: Admin Slash Command to Set Announce Role
+ - Only allow server admins to use the tag command
+ - How to store the data?
+ - Command to write data
+ New Feature: Admin Slash Command to Set Announce Role
+ - Update ReadQueue to send more data to message builder
+ - Update EpisodeMessage to post using the role
+ - Ensure user who set role has the active role in the channel
+ - INFO: @Role can't happen in the message embed. Instead it should get posed in a message before it.
+   That message can also be an empty string for when it isn't needed.
+ New Feature: Allow Unlimited Tags on an episode post.
