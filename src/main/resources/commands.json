@@ -72,7 +72,7 @@
   },
   {
     "name": "tag",
-    "description": "Tag role for episode announcements (Patreon member exclusive)",
+    "description": "Tag role for episode announcements; No role clears tags (Patreon member exclusive)",
     "default_manage_permissions": true,
     "options": [
       {
@@ -85,7 +85,7 @@
         "type": "role",
         "name": "role",
         "description": "Role to tag episode announcements with",
-        "required": true
+        "required": false
       }
     ]
   },

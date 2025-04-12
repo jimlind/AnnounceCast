@@ -151,4 +151,32 @@ public class Joined {
 
     return feedList;
   }
+
+  public List<String> getTagsByFeedIdAndChannelId(String feedId, String channelId) {
+    List<String> results = new ArrayList<>();
+
+    String sql =
+        """
+        SELECT tag.role_id FROM tag
+        INNER JOIN patreon ON tag.user_id = patreon.user_id
+        WHERE tag.feed_id = ? AND tag.channel_id = ?
+        """;
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, feedId);
+      statement.setString(2, channelId);
+      var resultSet = statement.executeQuery();
+      while (resultSet.next()) {
+        results.add(resultSet.getString("role_id"));
+      }
+    } catch (Exception exception) {
+      log.atWarn()
+          .setMessage("Unable to get tag")
+          .addKeyValue("feedId", feedId)
+          .addKeyValue("channelId", channelId)
+          .addKeyValue("exception", exception)
+          .log();
+    }
+
+    return results;
+  }
 }

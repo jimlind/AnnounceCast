@@ -25,8 +25,12 @@ public class TagAction {
     OptionMapping roleOption = event.getInteraction().getOption("role");
     String roleId = roleOption != null ? roleOption.getAsRole().getId() : "";
 
-    String chanelId = event.getChannelId();
-    this.tag.addTag(feedId, roleId, chanelId, userId);
+    String channelId = event.getChannelId();
+    if (roleId.isEmpty()) {
+      this.tag.removeTags(feedId, channelId);
+    } else {
+      this.tag.addTag(feedId, roleId, channelId, userId);
+    }
 
     return this.settingsAction.run(event);
   }

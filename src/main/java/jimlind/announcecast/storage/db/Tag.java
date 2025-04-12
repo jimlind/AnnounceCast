@@ -13,7 +13,7 @@ public class Tag {
   public void addTag(String feedId, String roleId, String channelId, String userId) {
     String sql =
         "INSERT OR IGNORE INTO tag(feed_id, role_id, channel_id, user_id) VALUES(?, ?, ?, ?)";
-    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+    try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
       statement.setString(1, feedId);
       statement.setString(2, roleId);
       statement.setString(3, channelId);
@@ -31,27 +31,43 @@ public class Tag {
     }
   }
 
-  public List<String> getTagsByFeedIdAndChannelId(String feedId, String channelId) {
-    List<String> results = new ArrayList<>();
-
-    String sql =
-        """
-        SELECT tag.role_id FROM tag
-        INNER JOIN patreon ON tag.user_id = patreon.user_id
-        WHERE tag.feed_id = ? AND tag.channel_id = ?
-        """;
-    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+  public void removeTags(String feedId, String channelId) {
+    String sql = "DELETE FROM tag WHERE feed_id = ? AND channel_id = ?";
+    try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
       statement.setString(1, feedId);
       statement.setString(2, channelId);
+      statement.execute();
+    } catch (Exception exception) {
+      log.atWarn()
+          .setMessage("Unable to remove tag")
+          .addKeyValue("feedId", feedId)
+          .addKeyValue("channelId", channelId)
+          .addKeyValue("exception", exception)
+          .log();
+    }
+  }
+
+  public List<jimlind.announcecast.storage.model.Tag> getTagsByUserId(String userId) {
+    List<jimlind.announcecast.storage.model.Tag> results = new ArrayList<>();
+
+    String sql = "SELECT feed_id, role_id, channel_id FROM tag WHERE user_id = ?";
+    try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
+      statement.setString(1, userId);
       var resultSet = statement.executeQuery();
       while (resultSet.next()) {
-        results.add(resultSet.getString("role_id"));
+        while (resultSet.next()) {
+          jimlind.announcecast.storage.model.Tag tag = new jimlind.announcecast.storage.model.Tag();
+          tag.setFeedId(resultSet.getString("feed_id"));
+          tag.setRoleId(resultSet.getString("role_id"));
+          tag.setChannelId(resultSet.getString("channel_id"));
+
+          results.add(tag);
+        }
       }
     } catch (Exception exception) {
       log.atWarn()
-          .setMessage("Unable to get tag")
-          .addKeyValue("feedId", feedId)
-          .addKeyValue("channelId", channelId)
+          .setMessage("Unable to get tags")
+          .addKeyValue("userId", userId)
           .addKeyValue("exception", exception)
           .log();
     }

@@ -44,7 +44,8 @@ public class HelpMessageList {
         "/search <keywords>", "Display up to 4 podcasts matching the search keyword(s)", false);
     embedBuilder.addField(
         "/prioritize <id> 🅿️", "Prioritize podcast for fastest episode processing", false);
-    embedBuilder.addField("/tag <id> <role> 🔒🅿️", "Tag role for episode announcements", false);
+    embedBuilder.addField(
+        "/tag <id> <role> 🔒🅿️", "Tag role for episode announcements; No role clears tags", false);
     embedBuilder.addField("/settings 🔒🅿️", "Displays prioritization and tags", false);
     embedBuilder.addField(
         "/help [test]", "Display this help message optionally sending test message", false);
