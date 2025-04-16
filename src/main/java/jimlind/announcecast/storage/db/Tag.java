@@ -55,14 +55,12 @@ public class Tag {
       statement.setString(1, userId);
       var resultSet = statement.executeQuery();
       while (resultSet.next()) {
-        while (resultSet.next()) {
-          jimlind.announcecast.storage.model.Tag tag = new jimlind.announcecast.storage.model.Tag();
-          tag.setFeedId(resultSet.getString("feed_id"));
-          tag.setRoleId(resultSet.getString("role_id"));
-          tag.setChannelId(resultSet.getString("channel_id"));
+        jimlind.announcecast.storage.model.Tag tag = new jimlind.announcecast.storage.model.Tag();
+        tag.setFeedId(resultSet.getString("feed_id"));
+        tag.setRoleId(resultSet.getString("role_id"));
+        tag.setChannelId(resultSet.getString("channel_id"));
 
-          results.add(tag);
-        }
+        results.add(tag);
       }
     } catch (Exception exception) {
       log.atWarn()
