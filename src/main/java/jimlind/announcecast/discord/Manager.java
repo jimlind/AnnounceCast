@@ -4,10 +4,8 @@ import com.google.inject.Inject;
 import jimlind.announcecast.Helper;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -88,6 +86,20 @@ public class Manager {
         .addKeyValue("message", Helper.objectToString(message))
         .addKeyValue("channel", Helper.objectToString(channel))
         .log();
+  }
+
+  public @Nullable GuildChannel getChannel(String channelId) {
+    if (this.shardManager == null) {
+      return null;
+    }
+    return this.shardManager.getChannelById(GuildMessageChannel.class, channelId);
+  }
+
+  public @Nullable Role getRole(String roleId) {
+    if (this.shardManager == null) {
+      return null;
+    }
+    return this.shardManager.getRoleById(roleId);
   }
 
   public void halt() {
