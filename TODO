@@ -1,9 +1,7 @@
 TODO:
 
-New Feature: Admin Slash Command to Post Patreon Member's Data
-- Show prioritized podcast
-- Show all roles
-New Feature: Allow Clearing Tags on an episode post.
+Fix: Don't allow duplicate tags
+New Feature: Make channel optional for tagging and following
 
 DONE:
 
@@ -19,21 +17,25 @@ New Feature: Admin Slash Command to Set Prioritized Podcast
  - Command to write and delete data to ensure only 1 podcast is prioritized
  - Allow overrides by system owner
  - Update ScrapePromoted to use the new data structures
- Tag Data Structure:
+Tag Data Structure:
  - User Input: Feed ID & Role
  - New Table: feed_id, role_id, user_id
- Cleanup
+Cleanup
  - Move all the commands to new commands instead of trying to bundle them.
  - Document them in the help. Use the :parking: emoji.
  - Delete all the "Admin" classes that won't be needed.
- New Feature: Admin Slash Command to Set Announce Role
+New Feature: Admin Slash Command to Set Announce Role
  - Only allow server admins to use the tag command
  - How to store the data?
  - Command to write data
- New Feature: Admin Slash Command to Set Announce Role
+New Feature: Admin Slash Command to Set Announce Role
  - Update ReadQueue to send more data to message builder
  - Update EpisodeMessage to post using the role
  - Ensure user who set role has the active role in the channel
  - INFO: @Role can't happen in the message embed. Instead it should get posed in a message before it.
    That message can also be an empty string for when it isn't needed.
- New Feature: Allow Unlimited Tags on an episode post.
+New Feature: Allow Unlimited Tags on an episode post.
+New Feature: Allow Clearing Tags on an episode post.
+New Feature: Admin Slash Command to Post Patreon Member's Data
+ - Show prioritized podcast
+ - Show all roles
