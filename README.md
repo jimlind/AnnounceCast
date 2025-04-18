@@ -6,6 +6,7 @@ Follows some Podcasts on your server and lets you know when new episodes drop.
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue?logo=gnu&logoColor=white)](https://www.gnu.org/licenses/agpl-3.0)
 [![Chat: Discord](https://img.shields.io/badge/Chat-Discord-7289da?logo=discord&logoColor=white)](https://discord.gg/sEjJTTjG3M)
 [![Docs: Available](https://img.shields.io/badge/Docs-Available-green?logo=googledocs&logoColor=white)](https://jimlind.github.io/AnnounceCast/)
+[![Test Status](https://github.com/jimlind/AnnounceCast/actions/workflows/run-maven-tests.yml/badge.svg)](https://github.com/jimlind/AnnounceCast/actions/workflows/run-maven-tests.yml)
 
 ---
 
