@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 public class Connection {
@@ -35,21 +36,29 @@ public class Connection {
       System.exit(-1);
     }
 
-    List<String> indexSqlList = new ArrayList<>();
-    indexSqlList.add("CREATE INDEX idx_channels_feed_id ON channels(feed_id)");
-    indexSqlList.add("CREATE INDEX idx_feeds_id ON feeds(id)");
-    indexSqlList.add("CREATE UNIQUE INDEX idx_patreon_user_id ON patreon(user_id)");
-    indexSqlList.add("CREATE UNIQUE INDEX idx_posted_feed_id ON posted(feed_id)");
-    indexSqlList.add("CREATE INDEX idx_promoted_feed_feed_id ON promoted_feed(feed_id)");
-    indexSqlList.add("CREATE INDEX idx_tag_feed_id_channel_id ON tag(feed_id, channel_id)");
-
-    for (String sql : indexSqlList) {
+    // Setup indexes for performance and uniqueness constraints
+    for (String sql : getIndexCreationStrings()) {
       try {
         this.connection.createStatement().execute(sql);
       } catch (SQLException ignore) {
         // Do nothing if there is an issue creating indexes
       }
     }
+  }
+
+  @NotNull
+  private static List<String> getIndexCreationStrings() {
+    List<String> list = new ArrayList<>();
+    list.add("CREATE INDEX idx_channels_feed_id ON channels(feed_id)");
+    list.add("CREATE INDEX idx_feeds_id ON feeds(id)");
+    list.add("CREATE UNIQUE INDEX idx_patreon_user_id ON patreon(user_id)");
+    list.add("CREATE UNIQUE INDEX idx_posted_feed_id ON posted(feed_id)");
+    list.add("CREATE INDEX idx_promoted_feed_feed_id ON promoted_feed(feed_id)");
+    list.add("CREATE INDEX idx_tag_feed_id_channel_id ON tag(feed_id, channel_id)");
+    list.add(
+        "CREATE UNIQUE INDEX idx_tag_feed_id_role_id_channel_id ON tag (feed_id, role_id, channel_id)");
+
+    return list;
   }
 
   public Statement createStatement() throws Exception {

@@ -1,6 +1,5 @@
 TODO:
 
-Fix: Don't allow duplicate tags
 New Feature: Make channel optional for tagging and following
 
 DONE:
@@ -39,3 +38,5 @@ New Feature: Allow Clearing Tags on an episode post.
 New Feature: Admin Slash Command to Post Patreon Member's Data
  - Show prioritized podcast
  - Show all roles
+ Fix: Don't allow duplicate tags
+  - unique key of tag, channel, podcast
