@@ -169,9 +169,10 @@ public class EpisodeMessage {
         return null;
       }
 
+      String cleanHost = host.replaceFirst("^[^a-zA-Z0-9]+", "");
       String path = matcher.group(3) != null ? matcher.group(3) : "";
 
-      return protocol + "://" + host + encodePath(path);
+      return protocol + "://" + cleanHost + encodePath(path);
     } else {
       return null;
     }
