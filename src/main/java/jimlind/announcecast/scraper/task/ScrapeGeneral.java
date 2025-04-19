@@ -29,10 +29,8 @@ public class ScrapeGeneral extends TimerTask {
       return;
     }
     this.paginationIndex++;
-    System.out.println(this.paginationIndex);
 
     for (PostedFeed postedFeed : postedFeedList) {
-      System.out.println(postedFeed.getUrl());
       Podcast podcast = client.createPodcastFromFeedUrl(postedFeed.getUrl(), 1);
       if (podcast == null || podcast.getEpisodeList().isEmpty()) {
         continue;

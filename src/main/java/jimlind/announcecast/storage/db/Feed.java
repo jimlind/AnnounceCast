@@ -64,7 +64,6 @@ public class Feed {
         result.add(feed);
       }
     } catch (Exception ignore) {
-      System.out.println(ignore);
       log.atWarn().setMessage("Unable to get all feeds").log();
     }
 
