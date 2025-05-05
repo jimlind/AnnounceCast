@@ -70,6 +70,7 @@ public class Parser {
 
           switch (localElementName) {
             case "title":
+              // Don't allow podcast or episode titles to be more than one line.
               String titleText = xmlStreamReader.getElementText().replaceAll("\\s+", " ");
               if (isChildOfChannel(elementStack)) {
                 podcast.setTitle(titleText);
