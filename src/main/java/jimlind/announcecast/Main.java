@@ -1,23 +1,17 @@
 package jimlind.announcecast;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.Properties;
-import jimlind.announcecast.administration.Action;
-import jimlind.announcecast.discord.Manager;
-import jimlind.announcecast.discord.ShutdownThread;
-import jimlind.announcecast.scraper.Schedule;
 
 public class Main {
   public static void main(String[] args) {
-    Injector injector = createDependencyInjector();
+    ApplicationComponent component = DaggerApplicationComponent.create();
 
     Properties properties = new Properties();
     String argument = Arrays.stream(args).findFirst().orElse("");
     if (argument.equals("admin")) {
-      injector.getInstance(Action.class).run();
+      component.administrationAction().run();
       System.exit(0);
     }
 
@@ -29,29 +23,16 @@ public class Main {
     }
 
     // Start the Podcast Scrapers
-    injector.getInstance(Schedule.class).startScrapeQueueWrite();
-    injector.getInstance(Schedule.class).startPromotedScrapeQueueWrite();
+    component.scraperSchedule().startScrapeQueueWrite();
+    component.scraperSchedule().startPromotedScrapeQueueWrite();
 
     // Start the Discord connection manager
-    injector.getInstance(Manager.class).run(properties.getProperty("DISCORD_BOT_TOKEN"));
+    component.manager().run(component.listeners(), properties.getProperty("DISCORD_BOT_TOKEN"));
 
     // Register the shutdownThread to the shutdownHook
-    Runtime.getRuntime().addShutdownHook(injector.getInstance(ShutdownThread.class));
+    Runtime.getRuntime().addShutdownHook(component.shutdownThread());
 
     // Start the Patreon Updaters
-    injector
-        .getInstance(jimlind.announcecast.patreon.Schedule.class)
-        .startMemberUpdate(properties.getProperty("PATREON_ACCESS_TOKEN"));
-  }
-
-  private static Injector createDependencyInjector() {
-    return Guice.createInjector(
-        new jimlind.announcecast.administration.DependencyInjectionModule(),
-        new jimlind.announcecast.discord.DependencyInjectionModule(),
-        new jimlind.announcecast.integration.DependencyInjectionModule(),
-        new jimlind.announcecast.patreon.DependencyInjectionModule(),
-        new jimlind.announcecast.podcast.BasicModule(),
-        new jimlind.announcecast.scraper.DependencyInjectionModule(),
-        new jimlind.announcecast.storage.BasicModule());
+    component.patreonSchedule().startMemberUpdate(properties.getProperty("PATREON_ACCESS_TOKEN"));
   }
 }
