@@ -1,17 +1,19 @@
 package jimlind.announcecast.administration.run;
 
-import com.google.inject.Inject;
 import java.util.List;
 import java.util.Scanner;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.discord.EmbedBuilder;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
-import jimlind.announcecast.storage.db.*;
+import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.PostedFeed;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
+@Singleton
 public class SendAllFeeds {
   private final Client client;
   private final Joined joined;
@@ -34,7 +36,7 @@ public class SendAllFeeds {
     System.out.print("Channel? (1345560192091426949, ...): ");
     String channelId = this.scanner.nextLine();
 
-    this.manager.run(botToken);
+    this.manager.run(null, botToken);
     // I could listen for when the manager is ready but dumber easier to wait 3s
     Thread.sleep(3000);
 
