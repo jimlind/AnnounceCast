@@ -1,10 +1,15 @@
 package jimlind.announcecast.discord;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.Helper;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -12,11 +17,14 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import org.jetbrains.annotations.Nullable;
 
 @Slf4j
+@Singleton
 public class Manager {
-  @Inject private Listeners listeners;
   private @Nullable ShardManager shardManager;
 
-  public void run(String discordBotToken) {
+  @Inject
+  public Manager() {}
+
+  public void run(Listeners listeners, String discordBotToken) {
     this.shardManager =
         DefaultShardManagerBuilder.createLight(discordBotToken)
             .addEventListeners(listeners)
