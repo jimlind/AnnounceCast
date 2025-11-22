@@ -185,7 +185,7 @@ public class EpisodeMessage {
 
     StringBuilder result = new StringBuilder();
     for (char ch : path.toCharArray()) {
-      if (Arrays.asList('/', '?', ',', '=', ':', '&').contains(ch)) {
+      if (Arrays.asList('/', '?', ',', '=', ':', '&', '#').contains(ch)) {
         result.append(ch);
       } else {
         result.append(URLEncoder.encode(String.valueOf(ch), StandardCharsets.UTF_8));
