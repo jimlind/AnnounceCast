@@ -1,6 +1,7 @@
 package jimlind.announcecast.storage.db;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -10,8 +11,14 @@ import jimlind.announcecast.patreon.PatreonMember;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Singleton
 public class Patreon {
-  private @Inject Connection connection;
+  private final Connection connection;
+
+  @Inject
+  public Patreon(Connection connection) {
+    this.connection = connection;
+  }
 
   public boolean userIdExists(String userId) {
     String sql = "SELECT COUNT(user_id) as value FROM patreon WHERE user_id = ?";

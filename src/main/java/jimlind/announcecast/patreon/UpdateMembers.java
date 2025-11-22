@@ -1,16 +1,24 @@
 package jimlind.announcecast.patreon;
 
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.storage.db.Patreon;
 import lombok.Setter;
 
+@Singleton
 public class UpdateMembers extends TimerTask {
+  private final Client client;
+  private final Patreon patreon;
   @Setter private String patreonAccessToken;
-  @Inject private Client client;
-  @Inject private Patreon patreon;
+
+  @Inject
+  public UpdateMembers(Client client, Patreon patreon) {
+    this.client = client;
+    this.patreon = patreon;
+  }
 
   @Override
   public void run() {

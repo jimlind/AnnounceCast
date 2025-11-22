@@ -1,17 +1,26 @@
 package jimlind.announcecast.storage.db;
 
-import com.google.inject.Inject;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.storage.model.Feed;
 import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 
 @Slf4j
+@Singleton
 public class Joined {
-  private @Inject jimlind.announcecast.storage.db.Connection connection;
+  private final jimlind.announcecast.storage.db.Connection connection;
+
+  @Inject
+  public Joined(jimlind.announcecast.storage.db.Connection connection) {
+    this.connection = connection;
+  }
 
   public List<Feed> getFeedsByChannelId(String channelId) {
     List<Feed> feedList = new ArrayList<>();

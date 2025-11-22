@@ -1,6 +1,7 @@
 package jimlind.announcecast.integration.action;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.stream.Stream;
 import jimlind.announcecast.integration.context.SearchContext;
@@ -10,9 +11,16 @@ import jimlind.announcecast.podcast.Podcast;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+@Singleton
 public class SearchAction {
-  @Inject private ITunes iTunes;
-  @Inject private Client client;
+  private final ITunes iTunes;
+  private final Client client;
+
+  @Inject
+  public SearchAction(ITunes iTunes, Client client) {
+    this.iTunes = iTunes;
+    this.client = client;
+  }
 
   public SearchContext run(SlashCommandInteractionEvent event) {
     OptionMapping keywordsOption = event.getInteraction().getOption("keywords");

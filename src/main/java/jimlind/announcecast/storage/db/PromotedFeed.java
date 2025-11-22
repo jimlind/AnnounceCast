@@ -1,13 +1,20 @@
 package jimlind.announcecast.storage.db;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Singleton
 public class PromotedFeed {
-  private @Inject Connection connection;
+  private final Connection connection;
+
+  @Inject
+  public PromotedFeed(Connection connection) {
+    this.connection = connection;
+  }
 
   public boolean promotedFeedExists(String feedId) {
     String sql = "SELECT COUNT(user_id) as value FROM promoted_feed WHERE feed_id = ?";

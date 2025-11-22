@@ -3,12 +3,18 @@ package jimlind.announcecast.scraper;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class Queue {
   private final int MAX_EPISODE_LIST_SIZE = 1000;
 
   private final LinkedList<String> podcastUrlList = new LinkedList<>();
   private final ArrayList<String> episodeHashList = new ArrayList<>();
+
+  @Inject
+  public Queue() {}
 
   public String getPodcast() {
     // Get the first message from the queue

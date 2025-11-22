@@ -1,8 +1,10 @@
 package jimlind.announcecast.administration.run.maintenance;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Scanner;
 
+@Singleton
 public class Action {
   private final DeleteUnauthorizedChannels deleteUnauthorizedChannels;
   private final DeleteUnfollowedFeeds deleteUnfollowedFeeds;

@@ -1,14 +1,23 @@
 package jimlind.announcecast.storage.db;
 
-import com.google.inject.Inject;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Singleton
 public class Feed {
-  private @Inject jimlind.announcecast.storage.db.Connection connection;
+  private final jimlind.announcecast.storage.db.Connection connection;
+
+  @Inject
+  public Feed(jimlind.announcecast.storage.db.Connection connection) {
+    this.connection = connection;
+  }
 
   public String getUrl(String feedId) {
     String url = "";

@@ -1,6 +1,7 @@
 package jimlind.announcecast.administration.run.maintenance;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Feed;
 
+@Singleton
 public class DeleteUselessFeeds {
   private final Client client;
   private final Feed feed;

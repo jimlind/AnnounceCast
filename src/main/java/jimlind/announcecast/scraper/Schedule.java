@@ -1,14 +1,16 @@
 package jimlind.announcecast.scraper;
 
-import com.google.inject.Inject;
-import java.util.*;
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.scraper.task.ReadQueue;
 import jimlind.announcecast.scraper.task.ScrapeGeneral;
 import jimlind.announcecast.scraper.task.ScrapePromoted;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Singleton
 public class Schedule {
   public static final long SINGLE_PODCAST_PERIOD = TimeUnit.MINUTES.toMillis(1);
   public static final long PROMOTED_SCRAPE_PERIOD = TimeUnit.HOURS.toMillis(2);
@@ -16,9 +18,16 @@ public class Schedule {
   private static final long QUEUE_READ_DELAY = TimeUnit.SECONDS.toMillis(1);
   private static final long QUEUE_READ_PERIOD = TimeUnit.MILLISECONDS.toMillis(20);
 
-  @Inject private ReadQueue readQueue;
-  @Inject private ScrapeGeneral scrapeGeneral;
-  @Inject private ScrapePromoted scrapePromoted;
+  private final ReadQueue readQueue;
+  private final ScrapeGeneral scrapeGeneral;
+  private final ScrapePromoted scrapePromoted;
+
+  @Inject
+  public Schedule(ReadQueue readQueue, ScrapeGeneral scrapeGeneral, ScrapePromoted scrapePromoted) {
+    this.readQueue = readQueue;
+    this.scrapeGeneral = scrapeGeneral;
+    this.scrapePromoted = scrapePromoted;
+  }
 
   public void startScrapeQueueWrite() {
     new Timer().schedule(scrapeGeneral, 0, GENERAL_SCRAPE_PERIOD);

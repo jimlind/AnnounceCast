@@ -1,6 +1,7 @@
 package jimlind.announcecast.integration.action;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.integration.context.UnfollowContext;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
@@ -9,13 +10,30 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.Nullable;
 
+@Singleton
 public class UnfollowAction {
-  @Inject private Channel channel;
-  @Inject private Client client;
-  @Inject private Feed feed;
-  @Inject private Joined joined;
-  @Inject private Posted posted;
-  @Inject private PromotedFeed promotedFeed;
+  private final Channel channel;
+  private final Client client;
+  private final Feed feed;
+  private final Joined joined;
+  private final Posted posted;
+  private final PromotedFeed promotedFeed;
+
+  @Inject
+  public UnfollowAction(
+      Channel channel,
+      Client client,
+      Feed feed,
+      Joined joined,
+      Posted posted,
+      PromotedFeed promotedFeed) {
+    this.channel = channel;
+    this.client = client;
+    this.feed = feed;
+    this.joined = joined;
+    this.posted = posted;
+    this.promotedFeed = promotedFeed;
+  }
 
   public UnfollowContext run(SlashCommandInteractionEvent event) {
     OptionMapping idOption = event.getInteraction().getOption("id");

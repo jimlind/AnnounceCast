@@ -1,6 +1,7 @@
 package jimlind.announcecast.administration.run.maintenance;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.List;
 import jimlind.announcecast.storage.db.Feed;
 import jimlind.announcecast.storage.db.Joined;
 
+@Singleton
 public class DeleteUnfollowedFeeds {
   private final Feed feed;
   private final Joined joined;

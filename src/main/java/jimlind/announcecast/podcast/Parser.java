@@ -1,11 +1,18 @@
 package jimlind.announcecast.podcast;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Stack;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import org.jetbrains.annotations.Nullable;
 
+@Singleton
 public class Parser {
+
+  @Inject
+  public Parser() {}
+
   private static boolean isChildOfChannel(Stack<String> elementStack) {
     if (elementStack.isEmpty()) {
       return false;

@@ -1,10 +1,11 @@
 package jimlind.announcecast.scraper;
 
-import com.google.inject.Inject;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.storage.db.Posted;
 import jimlind.announcecast.storage.db.PromotedFeed;
@@ -12,10 +13,18 @@ import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Singleton
 public class Helper {
-  @Inject private Posted posted;
-  @Inject private Queue queue;
-  @Inject private PromotedFeed promotedFeed;
+  private final Posted posted;
+  private final Queue queue;
+  private final PromotedFeed promotedFeed;
+
+  @Inject
+  public Helper(Posted posted, Queue queue, PromotedFeed promotedFeed) {
+    this.posted = posted;
+    this.queue = queue;
+    this.promotedFeed = promotedFeed;
+  }
 
   public boolean episodeNotProcessed(Episode episode, PostedFeed postedFeed) {
     // Episode already posted and stored in database

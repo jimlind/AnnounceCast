@@ -1,6 +1,7 @@
 package jimlind.announcecast.administration.run.maintenance;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -9,6 +10,7 @@ import jimlind.announcecast.storage.db.Feed;
 import jimlind.announcecast.storage.db.Posted;
 import jimlind.announcecast.storage.db.PromotedFeed;
 
+@Singleton
 public class UpdateFeedUrls {
   private final Channel channel;
   private final Feed feed;

@@ -1,6 +1,7 @@
 package jimlind.announcecast.administration;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
 import java.util.*;
 import jimlind.announcecast.administration.run.SendAllFeeds;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
+@Singleton
 public class Action {
   private final Channel channel;
   private final Feed feed;

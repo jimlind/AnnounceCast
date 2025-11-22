@@ -1,6 +1,7 @@
 package jimlind.announcecast.integration.action;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.integration.context.FollowContext;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
@@ -11,11 +12,20 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.Nullable;
 
+@Singleton
 public class FollowRssAction {
-  @Inject private Client client;
-  @Inject private Channel channel;
-  @Inject private Feed feed;
-  @Inject private Joined joined;
+  private final Client client;
+  private final Channel channel;
+  private final Feed feed;
+  private final Joined joined;
+
+  @Inject
+  public FollowRssAction(Client client, Channel channel, Feed feed, Joined joined) {
+    this.client = client;
+    this.channel = channel;
+    this.feed = feed;
+    this.joined = joined;
+  }
 
   public FollowContext run(SlashCommandInteractionEvent event) {
     Podcast podcast = this.buildPodcast(event);

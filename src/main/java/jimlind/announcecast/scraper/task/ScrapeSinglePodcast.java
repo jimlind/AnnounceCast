@@ -1,7 +1,7 @@
 package jimlind.announcecast.scraper.task;
 
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
+import dagger.assisted.Assisted;
+import dagger.assisted.AssistedInject;
 import java.util.TimerTask;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
@@ -18,7 +18,7 @@ public class ScrapeSinglePodcast extends TimerTask {
 
   private final String url;
 
-  @Inject
+  @AssistedInject
   public ScrapeSinglePodcast(
       Client client, Helper helper, Joined joined, Queue queue, @Assisted String url) {
     this.client = client;

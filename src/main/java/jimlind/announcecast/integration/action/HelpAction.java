@@ -1,6 +1,7 @@
 package jimlind.announcecast.integration.action;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.integration.context.HelpContext;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
@@ -11,9 +12,16 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+@Singleton
 public class HelpAction {
-  @Inject private Client client;
-  @Inject private Feed feed;
+  private final Client client;
+  private final Feed feed;
+
+  @Inject
+  public HelpAction(Client client, Feed feed) {
+    this.client = client;
+    this.feed = feed;
+  }
 
   public HelpContext run(SlashCommandInteractionEvent event) {
     String name = getClass().getPackage().getImplementationTitle();

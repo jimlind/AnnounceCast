@@ -13,8 +13,14 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class Client {
+
+  @Inject
+  public Client() {}
 
   public List<PatreonMember> createMemberList(String patreonAccessToken) {
     // TODO: There is a lot of hardcoded stuff here. Maybe break some of it out?

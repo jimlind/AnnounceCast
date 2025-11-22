@@ -1,7 +1,9 @@
 package jimlind.announcecast.scraper.task;
 
-import com.google.inject.assistedinject.Assisted;
+import dagger.assisted.Assisted;
+import dagger.assisted.AssistedFactory;
 
+@AssistedFactory
 public interface ScrapeSinglePodcastFactory {
   ScrapeSinglePodcast create(@Assisted String url);
 }

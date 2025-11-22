@@ -1,14 +1,21 @@
 package jimlind.announcecast.storage.db;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Singleton
 public class Tag {
-  private @Inject Connection connection;
+  private final Connection connection;
+
+  @Inject
+  public Tag(Connection connection) {
+    this.connection = connection;
+  }
 
   public void addTag(String feedId, String roleId, String channelId, String userId) {
     String sql =

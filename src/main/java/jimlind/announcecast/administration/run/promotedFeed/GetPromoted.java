@@ -1,10 +1,12 @@
 package jimlind.announcecast.administration.run.promotedFeed;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.Feed;
 
+@Singleton
 public class GetPromoted {
   private final Joined joined;
 

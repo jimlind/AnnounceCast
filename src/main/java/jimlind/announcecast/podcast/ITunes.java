@@ -15,8 +15,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class ITunes {
+
+  @Inject
+  public ITunes() {}
 
   public List<String> search(String keywords, int count) {
     int limit = Math.max(count, 10); // The API acts oddly if the limit is less than 10

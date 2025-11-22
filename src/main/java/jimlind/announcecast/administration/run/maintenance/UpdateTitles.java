@@ -1,10 +1,12 @@
 package jimlind.announcecast.administration.run.maintenance;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.storage.db.Feed;
 
+@Singleton
 public class UpdateTitles {
   private final Client client;
   private final Feed feed;

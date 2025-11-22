@@ -1,11 +1,12 @@
 package jimlind.announcecast.scraper.task;
 
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
@@ -18,13 +19,25 @@ import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.PostedFeed;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
+@Singleton
 public class ReadQueue extends TimerTask {
-  @Inject private Channel channel;
-  @Inject private Client client;
-  @Inject private Helper helper;
-  @Inject private Manager manager;
-  @Inject private Joined joined;
-  @Inject private Queue queue;
+  private final Channel channel;
+  private final Client client;
+  private final Helper helper;
+  private final Joined joined;
+  private final Manager manager;
+  private final Queue queue;
+
+  @Inject
+  public ReadQueue(
+      Channel channel, Client client, Helper helper, Joined joined, Manager manager, Queue queue) {
+    this.channel = channel;
+    this.client = client;
+    this.helper = helper;
+    this.joined = joined;
+    this.manager = manager;
+    this.queue = queue;
+  }
 
   @Override
   public void run() {

@@ -1,13 +1,20 @@
 package jimlind.announcecast.storage.db;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Singleton
 public class Posted {
-  private @Inject jimlind.announcecast.storage.db.Connection connection;
+  private final jimlind.announcecast.storage.db.Connection connection;
+
+  @Inject
+  public Posted(jimlind.announcecast.storage.db.Connection connection) {
+    this.connection = connection;
+  }
 
   public String getGuidByFeedId(String feedId) {
     String guid = "";

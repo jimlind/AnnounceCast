@@ -1,6 +1,7 @@
 package jimlind.announcecast.discord;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.scraper.Schedule;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -12,12 +13,21 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import org.jetbrains.annotations.NotNull;
 
 @Slf4j
+@Singleton
 public class Listeners extends ListenerAdapter {
-  @Inject private DirectMessage directMessage;
-  @Inject private SlashCommand slashCommandManager;
-  @Inject private Schedule schedule;
+  private final DirectMessage directMessage;
+  private final SlashCommand slashCommandManager;
+  private final Schedule schedule;
 
   private int readyCount = 0;
+
+  @Inject
+  public Listeners(
+      DirectMessage directMessage, SlashCommand slashCommandManager, Schedule schedule) {
+    this.directMessage = directMessage;
+    this.slashCommandManager = slashCommandManager;
+    this.schedule = schedule;
+  }
 
   @Override
   public void onReady(ReadyEvent e) {

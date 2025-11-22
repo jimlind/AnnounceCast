@@ -1,6 +1,7 @@
 package jimlind.announcecast.administration.run.maintenance;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import jimlind.announcecast.storage.db.Channel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
+@Singleton
 public class DeleteUnauthorizedChannels {
   private final Channel channel;
   private final Helper helper;

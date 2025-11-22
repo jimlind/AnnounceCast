@@ -1,22 +1,30 @@
 package jimlind.announcecast.podcast;
 
-import com.google.inject.Inject;
 import java.io.InputStream;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import org.jetbrains.annotations.Nullable;
 
+@Singleton
 public class Client {
+  private final Parser parser;
   int CONNECTION_CONNECT_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(2);
   int CONNECTION_READ_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(3);
   int XMLSTREAM_READ_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(2);
 
-  @Inject private Parser parser;
+  @Inject
+  public Client(Parser parser) {
+    this.parser = parser;
+  }
 
   public @Nullable Podcast createPodcastFromFeedUrl(String feed, int episodeCount) {
     return this.createPodcastFromFeedUrl(feed, episodeCount, 1);

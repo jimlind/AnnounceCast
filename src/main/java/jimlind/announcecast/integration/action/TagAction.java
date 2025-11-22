@@ -1,16 +1,25 @@
 package jimlind.announcecast.integration.action;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.integration.context.SettingsContext;
 import jimlind.announcecast.storage.db.Patreon;
 import jimlind.announcecast.storage.db.Tag;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+@Singleton
 public class TagAction {
-  @Inject Patreon patreon;
-  @Inject SettingsAction settingsAction;
-  @Inject Tag tag;
+  private final Patreon patreon;
+  private final SettingsAction settingsAction;
+  private final Tag tag;
+
+  @Inject
+  public TagAction(Patreon patreon, SettingsAction settingsAction, Tag tag) {
+    this.patreon = patreon;
+    this.settingsAction = settingsAction;
+    this.tag = tag;
+  }
 
   public SettingsContext run(SlashCommandInteractionEvent event) {
     String userId = event.getUser().getId();

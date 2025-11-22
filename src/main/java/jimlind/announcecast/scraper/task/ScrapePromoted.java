@@ -1,18 +1,26 @@
 package jimlind.announcecast.scraper.task;
 
-import com.google.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.scraper.Schedule;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.Feed;
 
+@Singleton
 public class ScrapePromoted extends TimerTask {
   private final LinkedList<Timer> promotedTimerList = new LinkedList<>();
-  @Inject private Joined joined;
-  @Inject private ScrapeSinglePodcastFactory scrapeSinglePodcast;
+  private final Joined joined;
+  private final ScrapeSinglePodcastFactory scrapeSinglePodcast;
+
+  @Inject
+  public ScrapePromoted(Joined joined, ScrapeSinglePodcastFactory scrapeSinglePodcast) {
+    this.joined = joined;
+    this.scrapeSinglePodcast = scrapeSinglePodcast;
+  }
 
   @Override
   public void run() {

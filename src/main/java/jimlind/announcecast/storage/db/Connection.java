@@ -6,15 +6,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 @Slf4j
+@Singleton
 public class Connection {
   static String DB_FILE_LOCATION = "jdbc:sqlite:db/podcasts.db";
 
   private java.sql.Connection connection;
 
+  @Inject
   public Connection() {
     try {
       this.connection = DriverManager.getConnection(DB_FILE_LOCATION);

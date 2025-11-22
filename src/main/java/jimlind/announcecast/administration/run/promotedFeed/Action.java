@@ -1,8 +1,10 @@
 package jimlind.announcecast.administration.run.promotedFeed;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Scanner;
 
+@Singleton
 public class Action {
   private final GetPromoted getPromoted;
   private final Scanner scanner;
