@@ -28,7 +28,12 @@ public class SettingsAction {
 
   @Inject
   public SettingsAction(
-          Feed feed, Client client, Manager manager, Patreon patreon, PromotedFeed promotedFeed, Tag tag) {
+      Feed feed,
+      Client client,
+      Manager manager,
+      Patreon patreon,
+      PromotedFeed promotedFeed,
+      Tag tag) {
     this.feed = feed;
     this.client = client;
     this.manager = manager;
