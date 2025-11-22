@@ -1,8 +1,9 @@
 package jimlind.announcecast.integration.action;
 
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.integration.PopulatedTag;
 import jimlind.announcecast.integration.context.SettingsContext;
@@ -16,13 +17,25 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
+@Singleton
 public class SettingsAction {
-  @Inject Feed feed;
-  @Inject Client client;
-  @Inject Manager manager;
-  @Inject Patreon patreon;
-  @Inject PromotedFeed promotedFeed;
-  @Inject Tag tag;
+  private final Feed feed;
+  private final Client client;
+  private final Manager manager;
+  private final Patreon patreon;
+  private final PromotedFeed promotedFeed;
+  private final Tag tag;
+
+  @Inject
+  public SettingsAction(
+          Feed feed, Client client, Manager manager, Patreon patreon, PromotedFeed promotedFeed, Tag tag) {
+    this.feed = feed;
+    this.client = client;
+    this.manager = manager;
+    this.patreon = patreon;
+    this.promotedFeed = promotedFeed;
+    this.tag = tag;
+  }
 
   public SettingsContext run(SlashCommandInteractionEvent event) {
     String userId = event.getUser().getId();
