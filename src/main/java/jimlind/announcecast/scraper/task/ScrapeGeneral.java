@@ -1,8 +1,9 @@
 package jimlind.announcecast.scraper.task;
 
-import com.google.inject.Inject;
 import java.util.List;
 import java.util.TimerTask;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.scraper.Helper;
@@ -12,13 +13,22 @@ import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Singleton
 public class ScrapeGeneral extends TimerTask {
   private static final int PAGINATION_SIZE = 20;
-  @Inject private Client client;
-  @Inject private Helper helper;
-  @Inject private Joined joined;
-  @Inject private Queue queue;
+  private final Client client;
+  private final Helper helper;
+  private final Joined joined;
+  private final Queue queue;
   private int paginationIndex = 0;
+
+  @Inject
+  public ScrapeGeneral(Client client, Helper helper, Joined joined, Queue queue) {
+    this.client = client;
+    this.helper = helper;
+    this.joined = joined;
+    this.queue = queue;
+  }
 
   @Override
   public void run() {
