@@ -2,21 +2,22 @@ package jimlind.announcecast.patreon;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Singleton
+@Slf4j
 public class Client {
 
   @Inject
@@ -50,8 +51,12 @@ public class Client {
     JsonNode jsonNode;
     try {
       jsonNode = new ObjectMapper().readTree(responseString).get("included");
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+    } catch (StreamReadException e) {
+      log.atWarn()
+          .setMessage("Unable to parse patreon api response")
+          .addKeyValue("responseString", responseString)
+          .log();
+      return List.of();
     }
     if (jsonNode == null) {
       return List.of();
@@ -59,20 +64,20 @@ public class Client {
 
     // Build out the Member List
     List<PatreonMember> memberList = new ArrayList<>();
-    for (Iterator<JsonNode> it = jsonNode.elements(); it.hasNext(); ) {
-      JsonNode member = it.next();
-      JsonNode attributes = member.get("attributes");
-      JsonNode userId = attributes.get("social_connections").get("discord").get("user_id");
-      if (userId == null) {
-        continue;
-      }
+    jsonNode.forEach(
+        member -> {
+          JsonNode attributes = member.get("attributes");
+          JsonNode userId = attributes.get("social_connections").get("discord").get("user_id");
+          if (userId == null) {
+            return;
+          }
 
-      PatreonMember memberObject = new PatreonMember();
-      memberObject.setFullName(attributes.get("full_name").textValue());
-      memberObject.setPatreonId(member.get("id").textValue());
-      memberObject.setUserId(userId.textValue());
-      memberList.add(memberObject);
-    }
+          PatreonMember memberObject = new PatreonMember();
+          memberObject.setFullName(attributes.get("full_name").asString());
+          memberObject.setPatreonId(member.get("id").asString());
+          memberObject.setUserId(userId.asString());
+          memberList.add(memberObject);
+        });
 
     return memberList;
   }
