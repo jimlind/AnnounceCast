@@ -2,8 +2,6 @@ package jimlind.announcecast.podcast;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -17,6 +15,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Singleton
 public class ITunes {
@@ -49,7 +49,7 @@ public class ITunes {
       JsonNode results = parentNode.get("results");
       // Stream to easily map and grab feedUrl
       Stream<JsonNode> nodeStream = StreamSupport.stream(results.spliterator(), false).limit(count);
-      return nodeStream.map(node -> node.get("feedUrl").asText()).toList();
+      return nodeStream.map(node -> node.get("feedUrl").asString()).toList();
     } catch (Exception ignore) {
       return Collections.emptyList();
     }
