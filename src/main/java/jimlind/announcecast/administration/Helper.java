@@ -1,7 +1,5 @@
 package jimlind.announcecast.administration;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Singleton
 public class Helper {
@@ -27,14 +27,14 @@ public class Helper {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode commandsNode = objectMapper.readTree(file);
     for (JsonNode node : commandsNode) {
-      String name = node.path("name").asText();
-      String description = node.path("description").asText();
+      String name = node.path("name").asString();
+      String description = node.path("description").asString();
       SlashCommandData commandData = Commands.slash(name, description);
 
       if (node.has("options")) {
         for (JsonNode option : node.path("options")) {
           OptionType type =
-              switch (option.path("type").asText()) {
+              switch (option.path("type").asString()) {
                 case "boolean" -> OptionType.BOOLEAN;
                 case "role" -> OptionType.ROLE;
                 default -> OptionType.STRING;
@@ -42,13 +42,14 @@ public class Helper {
           OptionData optionData =
               new OptionData(
                   type,
-                  option.path("name").asText(),
-                  option.path("description").asText(),
+                  option.path("name").asString(),
+                  option.path("description").asString(),
                   option.path("required").asBoolean(false));
 
           if (option.has("choices")) {
             for (JsonNode choice : option.path("choices")) {
-              optionData.addChoice(choice.path("label").asText(), choice.path("value").asText());
+              optionData.addChoice(
+                  choice.path("label").asString(), choice.path("value").asString());
             }
           }
           commandData.addOptions(optionData);
