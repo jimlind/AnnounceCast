@@ -1,6 +1,5 @@
 package jimlind.announcecast;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.furstenheim.CopyDown;
 import io.github.furstenheim.Options;
 import io.github.furstenheim.OptionsBuilder;
@@ -11,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import tools.jackson.databind.ObjectMapper;
 
 public class Helper {
 
