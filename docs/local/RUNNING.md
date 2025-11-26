@@ -6,5 +6,11 @@ The parameter is the file that contains the settings. This gives us flexibility 
 them in a space that is more protected. That file is never committed. An example properties.tmp exists as an example of
 the formatting.
 
+To use brew's version of Java 21
 > export JAVA_HOME=/opt/homebrew/opt/openjdk@21
+
+To start the bot using the dev properties file
 > mvn package && java -jar target/announcecast.jar input/properties
+
+To start the admin command runner
+> mvn package && java -jar target/announcecast.jar admin
