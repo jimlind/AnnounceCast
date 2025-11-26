@@ -1,7 +1,9 @@
 package jimlind.announcecast.discord.message;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import jimlind.announcecast.discord.EmbedBuilder;
 import jimlind.announcecast.integration.context.HelpContext;
 import jimlind.announcecast.podcast.Episode;
@@ -24,10 +26,12 @@ public class HelpMessageList {
         "https://jimlind.github.io/AnnounceCast/");
 
     // Set description
+    NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
     embedBuilder.setDescription(
         String.format(
             "Tracking %s podcasts on %s servers.",
-            context.getPodcastCount(), context.getGuildCount()));
+            formatter.format(context.getPodcastCount()),
+            formatter.format(context.getGuildCount())));
 
     // Set fields for slash commands
     embedBuilder.addField(
