@@ -3,9 +3,20 @@ package jimlind.announcecast;
 import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.Properties;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Main {
   public static void main(String[] args) {
+    Thread.setDefaultUncaughtExceptionHandler(
+        (thread, event) -> {
+          log.atWarn()
+              .setMessage("Uncaught exception in thread '" + thread.getName() + "'")
+              .addKeyValue("threadName", thread.getName())
+              .addKeyValue("eventMessage", event.getMessage())
+              .log();
+        });
+
     ApplicationComponent component = DaggerApplicationComponent.create();
 
     Properties properties = new Properties();

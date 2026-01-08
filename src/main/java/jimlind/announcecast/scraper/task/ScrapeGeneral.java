@@ -32,6 +32,17 @@ public class ScrapeGeneral extends TimerTask {
 
   @Override
   public void run() {
+    try {
+      executeScrape();
+    } catch (Throwable event) {
+      log.atError()
+          .setMessage("Error running ScrapeGeneral task")
+          .addKeyValue("exception", event.getMessage())
+          .log();
+    }
+  }
+
+  private void executeScrape() {
     List<PostedFeed> postedFeedList =
         joined.getPaginatedPostedFeed(PAGINATION_SIZE, this.paginationIndex);
     if (postedFeedList == null) {

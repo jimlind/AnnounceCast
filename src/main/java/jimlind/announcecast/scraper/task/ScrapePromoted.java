@@ -9,7 +9,9 @@ import javax.inject.Singleton;
 import jimlind.announcecast.scraper.Schedule;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.Feed;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Singleton
 public class ScrapePromoted extends TimerTask {
   private final LinkedList<Timer> promotedTimerList = new LinkedList<>();
@@ -24,6 +26,17 @@ public class ScrapePromoted extends TimerTask {
 
   @Override
   public void run() {
+    try {
+      executeScrape();
+    } catch (Throwable event) {
+      log.atError()
+          .setMessage("Error running ScrapeGeneral task")
+          .addKeyValue("exception", event.getMessage())
+          .log();
+    }
+  }
+
+  private void executeScrape() {
     while (!promotedTimerList.isEmpty()) {
       promotedTimerList.pop().cancel();
     }
