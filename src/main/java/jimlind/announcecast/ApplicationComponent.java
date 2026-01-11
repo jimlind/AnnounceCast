@@ -1,11 +1,13 @@
 package jimlind.announcecast;
 
-import dagger.Component;
 import javax.inject.Singleton;
+
+import dagger.Component;
 
 @Singleton
 @Component
 public interface ApplicationComponent {
+
   // Listens to Discord events
   jimlind.announcecast.discord.Listeners listeners();
 
