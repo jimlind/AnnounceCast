@@ -31,8 +31,12 @@ public class ScrapeSinglePodcast extends TimerTask {
   @Override
   public void run() {
     Podcast podcast = client.createPodcastFromFeedUrl(this.url, 1);
+    if (podcast == null || podcast.getEpisodeList().isEmpty()) {
+      return;
+    }
+
     PostedFeed postedFeed = joined.getPostedFeedByUrl(this.url);
-    if (podcast == null || postedFeed == null || podcast.getEpisodeList().isEmpty()) {
+    if (postedFeed == null) {
       return;
     }
 
