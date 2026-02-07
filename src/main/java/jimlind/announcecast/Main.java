@@ -33,10 +33,6 @@ public class Main {
       System.exit(-1);
     }
 
-    // Start the Podcast Scrapers
-    component.scraperSchedule().startScrapeQueueWrite();
-    component.scraperSchedule().startPromotedScrapeQueueWrite();
-
     // Start the Discord connection manager
     component.manager().run(component.listeners(), properties.getProperty("DISCORD_BOT_TOKEN"));
 

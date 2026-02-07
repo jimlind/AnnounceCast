@@ -1,8 +1,7 @@
 package jimlind.announcecast;
 
-import javax.inject.Singleton;
-
 import dagger.Component;
+import javax.inject.Singleton;
 
 @Singleton
 @Component
@@ -16,9 +15,6 @@ public interface ApplicationComponent {
 
   // Shuts the Discord connection down successfully
   jimlind.announcecast.discord.ShutdownThread shutdownThread();
-
-  // Scrapes the podcast feeds to find most recent podcasts
-  jimlind.announcecast.scraper.Schedule scraperSchedule();
 
   // Scrapes the promoted podcast feeds to find most recent podcasts
   jimlind.announcecast.patreon.Schedule patreonSchedule();
