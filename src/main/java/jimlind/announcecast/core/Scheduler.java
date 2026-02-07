@@ -27,15 +27,14 @@ public class Scheduler {
    *
    * @param name Name of the task used for internal debugging. Uniqueness not needed.
    * @param task The runnable that will be executed on schedule.
-   * @param delaySeconds Number of seconds to wait between each task run.
-   * @param timeoutSeconds Number of seconds to allow the tak to run before cancelling it.
+   * @param periodSeconds Number of seconds spend on each task.
    */
-  public void addTask(String name, Runnable task, long delaySeconds, long timeoutSeconds) {
+  public void addTask(String name, Runnable task, long periodSeconds) {
     if (started.get()) {
       log.error("Failure: Tasks can not be added after scheduler starts.");
       return;
     }
-    tasks.add(new TaskDescriptor(name, task, delaySeconds, timeoutSeconds));
+    tasks.add(new TaskDescriptor(name, task, periodSeconds));
   }
 
   /** Start the list of supplied tasks as well as the watchdog task. */
@@ -55,8 +54,8 @@ public class Scheduler {
    * @param taskDescriptor Task with metadata
    */
   private void scheduleTask(TaskDescriptor taskDescriptor) {
-    scheduler.scheduleWithFixedDelay(
-        () -> runTaskWithTimeout(taskDescriptor), 0, taskDescriptor.delaySeconds, TimeUnit.SECONDS);
+    Runnable runnable = () -> runTaskWithTimeout(taskDescriptor);
+    scheduler.scheduleAtFixedRate(runnable, 0, taskDescriptor.periodSeconds, TimeUnit.SECONDS);
   }
 
   /**
@@ -68,7 +67,7 @@ public class Scheduler {
   private void runTaskWithTimeout(TaskDescriptor taskDescriptor) {
     Future<?> future = workerPool.submit(() -> executeTask(taskDescriptor));
     try {
-      future.get(taskDescriptor.timeoutSeconds, TimeUnit.SECONDS);
+      future.get(taskDescriptor.periodSeconds, TimeUnit.SECONDS);
     } catch (TimeoutException timeoutException) {
       log.error("Task '{}' timed out", taskDescriptor.name);
       future.cancel(true);
@@ -106,6 +105,5 @@ public class Scheduler {
   }
 
   // Object record with all necessary data as appropriate types to describe a task
-  private record TaskDescriptor(
-      String name, Runnable task, long delaySeconds, long timeoutSeconds) {}
+  private record TaskDescriptor(String name, Runnable task, long periodSeconds) {}
 }
