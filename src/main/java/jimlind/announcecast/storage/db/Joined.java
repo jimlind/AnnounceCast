@@ -70,6 +70,30 @@ public class Joined {
     }
   }
 
+  public List<String> getPromotedFeedUrlList() {
+    List<String> urlList = new ArrayList<>();
+
+    String sql =
+        """
+        SELECT DISTINCT url
+        FROM feeds
+        INNER JOIN promoted_feed ON feeds.id = promoted_feed.feed_id
+        LEFT JOIN patreon ON promoted_feed.user_id = patreon.user_id
+        WHERE promoted_feed.user_id = 'OVERRIDE'
+        OR patreon.user_id IS NOT NULL;
+        """;
+    try (Statement statement = connection.createStatement()) {
+      ResultSet resultSet = statement.executeQuery(sql);
+      while (resultSet.next()) {
+        urlList.add(resultSet.getString("url"));
+      }
+    } catch (Exception ignore) {
+      log.warn("Unable to get promoted feed list");
+    }
+
+    return urlList;
+  }
+
   public List<PostedFeed> getPaginatedPostedFeed(int paginationSize, int paginationIndex) {
     List<PostedFeed> postedFeedList = new ArrayList<>();
 

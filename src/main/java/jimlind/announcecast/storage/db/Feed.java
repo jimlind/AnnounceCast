@@ -79,6 +79,38 @@ public class Feed {
     return result;
   }
 
+  public List<String> getFeedUrlPage(int paginationSize, int paginationIndex) {
+    List<String> urlList = new ArrayList<>();
+
+    String sql =
+        """
+        SELECT DISTINCT url
+        FROM feeds
+        LIMIT ? OFFSET ?;
+        """;
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setInt(1, paginationSize);
+      statement.setInt(2, paginationIndex * paginationSize);
+      ResultSet resultSet = statement.executeQuery();
+
+      if (!resultSet.isBeforeFirst()) {
+        return urlList;
+      }
+
+      while (resultSet.next()) {
+        urlList.add(resultSet.getString("url"));
+      }
+    } catch (Exception ignore) {
+      log.atWarn()
+          .setMessage("Unable to get feed url page")
+          .addKeyValue("paginationSize", paginationSize)
+          .addKeyValue("paginationIndex", paginationIndex)
+          .log();
+    }
+
+    return urlList;
+  }
+
   public String addFeed(String feedUrl, String feedTitle) {
     String feedId = "";
 
