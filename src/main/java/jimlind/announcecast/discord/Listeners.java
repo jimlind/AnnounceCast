@@ -40,7 +40,7 @@ public class Listeners extends ListenerAdapter {
 
     ShardManager shardManager = e.getJDA().getShardManager();
     if (shardManager != null && readyCount == shardManager.getShardsTotal()) {
-      this.schedule.startScrapeQueueRead();
+      schedule.start();
     }
   }
 
@@ -48,11 +48,11 @@ public class Listeners extends ListenerAdapter {
   public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
     // Ignore slack commands in private messages
     if (event.getChannel().getType() == ChannelType.PRIVATE) {
-      this.directMessage.process(event);
+      directMessage.process(event);
       return;
     }
 
-    boolean processSuccess = this.slashCommandManager.process(event);
+    boolean processSuccess = slashCommandManager.process(event);
     if (processSuccess) {
       log.atInfo()
           .setMessage("Successfully processed slash command.")
@@ -75,7 +75,7 @@ public class Listeners extends ListenerAdapter {
       return;
     }
 
-    this.directMessage.process(event);
+    directMessage.process(event);
     log.atInfo()
         .setMessage("Successfully processed message.")
         .addKeyValue("message", event.getMessage())
