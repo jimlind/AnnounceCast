@@ -1,51 +1,28 @@
 package jimlind.announcecast.scraper.task;
 
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import jimlind.announcecast.scraper.Schedule;
 import jimlind.announcecast.storage.db.Joined;
-import jimlind.announcecast.storage.model.Feed;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-public class ScrapePromoted extends TimerTask {
-  private final LinkedList<Timer> promotedTimerList = new LinkedList<>();
+public class ScrapePromoted implements Runnable {
   private final Joined joined;
-  private final ScrapeSinglePodcastFactory scrapeSinglePodcast;
+  private final ScrapeSinglePodcastFactory scrapeFactory;
 
   @Inject
-  public ScrapePromoted(Joined joined, ScrapeSinglePodcastFactory scrapeSinglePodcast) {
+  public ScrapePromoted(Joined joined, ScrapeSinglePodcastFactory scrapeSinglePodcastFactory) {
     this.joined = joined;
-    this.scrapeSinglePodcast = scrapeSinglePodcast;
+    this.scrapeFactory = scrapeSinglePodcastFactory;
   }
 
   @Override
   public void run() {
-    try {
-      executeScrape();
-    } catch (Throwable event) {
-      log.atError()
-          .setMessage("Error running ScrapeGeneral task")
-          .addKeyValue("exception", event.getMessage())
-          .log();
-    }
-  }
-
-  private void executeScrape() {
-    while (!promotedTimerList.isEmpty()) {
-      promotedTimerList.pop().cancel();
-    }
-
-    List<Feed> feedList = joined.getPromotedPodcasts();
-    for (Feed feed : feedList) {
-      Timer timer = new Timer();
-      timer.schedule(scrapeSinglePodcast.create(feed.getUrl()), 0, Schedule.SINGLE_PODCAST_PERIOD);
-      promotedTimerList.push(timer);
-    }
+    List<String> urlList = joined.getPromotedFeedUrlList();
+    Collections.shuffle(urlList);
+    urlList.forEach(url -> scrapeFactory.create(url).run());
   }
 }

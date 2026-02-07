@@ -2,7 +2,6 @@ package jimlind.announcecast.scraper.task;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -20,7 +19,7 @@ import jimlind.announcecast.storage.model.PostedFeed;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Singleton
-public class ReadQueue extends TimerTask {
+public class ReadQueue implements Runnable {
   private final Channel channel;
   private final Client client;
   private final Helper helper;
