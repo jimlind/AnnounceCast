@@ -94,6 +94,40 @@ public class Joined {
     return urlList;
   }
 
+  public List<String> getFollowedFeedUrlPage(int paginationSize, int paginationIndex) {
+    List<String> urlList = new ArrayList<>();
+
+    String sql =
+        """
+        SELECT DISTINCT feeds.url
+        FROM feeds
+        INNER JOIN channels ON feeds.id = channels.feed_id
+        ORDER BY feeds.id
+        LIMIT ? OFFSET ?;
+        """;
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setInt(1, paginationSize);
+      statement.setInt(2, paginationIndex * paginationSize);
+      ResultSet resultSet = statement.executeQuery();
+
+      if (!resultSet.isBeforeFirst()) {
+        return urlList;
+      }
+
+      while (resultSet.next()) {
+        urlList.add(resultSet.getString("url"));
+      }
+    } catch (Exception ignore) {
+      log.atWarn()
+          .setMessage("Unable to get feed url page")
+          .addKeyValue("paginationSize", paginationSize)
+          .addKeyValue("paginationIndex", paginationIndex)
+          .log();
+    }
+
+    return urlList;
+  }
+
   public List<PostedFeed> getPaginatedPostedFeed(int paginationSize, int paginationIndex) {
     List<PostedFeed> postedFeedList = new ArrayList<>();
 
