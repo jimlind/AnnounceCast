@@ -53,6 +53,8 @@ public class Client {
       if (responseCode > 299 && responseCode < 400) {
         return createPodcastFromFeedUrl(
             connection.getHeaderField("Location"), episodeCount, timeoutX);
+      } else if (responseCode >= 400) {
+        return null;
       }
     } catch (Exception ignored) {
       // Ignore any errors from trying to get a response code
