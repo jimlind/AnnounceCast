@@ -23,18 +23,34 @@ public class Scheduler {
   }
 
   /**
-   * Add a task to the task list.
+   * Add a task that runs periodically with a forced timeout of that period.
    *
-   * @param name Name of the task used for internal debugging. Uniqueness not needed.
+   * @param name Name of the task used for internal debugging.
    * @param task The runnable that will be executed on schedule.
-   * @param periodSeconds Number of seconds spend on each task.
+   * @param periodMillis The period between successive executions.
    */
-  public void addTask(String name, Runnable task, long periodSeconds) {
+  public void addPeriodicTask(String name, Runnable task, long periodMillis) {
     if (started.get()) {
-      log.error("Failure: Tasks can not be added after scheduler starts.");
+      log.error("Failure: Periodic tasks can not be added after scheduler starts.");
       return;
     }
-    tasks.add(new TaskDescriptor(name, task, periodSeconds));
+    tasks.add(new TaskDescriptor(name, task, periodMillis, 0, periodMillis));
+  }
+
+  /**
+   * Add a task that runs once after a specific delay with a specific timeout.
+   *
+   * @param name Name of the task used for internal debugging.
+   * @param task The runnable that will be executed.
+   * @param delayMillis The delay before the task is executed.
+   * @param timeoutMillis The maximum time allowed for the execution.
+   */
+  public void addDelayedTask(String name, Runnable task, long delayMillis, long timeoutMillis) {
+    if (started.get()) {
+      log.error("Failure: Delayed tasks can not be added after scheduler starts.");
+      return;
+    }
+    tasks.add(new TaskDescriptor(name, task, 0, delayMillis, timeoutMillis));
   }
 
   /** Start the list of supplied tasks as well as the watchdog task. */
@@ -55,7 +71,15 @@ public class Scheduler {
    */
   private void scheduleTask(TaskDescriptor taskDescriptor) {
     Runnable runnable = () -> runTaskWithTimeout(taskDescriptor);
-    scheduler.scheduleAtFixedRate(runnable, 0, taskDescriptor.periodSeconds, TimeUnit.SECONDS);
+    if (taskDescriptor.delayMillis == 0 && taskDescriptor.periodMillis > 0) {
+      scheduler.scheduleAtFixedRate(
+          runnable, 0, taskDescriptor.periodMillis, TimeUnit.MILLISECONDS);
+    } else if (taskDescriptor.periodMillis == 0 && taskDescriptor.delayMillis > 0) {
+      scheduler.scheduleWithFixedDelay(
+          runnable, 0, taskDescriptor.delayMillis, TimeUnit.MILLISECONDS);
+    } else {
+      log.error("Failure: Invalid TaskDescriptor created.");
+    }
   }
 
   /**
@@ -67,7 +91,7 @@ public class Scheduler {
   private void runTaskWithTimeout(TaskDescriptor taskDescriptor) {
     Future<?> future = workerPool.submit(() -> executeTask(taskDescriptor));
     try {
-      future.get(taskDescriptor.periodSeconds, TimeUnit.SECONDS);
+      future.get(taskDescriptor.timeoutMillis, TimeUnit.MILLISECONDS);
     } catch (TimeoutException timeoutException) {
       log.error("Task '{}' timed out", taskDescriptor.name);
       future.cancel(true);
@@ -105,5 +129,7 @@ public class Scheduler {
   }
 
   // Object record with all necessary data as appropriate types to describe a task
-  private record TaskDescriptor(String name, Runnable task, long periodSeconds) {}
+  // This should probably be extracted to another class that validates periodic and delay
+  private record TaskDescriptor(
+      String name, Runnable task, long periodMillis, long delayMillis, long timeoutMillis) {}
 }
