@@ -11,6 +11,8 @@
 
 # IntelliJ
 /.idea
+# VS Code
+/.vscode
 
 # Protect Application Properties
 /input/properties
