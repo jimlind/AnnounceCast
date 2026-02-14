@@ -6,6 +6,11 @@ import java.util.LinkedList;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * This maintains a podcast and episode queue. When the scraper finds a new episode of a podcast it
+ * is added to the podcast list. When the new episode begins the write process it is added to the
+ * episode list. Items are removed from the queues when work with them has completed.
+ */
 @Singleton
 public class Queue {
   private final int MAX_EPISODE_LIST_SIZE = 1000;
