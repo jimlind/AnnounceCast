@@ -1,17 +1,17 @@
 package jimlind.announcecast;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.List;
-
 import io.github.furstenheim.CopyDown;
 import io.github.furstenheim.Options;
 import io.github.furstenheim.OptionsBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import tools.jackson.databind.ObjectMapper;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.List;
 
 public class Helper {
 
@@ -54,7 +54,10 @@ public class Helper {
 
   public static ZonedDateTime stringToDate(String input) {
     List<String> datePatterns =
-        Arrays.asList("EEE, dd MMM yyyy HH:mm:ss Z", "EEE, dd MMM yyyy HH:mm:ss z");
+        Arrays.asList(
+            "EEE, dd MMM yyyy HH:mm:ss Z",
+            "EEE, dd MMM yyyy HH:mm:ss z",
+            "EEE, d MMM yyyy HH:mm:ss Z");
 
     ZonedDateTime zonedDateTime = ZonedDateTime.now();
     for (String pattern : datePatterns) {
