@@ -1,16 +1,17 @@
 package jimlind.announcecast.scraper;
 
-import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.storage.db.Posted;
 import jimlind.announcecast.storage.db.PromotedFeed;
 import jimlind.announcecast.storage.model.PostedFeed;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Singleton
