@@ -51,21 +51,24 @@ public class Helper {
         .addKeyValue("episodeTitle", episode.getTitle())
         .log();
 
+    recordSuccessLocally(feedId, episode.getGuid());
+  }
+
+  public synchronized void recordSuccessLocally(String feedId, String episodeGuid) {
     String separatedGuid = this.posted.getGuidByFeedId(feedId);
-    String guid = episode.getGuid();
-    if (separatedGuid.contains(guid != null ? guid : "")) {
+    if (separatedGuid.contains(episodeGuid != null ? episodeGuid : "")) {
       return;
     }
 
     String separator = "■■■■■■■■■■";
     List<String> guidList = new ArrayList<>(List.of(separatedGuid.split(separator)));
-    guidList.add(guid);
+    guidList.add(episodeGuid);
 
     List<String> guidSublist =
         guidList.subList(guidList.size() - Math.min(guidList.size(), 5), guidList.size());
     separatedGuid = String.join(separator, guidSublist);
 
     this.posted.setGuidByFeed(feedId, separatedGuid);
-    this.queue.removeEpisode(feedId, guid);
+    this.queue.removeEpisode(feedId, episodeGuid);
   }
 }
