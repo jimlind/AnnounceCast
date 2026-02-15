@@ -28,6 +28,7 @@ public abstract class InfiniteFixedDelayTask extends InfiniteTask {
   protected abstract void runTask();
 
   /** Starts the SingleThreadScheduledExecutor using scheduleWithFixedDelay. */
+  @Override
   public void start() {
     if (subsequentDelayMillis <= 0) {
       throw new IllegalArgumentException("Interval must be positive: " + subsequentDelayMillis);
