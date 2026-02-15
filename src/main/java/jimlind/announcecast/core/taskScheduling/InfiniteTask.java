@@ -2,22 +2,27 @@ package jimlind.announcecast.core.taskScheduling;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Wrapper for a ScheduledExecutorService task.
  *
- * <p>This serves two purposes: 1) To ensure that the task could theoretically be closed when they
- * are not no longer needed, making static analysis tools and 2) ensure that appropriate error and
- * throwable events are handled correctly.
+ * <p>This serves three purposes: 1) Handle timeouts on service runners and 2) ensure that
+ * appropriate error and throwable events are handled correctly and 3) To ensure that the task could
+ * theoretically be closed when they are not no longer needed, making static analysis tools happy
  */
 @Slf4j
 public abstract class InfiniteTask {
   protected final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+  protected final ExecutorService workerPool = Executors.newCachedThreadPool();
   protected ScheduledFuture<?> scheduledFuture;
+  protected long timeoutMillis = TimeUnit.HOURS.toMillis(1);
 
   /**
    * Starts the ScheduledExecutorService. Needs to be implemented.
@@ -61,10 +66,15 @@ public abstract class InfiniteTask {
       return;
     }
 
-    // Wraps the `runTask` method catching exceptions so they don't stop the scheduled task running.
-    // Do throw any errors after logging so that we have visibility into those events.
+    // Wraps the `runTask` method forcing timeouts and catching appropriate events. Throwing
+    // exceptions on a task should not stop the scheduler so catch and log those. Throwing errors on
+    // a task should stop the scheduler so we need to log and rethrow those events so functionality
+    // stays the same but visibility increases.
     try {
-      runTask();
+      Future<?> future = workerPool.submit(this::runTask);
+      future.get(timeoutMillis, TimeUnit.MILLISECONDS);
+    } catch (TimeoutException timeoutException) {
+      log.error("Task timed out: {}", this.getClass().getSimpleName());
     } catch (Error error) {
       log.error("Fatal error thrown in scheduled task and task killed: {}", error.toString());
       throw error;
