@@ -1,23 +1,24 @@
 package jimlind.announcecast.core;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Scheduler {
+public class SchedulerOldFashioned {
 
-  private final ScheduledExecutorService scheduler;
+  private final List<ScheduledExecutorService> schedulers = new ArrayList<>();
   private final ExecutorService workerPool;
   private final ScheduledExecutorService supervisor;
 
   private final List<TaskDescriptor> tasks = new ArrayList<>();
   private final AtomicBoolean started = new AtomicBoolean(false);
 
-  public Scheduler() {
-    this.scheduler = Executors.newSingleThreadScheduledExecutor();
+  public SchedulerOldFashioned() {
+    //    this.scheduler = Executors.newSingleThreadScheduledExecutor();
     this.workerPool = Executors.newCachedThreadPool();
     this.supervisor = Executors.newSingleThreadScheduledExecutor();
   }
@@ -70,15 +71,20 @@ public class Scheduler {
    * @param taskDescriptor Task with metadata
    */
   private void scheduleTask(TaskDescriptor taskDescriptor) {
-    Runnable runnable = () -> runTaskWithTimeout(taskDescriptor);
-    if (taskDescriptor.delayMillis == 0 && taskDescriptor.periodMillis > 0) {
-      scheduler.scheduleAtFixedRate(
-          runnable, 0, taskDescriptor.periodMillis, TimeUnit.MILLISECONDS);
-    } else if (taskDescriptor.periodMillis == 0 && taskDescriptor.delayMillis > 0) {
-      scheduler.scheduleWithFixedDelay(
-          runnable, 0, taskDescriptor.delayMillis, TimeUnit.MILLISECONDS);
-    } else {
-      log.error("Failure: Invalid TaskDescriptor created.");
+    try (ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
+      System.out.print("wakka");
+      schedulers.add(executor);
+      Runnable runnable = () -> runTaskWithTimeout(taskDescriptor);
+
+      if (taskDescriptor.delayMillis == 0 && taskDescriptor.periodMillis > 0) {
+        executor.scheduleAtFixedRate(
+            runnable, 0, taskDescriptor.periodMillis, TimeUnit.MILLISECONDS);
+      } else if (taskDescriptor.periodMillis == 0 && taskDescriptor.delayMillis > 0) {
+        executor.scheduleWithFixedDelay(
+            runnable, 0, taskDescriptor.delayMillis, TimeUnit.MILLISECONDS);
+      } else {
+        log.error("Failure: Invalid TaskDescriptor created.");
+      }
     }
   }
 
@@ -120,10 +126,17 @@ public class Scheduler {
   private void startSupervisor() {
     Runnable rebuildTasksIfSchedulerExited =
         () -> {
-          if (scheduler.isShutdown() || scheduler.isTerminated()) {
-            log.atInfo().setMessage("Rebuilding tasks because exited scheduler found.").log();
-            tasks.forEach(this::scheduleTask);
-          }
+          schedulers.forEach(
+              service -> {
+                if (service.isShutdown() || service.isTerminated()) {
+                  System.out.print("a service is in peril");
+                }
+              });
+          //              if (scheduler.isShutdown() || scheduler.isTerminated()) {
+          //                log.atInfo().setMessage("Rebuilding tasks because exited scheduler
+          // found.").log();
+          //                tasks.forEach(this::scheduleTask);
+          //              }
         };
     supervisor.scheduleAtFixedRate(rebuildTasksIfSchedulerExited, 1, 1, TimeUnit.HOURS);
   }
