@@ -1,5 +1,6 @@
 TODO:
 
+Tech Debt: Ensure that all Feature of SchedulerOldFashioned have been relocated and delete the class
 New Feature: Make channel optional for tagging and following
 
 DONE:
@@ -40,3 +41,4 @@ New Feature: Admin Slash Command to Post Patreon Member's Data
  - Show all roles
  Fix: Don't allow duplicate tags
   - unique key of tag, channel, podcast
+Improvement: Major improvements to the Scheduling aspect of codebase
