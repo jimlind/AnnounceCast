@@ -12,7 +12,11 @@ public class Scheduler {
     taskList.add(task);
   }
 
-  public void start() {
+  public void startAll() {
     taskList.forEach(InfiniteTask::start);
+  }
+
+  public void stopAll() {
+    taskList.forEach(InfiniteTask::stop);
   }
 }
