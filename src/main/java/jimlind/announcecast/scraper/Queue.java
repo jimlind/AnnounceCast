@@ -1,10 +1,10 @@
 package jimlind.announcecast.scraper;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * This maintains a podcast and episode queue. When the scraper finds a new episode of a podcast it
@@ -25,30 +25,35 @@ public class Queue {
     // Get the first message from the queue
     // Checking length doesn't seem to be a foolproof way to resolve this so wrapping in a try/catch
     try {
-      return this.podcastUrlList.pop();
+      return podcastUrlList.pop();
     } catch (Exception e) {
       return null;
     }
   }
 
   public void setPodcast(String url) {
-    this.podcastUrlList.add(url);
+    podcastUrlList.add(url);
   }
 
   public boolean isEpisodeQueued(String feedId, String episodeGuid) {
-    return this.episodeHashList.contains(hashString(feedId + episodeGuid));
+    return episodeHashList.contains(hashString(feedId + episodeGuid));
   }
 
   public void setEpisode(String feedId, String episodeGuid) {
-    this.episodeHashList.add(hashString(feedId + episodeGuid));
+    episodeHashList.add(hashString(feedId + episodeGuid));
+    trimEpisodeList();
   }
 
   public void removeEpisode(String feedId, String episodeGuid) {
-    this.episodeHashList.remove(hashString(feedId + episodeGuid));
-    if (this.episodeHashList.size() > MAX_EPISODE_LIST_SIZE) {
-      this.episodeHashList.subList(0, this.episodeHashList.size() - MAX_EPISODE_LIST_SIZE).clear();
+    episodeHashList.remove(hashString(feedId + episodeGuid));
+    trimEpisodeList();
+  }
+
+  private void trimEpisodeList() {
+    if (episodeHashList.size() > MAX_EPISODE_LIST_SIZE) {
+      episodeHashList.subList(0, episodeHashList.size() - MAX_EPISODE_LIST_SIZE).clear();
     }
-    this.episodeHashList.trimToSize();
+    episodeHashList.trimToSize();
   }
 
   private String hashString(String input) {
