@@ -13,18 +13,23 @@ import javax.inject.Singleton;
 @Singleton
 public class Schedule {
   private final ReadQueue readQueue;
+  private final Scheduler scheduler;
   private final ScrapeGeneral scrapeGeneral;
   private final ScrapePromoted scrapePromoted;
 
   @Inject
-  public Schedule(ReadQueue readQueue, ScrapeGeneral scrapeGeneral, ScrapePromoted scrapePromoted) {
+  public Schedule(
+      ReadQueue readQueue,
+      Scheduler scheduler,
+      ScrapeGeneral scrapeGeneral,
+      ScrapePromoted scrapePromoted) {
     this.readQueue = readQueue;
+    this.scheduler = scheduler;
     this.scrapeGeneral = scrapeGeneral;
     this.scrapePromoted = scrapePromoted;
   }
 
   public void start() {
-    Scheduler scheduler = new Scheduler();
     scheduler.addTask(scrapeGeneral);
     scheduler.addTask(scrapePromoted);
     scheduler.addTask(readQueue);
