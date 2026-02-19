@@ -2,6 +2,7 @@ package jimlind.announcecast.core.taskScheduling;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -30,6 +31,18 @@ public abstract class InfiniteTask {
    * <p>Should schedule running the `runSafely` method accordingly.
    */
   public abstract void start();
+
+  /**
+   * Returns true if any piece of the scheduling task has exited.
+   *
+   * @return Exit status
+   */
+  public boolean hasExited() {
+    return scheduledFuture.isCancelled()
+        || scheduledFuture.isDone()
+        || scheduler.isShutdown()
+        || scheduler.isTerminated();
+  }
 
   /**
    * Stops the ScheduledExecutorService. Even though this method should not be executed in the
@@ -75,11 +88,18 @@ public abstract class InfiniteTask {
       future.get(timeoutMillis, TimeUnit.MILLISECONDS);
     } catch (TimeoutException timeoutException) {
       log.error("Task timed out: {}", this.getClass().getSimpleName());
-    } catch (Error error) {
-      log.error("Fatal error thrown in scheduled task and task killed: {}", error.toString());
-      throw error;
-    } catch (Exception exception) {
-      log.error("Exception thrown and caught in scheduled task: {}", exception.getMessage());
+    } catch (ExecutionException executionException) {
+      Throwable cause = executionException.getCause();
+      if (cause instanceof Error) {
+        log.error("Fatal error thrown in scheduled task and task killed: {}", cause.toString());
+        throw (Error) cause;
+      } else {
+        log.error("Exception thrown and caught in scheduled task: {}", cause.getMessage());
+      }
+    } catch (InterruptedException interruption) {
+      log.error("Interrupted Exception thrown in scheduled task: {}", interruption.getMessage());
+      Thread.currentThread().interrupt();
+      throw new RuntimeException(interruption);
     }
   }
 }
