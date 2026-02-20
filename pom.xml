@@ -16,7 +16,6 @@
         <maven.compiler.release>21</maven.compiler.release>
 
         <logback.version>1.5.31</logback.version>
-        <jackson.version>3.0.3</jackson.version>
         <dagger.version>2.57.2</dagger.version>
         <copy_down.version>1.1</copy_down.version>
         <jda.version>6.2.1</jda.version>
@@ -60,12 +59,6 @@
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>tools.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.dagger</groupId>
@@ -172,19 +165,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>${maven-shade-plugin.version}</version>
                 <executions>
@@ -194,11 +174,20 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>jimlind.announcecast:announcecast</exclude>
+                                </excludes>
+                            </artifactSet>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
-                                        **/module-info.class
+                                        <exclude>**/module-info.class</exclude>
+                                        <exclude>META-INF/LICENSE*</exclude>
+                                        <exclude>META-INF/NOTICE*</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/versions/**/OSGI-INF/MANIFEST.MF</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
