@@ -190,11 +190,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>jimlind.announcecast:announcecast</exclude>
-                                </excludes>
-                            </artifactSet>
+                            <outputFile>${project.build.directory}/${project.artifactId}-shaded.jar</outputFile>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
