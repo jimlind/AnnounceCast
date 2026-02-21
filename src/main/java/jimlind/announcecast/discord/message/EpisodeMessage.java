@@ -1,5 +1,12 @@
 package jimlind.announcecast.discord.message;
 
+import jimlind.announcecast.Helper;
+import jimlind.announcecast.discord.EmbedBuilder;
+import jimlind.announcecast.podcast.Episode;
+import jimlind.announcecast.podcast.Podcast;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.Nullable;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -8,12 +15,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import jimlind.announcecast.Helper;
-import jimlind.announcecast.discord.EmbedBuilder;
-import jimlind.announcecast.podcast.Episode;
-import jimlind.announcecast.podcast.Podcast;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.jetbrains.annotations.Nullable;
 
 public class EpisodeMessage {
   public static MessageEmbed build(Podcast podcast, Episode episode) {
