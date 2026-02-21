@@ -1,7 +1,5 @@
 package jimlind.announcecast.integration.action;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import jimlind.announcecast.integration.context.HelpContext;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
@@ -11,6 +9,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 public class HelpAction {
