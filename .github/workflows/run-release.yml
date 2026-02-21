@@ -24,4 +24,7 @@ jobs:
       - name: Create GitHub Release and Upload Files
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${GITHUB_REF##*/}" target/*.jar
+        run: |
+          rm target/announcecast.jar
+          mv target/announcecast-shaded.jar target/announcecast.jar
+          gh release create "${GITHUB_REF##*/}" target/announcecast.jar
