@@ -1,10 +1,7 @@
 package jimlind.announcecast.administration;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -13,8 +10,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class Helper {
@@ -27,14 +28,14 @@ public class Helper {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode commandsNode = objectMapper.readTree(file);
     for (JsonNode node : commandsNode) {
-      String name = node.path("name").asString();
-      String description = node.path("description").asString();
+      String name = node.path("name").asText();
+      String description = node.path("description").asText();
       SlashCommandData commandData = Commands.slash(name, description);
 
       if (node.has("options")) {
         for (JsonNode option : node.path("options")) {
           OptionType type =
-              switch (option.path("type").asString()) {
+              switch (option.path("type").asText()) {
                 case "boolean" -> OptionType.BOOLEAN;
                 case "role" -> OptionType.ROLE;
                 default -> OptionType.STRING;
@@ -42,14 +43,13 @@ public class Helper {
           OptionData optionData =
               new OptionData(
                   type,
-                  option.path("name").asString(),
-                  option.path("description").asString(),
+                  option.path("name").asText(),
+                  option.path("description").asText(),
                   option.path("required").asBoolean(false));
 
           if (option.has("choices")) {
             for (JsonNode choice : option.path("choices")) {
-              optionData.addChoice(
-                  choice.path("label").asString(), choice.path("value").asString());
+              optionData.addChoice(choice.path("label").asText(), choice.path("value").asText());
             }
           }
           commandData.addOptions(optionData);

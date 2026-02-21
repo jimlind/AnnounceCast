@@ -1,20 +1,20 @@
 package jimlind.announcecast.patreon;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-import tools.jackson.core.exc.StreamReadException;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 @Singleton
 @Slf4j
@@ -53,7 +53,13 @@ public class Client {
       jsonNode = new ObjectMapper().readTree(responseString).get("included");
     } catch (StreamReadException e) {
       log.atWarn()
-          .setMessage("Unable to parse patreon api response")
+          .setMessage("Unable to parse Patreon api response - StreamReadException")
+          .addKeyValue("responseString", responseString)
+          .log();
+      return List.of();
+    } catch (Exception e) {
+      log.atWarn()
+          .setMessage("Unable to parse Patreon api response - Exception")
           .addKeyValue("responseString", responseString)
           .log();
       return List.of();
@@ -73,9 +79,9 @@ public class Client {
           }
 
           PatreonMember memberObject = new PatreonMember();
-          memberObject.setFullName(attributes.get("full_name").asString());
-          memberObject.setPatreonId(member.get("id").asString());
-          memberObject.setUserId(userId.asString());
+          memberObject.setFullName(attributes.get("full_name").asText());
+          memberObject.setPatreonId(member.get("id").asText());
+          memberObject.setUserId(userId.asText());
           memberList.add(memberObject);
         });
 
