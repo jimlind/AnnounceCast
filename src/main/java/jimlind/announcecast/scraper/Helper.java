@@ -16,14 +16,14 @@ import java.util.List;
 @Slf4j
 @Singleton
 public class Helper {
+  private final EpisodeCache episodeCache;
   private final Posted posted;
-  private final Queue queue;
   private final PromotedFeed promotedFeed;
 
   @Inject
-  public Helper(Posted posted, Queue queue, PromotedFeed promotedFeed) {
+  public Helper(EpisodeCache episodeCache, Posted posted, PromotedFeed promotedFeed) {
+    this.episodeCache = episodeCache;
     this.posted = posted;
-    this.queue = queue;
     this.promotedFeed = promotedFeed;
   }
 
@@ -34,14 +34,14 @@ public class Helper {
     }
 
     // Episode already queued to be posted
-    return !this.queue.isEpisodeQueued(postedFeed.getId(), episode.getGuid());
+    return !episodeCache.isEpisodeCached(postedFeed.getId(), episode.getGuid());
   }
 
   public synchronized void recordSuccess(String feedId, Episode episode) {
     Duration pubDateDifference =
         Duration.between(
             jimlind.announcecast.Helper.stringToDate(episode.getPubDate()), ZonedDateTime.now());
-    boolean isPromoted = this.promotedFeed.promotedFeedExists(feedId);
+    boolean isPromoted = promotedFeed.promotedFeedExists(feedId);
 
     log.atInfo()
         .setMessage("Message Send Success Metadata")
@@ -53,11 +53,11 @@ public class Helper {
         .log();
 
     recordSuccessToDatabase(feedId, episode.getGuid());
-    this.queue.removeEpisode(feedId, episode.getGuid());
+    episodeCache.removeEpisode(feedId, episode.getGuid());
   }
 
   public synchronized void recordSuccessToDatabase(String feedId, String episodeGuid) {
-    String separatedGuid = this.posted.getGuidByFeedId(feedId);
+    String separatedGuid = posted.getGuidByFeedId(feedId);
     if (separatedGuid.contains(episodeGuid != null ? episodeGuid : "")) {
       return;
     }
@@ -70,6 +70,6 @@ public class Helper {
         guidList.subList(guidList.size() - Math.min(guidList.size(), 5), guidList.size());
     separatedGuid = String.join(separator, guidSublist);
 
-    this.posted.setGuidByFeed(feedId, separatedGuid);
+    posted.setGuidByFeed(feedId, separatedGuid);
   }
 }

@@ -2,29 +2,33 @@ package jimlind.announcecast.scraper.task;
 
 import dagger.assisted.Assisted;
 import dagger.assisted.AssistedInject;
-import java.util.TimerTask;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
 import jimlind.announcecast.scraper.Helper;
-import jimlind.announcecast.scraper.Queue;
+import jimlind.announcecast.scraper.PodcastQueue;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.PostedFeed;
+
+import java.util.TimerTask;
 
 public class ScrapeSinglePodcast extends TimerTask {
   private final Client client;
   private final Helper helper;
   private final Joined joined;
-  private final Queue queue;
-
+  private final PodcastQueue podcastQueue;
   private final String url;
 
   @AssistedInject
   public ScrapeSinglePodcast(
-      Client client, Helper helper, Joined joined, Queue queue, @Assisted String url) {
+      Client client,
+      Helper helper,
+      Joined joined,
+      PodcastQueue podcastQueue,
+      @Assisted String url) {
     this.client = client;
     this.helper = helper;
     this.joined = joined;
-    this.queue = queue;
+    this.podcastQueue = podcastQueue;
     this.url = url;
   }
 
@@ -41,7 +45,7 @@ public class ScrapeSinglePodcast extends TimerTask {
     }
 
     if (this.helper.episodeNotProcessed(podcast.getEpisodeList().getFirst(), postedFeed)) {
-      queue.setPodcast(postedFeed.getUrl());
+      podcastQueue.setPodcast(postedFeed.getUrl());
     }
   }
 }

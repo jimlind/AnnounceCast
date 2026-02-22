@@ -6,8 +6,9 @@ import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
+import jimlind.announcecast.scraper.EpisodeCache;
 import jimlind.announcecast.scraper.Helper;
-import jimlind.announcecast.scraper.Queue;
+import jimlind.announcecast.scraper.PodcastQueue;
 import jimlind.announcecast.storage.db.Channel;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.PostedFeed;
@@ -31,27 +32,35 @@ public class ReadQueue extends InfiniteFixedRateTask {
 
   private final Channel channel;
   private final Client client;
+  private final EpisodeCache episodeCache;
   private final Helper helper;
   private final Joined joined;
   private final Manager manager;
-  private final Queue queue;
+  private final PodcastQueue podcastQueue;
 
   @Inject
   public ReadQueue(
-      Channel channel, Client client, Helper helper, Joined joined, Manager manager, Queue queue) {
+      Channel channel,
+      Client client,
+      EpisodeCache episodeCache,
+      Helper helper,
+      Joined joined,
+      Manager manager,
+      PodcastQueue podcastQueue) {
     super(INITIAL_DELAY_MILLIS, PERIOD_MILLIS, TIMEOUT_MILLIS);
     this.channel = channel;
     this.client = client;
+    this.episodeCache = episodeCache;
     this.helper = helper;
     this.joined = joined;
     this.manager = manager;
-    this.queue = queue;
+    this.podcastQueue = podcastQueue;
   }
 
   @Override
   public void runTask() {
     // Trying to get from the queue will return null if empty so exit early
-    String url = queue.getPodcast();
+    String url = podcastQueue.getPodcast();
     if (url == null) {
       return;
     }
@@ -86,7 +95,7 @@ public class ReadQueue extends InfiniteFixedRateTask {
 
     // Loop over all episodes reversed (so oldest is first) attempting to post messages
     for (Episode episode : episodeList.reversed()) {
-      queue.setEpisode(postedFeed.getId(), episode.getGuid());
+      episodeCache.setEpisode(postedFeed.getId(), episode.getGuid());
       for (String channelId : channel.getChannelsByFeedId(postedFeed.getId())) {
         // Process the episode for the channel
         List<String> role = this.joined.getTagsByFeedIdAndChannelId(postedFeed.getId(), channelId);
