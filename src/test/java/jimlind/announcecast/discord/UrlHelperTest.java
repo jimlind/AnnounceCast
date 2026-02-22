@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class UrlHelperTest {
@@ -30,15 +31,7 @@ class UrlHelperTest {
   }
 
   @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "htp://missing.scheme",
-        "ftp://debian.org/tmp/file.zip",
-        "www.no-scheme.com",
-        "http://",
-        "just a string",
-        "",
-      })
+  @CsvFileSource(resources = "/urls/data-invalid-urls.csv")
   void createValidUrl_withInvalidInputs_shouldReturnNull(String invalidUrlString) {
     assertDoesNotThrow(
         () -> {
