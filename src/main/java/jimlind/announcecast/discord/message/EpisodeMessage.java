@@ -1,24 +1,20 @@
 package jimlind.announcecast.discord.message;
 
 import jimlind.announcecast.Helper;
+import jimlind.announcecast.discord.UrlHelper;
 import jimlind.announcecast.discord.EmbedBuilder;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class EpisodeMessage {
   public static MessageEmbed build(Podcast podcast, Episode episode) {
-    String authorUrl = createValidUrl(podcast.getShowUrl());
+    String authorUrl = UrlHelper.createValidUrl(podcast.getShowUrl());
     String authorImageUrl = getAuthorImage(podcast, episode);
 
     EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -52,12 +48,12 @@ public class EpisodeMessage {
   }
 
   private static @Nullable String getTitleLink(Episode episode) {
-    String link = createValidUrl(episode.getLink());
+    String link = UrlHelper.createValidUrl(episode.getLink());
     if (link == null || link.isBlank()) {
-      link = createValidUrl(episode.getMpegUrl());
+      link = UrlHelper.createValidUrl(episode.getMpegUrl());
     }
     if (link == null || link.isBlank()) {
-      link = createValidUrl(episode.getM4aUrl());
+      link = UrlHelper.createValidUrl(episode.getM4aUrl());
     }
     if (link == null || link.isBlank()) {
       return null;
@@ -66,24 +62,24 @@ public class EpisodeMessage {
   }
 
   private static @Nullable String getEpisodeImage(Podcast podcast, Episode episode) {
-    String result = createValidUrl(episode.getImageUrl());
+    String result = UrlHelper.createValidUrl(episode.getImageUrl());
     if (result == null) {
-      result = createValidUrl(episode.getThumbnailUrl());
+      result = UrlHelper.createValidUrl(episode.getThumbnailUrl());
     }
     if (result == null) {
-      result = createValidUrl(podcast.getImageUrl());
+      result = UrlHelper.createValidUrl(podcast.getImageUrl());
     }
 
     return result;
   }
 
   private static @Nullable String getAuthorImage(Podcast podcast, Episode episode) {
-    String result = createValidUrl(podcast.getImageUrl());
+    String result = UrlHelper.createValidUrl(podcast.getImageUrl());
     if (result == null) {
-      result = createValidUrl(episode.getImageUrl());
+      result = UrlHelper.createValidUrl(episode.getImageUrl());
     }
     if (result == null) {
-      result = createValidUrl(episode.getThumbnailUrl());
+      result = UrlHelper.createValidUrl(episode.getThumbnailUrl());
     }
     return result;
   }
@@ -146,52 +142,5 @@ public class EpisodeMessage {
       return false;
     }
     return !input.isBlank();
-  }
-
-  private static @Nullable String createValidUrl(@Nullable String input) {
-    if (input == null) {
-      return null;
-    }
-
-    String shortUrl = input.trim();
-    if (shortUrl.isBlank()) {
-      return null;
-    }
-
-    String urlPattern = "^(https?)://([^/]+)(/.*)?$";
-    Pattern pattern = Pattern.compile(urlPattern, Pattern.CASE_INSENSITIVE);
-    Matcher matcher = pattern.matcher(shortUrl);
-
-    if (matcher.matches()) {
-      String protocol = matcher.group(1);
-      String host = matcher.group(2);
-      // Various DNS services allow underscores but Discord does not
-      if (host.contains("_")) {
-        return null;
-      }
-
-      String cleanHost = host.replaceFirst("^[^a-zA-Z0-9]+", "");
-      String path = matcher.group(3) != null ? matcher.group(3) : "";
-
-      return protocol + "://" + cleanHost + encodePath(path);
-    } else {
-      return null;
-    }
-  }
-
-  private static String encodePath(String path) {
-    // Some odd feeds give us garbage that we need to correct
-    path = path.replace("&amp;", "&");
-    path = path.replace("%3D", "=");
-
-    StringBuilder result = new StringBuilder();
-    for (char ch : path.toCharArray()) {
-      if (Arrays.asList('/', '?', ',', '=', ':', '&', '#').contains(ch)) {
-        result.append(ch);
-      } else {
-        result.append(URLEncoder.encode(String.valueOf(ch), StandardCharsets.UTF_8));
-      }
-    }
-    return result.toString().replace("+", "%20");
   }
 }

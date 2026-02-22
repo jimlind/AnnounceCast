@@ -1,16 +1,14 @@
-package jimlind.announcecast.discord.message;
+package jimlind.announcecast.discord;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class EpisodeMessageTest {
+class UrlHelperTest {
 
   @ParameterizedTest
   @ValueSource(
@@ -24,10 +22,7 @@ class EpisodeMessageTest {
   void createValidUrl_withValidUrls_shouldReturnString(String validUrlString) {
     assertDoesNotThrow(
         () -> {
-          Method method = EpisodeMessage.class.getDeclaredMethod("createValidUrl", String.class);
-          method.setAccessible(true);
-          String result = (String) method.invoke(null, validUrlString);
-
+          String result = UrlHelper.createValidUrl(validUrlString);
           assertNotNull(result, "URL object should not be null for valid input");
           assertEquals(validUrlString, result, "URL string representation should match input");
         },
@@ -47,10 +42,7 @@ class EpisodeMessageTest {
   void createValidUrl_withInvalidInputs_shouldReturnNull(String invalidUrlString) {
     assertDoesNotThrow(
         () -> {
-          Method method = EpisodeMessage.class.getDeclaredMethod("createValidUrl", String.class);
-          method.setAccessible(true);
-          String result = (String) method.invoke(null, invalidUrlString);
-
+          String result = UrlHelper.createValidUrl(invalidUrlString);
           assertNull(result, "URL object should be null for invalid input");
         },
         "Should not throw for valid URL: " + invalidUrlString);
@@ -60,9 +52,7 @@ class EpisodeMessageTest {
   void createValidUrl_withNullInput_shouldThrowIllegalArgumentException() {
     assertDoesNotThrow(
         () -> {
-          Method method = EpisodeMessage.class.getDeclaredMethod("createValidUrl", String.class);
-          method.setAccessible(true);
-          String result = (String) method.invoke(null, (Object) null);
+          String result = UrlHelper.createValidUrl(null);
           assertNull(result, "URL object should be null for null input");
         },
         "Should throw IllegalArgumentException for null input");
