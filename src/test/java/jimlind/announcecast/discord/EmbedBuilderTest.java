@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class EmbedBuilderTest {
   @Test
-  void createEmbedBuilder_withLongTitle_shouldThrowException() {
+  void createEmbedBuilder_withLongTitle_shouldReturnShortTitle() {
     EmbedBuilder embedBuilder = new EmbedBuilder();
     String longText = "a".repeat(300);
     embedBuilder.setTitle(longText);
