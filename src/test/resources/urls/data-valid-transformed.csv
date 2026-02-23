@@ -9,4 +9,3 @@
 "https://example.com#top","https://example.com#top"
 "http://example","http://example"
 "https://user:pass@example.com","https://user:pass@example.com"
-"https://[2001:db8::1]/foo","https://2001:db8::1]/foo"

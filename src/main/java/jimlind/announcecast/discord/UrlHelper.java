@@ -31,10 +31,14 @@ public class UrlHelper {
         return null;
       }
 
-      String cleanHost = host.replaceFirst("^[^a-zA-Z0-9]+", "");
+      // If first character of the host isn't alphanumeric, reject it
+      if (host.matches("^[^a-zA-Z0-9].*")) {
+        return null;
+      }
+
       String path = matcher.group(3) != null ? matcher.group(3) : "";
 
-      return protocol + "://" + cleanHost + encodePath(path);
+      return protocol + "://" + host + encodePath(path);
     } else {
       return null;
     }
