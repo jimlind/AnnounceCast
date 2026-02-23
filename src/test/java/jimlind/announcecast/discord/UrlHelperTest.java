@@ -13,8 +13,8 @@ class UrlHelperTest {
   @CsvFileSource(resources = "/urls/data-valid.csv")
   void createValidUrl_withValidUrls_shouldReturnSame(String validUrlString) {
     String result = UrlHelper.createValidUrl(validUrlString);
-    assertNotNull(result, "URL object should not be null for valid input");
     assertEquals(validUrlString, result, "URL string representation should match input");
+    assertNotNull(result, "URL object should not be null for valid input");
   }
 
   @ParameterizedTest
@@ -29,8 +29,8 @@ class UrlHelperTest {
   void createValidUrl_withValidUrls_shouldReturnTransformed(
       String validUrl, String transformedUrl) {
     String result = UrlHelper.createValidUrl(validUrl);
-    assertNotNull(result, "URL object should not be null for valid input");
     assertEquals(transformedUrl, result, "URL string representation should match input");
+    assertNotNull(result, "URL object should not be null for valid input");
   }
 
   @Test
