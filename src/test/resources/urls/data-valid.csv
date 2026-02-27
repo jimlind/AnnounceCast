@@ -1,5 +1,5 @@
 "http://example.com"
-"https://www.google.com"
+"https://example.com"
 "http://localhost:8080/path/to/resource?query=value#fragment"
 "http://localhost:8080/index.html?a=1&b=2&c=/"
 "http://localhost:8080/index.html?big:small,cat:dog"
