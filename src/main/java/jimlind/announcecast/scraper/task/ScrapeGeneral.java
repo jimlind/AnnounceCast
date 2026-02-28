@@ -13,7 +13,7 @@ import java.util.List;
 @Singleton
 public class ScrapeGeneral extends InfiniteFixedDelayTask {
   private static final long INITIAL_DELAY_MILLIS = 0;
-  private static final long SUBSEQUENT_DELAY_MILLIS = 2000; // 2 seconds
+  private static final long SUBSEQUENT_DELAY_MILLIS = 5000; // 5 seconds
   private static final long TIMEOUT_MILLIS = 60000; // 1 minute
   private static final int PAGINATION_SIZE = 20;
 
