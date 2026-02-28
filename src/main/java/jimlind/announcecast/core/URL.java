@@ -1,5 +1,7 @@
 package jimlind.announcecast.core;
 
+import org.jspecify.annotations.Nullable;
+
 import java.net.IDN;
 import java.net.URI;
 import java.util.Locale;
@@ -15,11 +17,13 @@ public class URL {
    * @param input A URL from the user expected to be messy
    * @return A cleaner URL based on a lot of assumptions
    */
-  public static String rebuild(String input) {
+  public static @Nullable String rebuild(@Nullable String input) {
+    if (input == null || input.isBlank()) {
+      return null;
+    }
+
     String schema = "https";
     String domain = "";
-    String path = "";
-    String query = "";
     String rest = input;
 
     Matcher schemaMatcher = Pattern.compile("(.*):+/+(.*)").matcher(input);
