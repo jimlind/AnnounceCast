@@ -112,6 +112,12 @@
         "name": "role",
         "description": "Role to tag episode announcements with",
         "required": false
+      },
+      {
+        "type": "channel",
+        "name": "channel",
+        "description": "(Optional) Specify channel to use instead of current.",
+        "required": false
       }
     ]
   },
