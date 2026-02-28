@@ -48,6 +48,10 @@ public class URL {
       return null;
     }
 
+    // Some odd feeds give us garbage that we need to correct
+    rest = rest.replace("&amp;", "&");
+    rest = rest.replace("%3D", "=");
+
     URI uri;
     try {
       uri = new URI(schema + "://" + domain + "/" + rest);

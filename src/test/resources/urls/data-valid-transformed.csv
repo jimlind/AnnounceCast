@@ -8,3 +8,6 @@
 "https://münich.de/", "https://xn--mnich-kva.de/"
 "http://localhost", "http://localhost/"
 "https://localhost", "https://localhost/"
+"http://localhost/?a=1&b=2","http://localhost/?a=1&b=2"
+"http://localhost/?a=1&amp;b=2","http://localhost/?a=1&b=2"
+"http://localhost/?a%3D1&b%3D2","http://localhost/?a=1&b=2"
