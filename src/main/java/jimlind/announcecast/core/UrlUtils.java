@@ -8,14 +8,14 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class URL {
+public class UrlUtils {
 
   /**
    * I want to be nice to people and systems that write or encode bad URLs and make some good faith
    * guesses about what they want and what I know I can and can't support here.
    *
-   * @param input A URL from the user expected to be messy
-   * @return A cleaner URL based on a lot of assumptions
+   * @param input A Url string from the user expected to be messy
+   * @return A cleaner Url string based on a lot of assumptions
    */
   public static @Nullable String rebuild(@Nullable String input) {
     if (input == null || input.isBlank()) {
