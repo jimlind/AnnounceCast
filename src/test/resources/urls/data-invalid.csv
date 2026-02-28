@@ -1,6 +1,5 @@
 ""
 " "
-"string with spaces"
 "http://"
 "http://http://double.schema"
 "ftp://ftp.schema.org/tmp/file.zip"
@@ -10,3 +9,4 @@
 "http://www.example_domain.com"
 "http://localhost/?a=%"
 "https://[2001:db8::1]/foo"
+"http://localhost/?a=^"

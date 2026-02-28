@@ -37,7 +37,7 @@ public class URL {
     }
 
     Matcher domainMatcher =
-        Pattern.compile("([\\w.:@]+)(.*)", Pattern.UNICODE_CHARACTER_CLASS).matcher(rest);
+        Pattern.compile("([\\w.:@-]+)(.*)", Pattern.UNICODE_CHARACTER_CLASS).matcher(rest);
     if (domainMatcher.find()) {
       domain = IDN.toASCII(domainMatcher.group(1));
       String remainder = domainMatcher.group(2);
@@ -51,6 +51,7 @@ public class URL {
     // Some odd feeds give us garbage that we need to correct
     rest = rest.replace("&amp;", "&");
     rest = rest.replace("%3D", "=");
+    rest = rest.replace(" ", "%20");
 
     URI uri;
     try {
