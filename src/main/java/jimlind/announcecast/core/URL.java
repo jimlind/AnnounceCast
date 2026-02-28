@@ -1,5 +1,7 @@
 package jimlind.announcecast.core;
 
+import java.net.IDN;
+import java.net.URI;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,19 +36,25 @@ public class URL {
       return null;
     }
 
-    System.out.println(rest);
     Matcher domainMatcher =
-        Pattern.compile("([\\w.:]+)(.*)?(.*)", Pattern.UNICODE_CHARACTER_CLASS).matcher(rest);
+        Pattern.compile("([\\w.:@]+)(.*)", Pattern.UNICODE_CHARACTER_CLASS).matcher(rest);
     if (domainMatcher.find()) {
-      domain = domainMatcher.group(1);
-      path = domainMatcher.group(2);
-      query = domainMatcher.group(3);
+      domain = IDN.toASCII(domainMatcher.group(1));
+      String remainder = domainMatcher.group(2);
+      rest = remainder.startsWith("/") ? remainder.substring(1) : remainder;
     }
 
     if (domain.isBlank() || domain.contains("_")) {
       return null;
     }
 
-    return schema + "://" + domain + path + query;
+    URI uri;
+    try {
+      uri = new URI(schema + "://" + domain + "/" + rest);
+    } catch (Exception e) {
+      return null;
+    }
+
+    return uri.toString();
   }
 }

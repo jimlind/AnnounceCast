@@ -1,5 +1,6 @@
 ""
 " "
+"string with spaces"
 "http://"
 "http://http://double.schema"
 "ftp://ftp.schema.org/tmp/file.zip"
