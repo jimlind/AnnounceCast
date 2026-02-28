@@ -6,3 +6,5 @@
 "example.com?x=1", "https://example.com/?x=1"
 "example.com#top", "https://example.com/#top"
 "https://münich.de/", "https://xn--mnich-kva.de/"
+"http://localhost", "http://localhost/"
+"https://localhost", "https://localhost/"

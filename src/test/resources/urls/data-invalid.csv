@@ -8,3 +8,5 @@
 "htp://localhost"
 "hhttp://example.com"
 "http://www.example_domain.com"
+"http://localhost/?a=%"
+"https://[2001:db8::1]/foo"

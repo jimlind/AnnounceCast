@@ -8,3 +8,5 @@
 "https://example.com/#top"
 "http://example/"
 "https://user:pass@example.com/"
+"http://localhost/"
+"https://localhost/"
