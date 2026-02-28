@@ -1,12 +1,14 @@
 package jimlind.announcecast.integration.action;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
+import jimlind.announcecast.integration.ActionUtils;
 import jimlind.announcecast.integration.context.FollowingContext;
 import jimlind.announcecast.storage.db.Joined;
 import jimlind.announcecast.storage.model.Feed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
 public class FollowingAction {
@@ -18,7 +20,7 @@ public class FollowingAction {
   }
 
   public FollowingContext run(SlashCommandInteractionEvent event) {
-    List<Feed> feedList = this.joined.getFeedsByChannelId(event.getChannel().getId());
+    List<Feed> feedList = this.joined.getFeedsByChannelId(ActionUtils.getChannelId(event));
 
     return new FollowingContext(feedList);
   }

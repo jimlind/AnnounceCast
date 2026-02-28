@@ -1,7 +1,6 @@
 package jimlind.announcecast.integration.action;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jimlind.announcecast.integration.ActionUtils;
 import jimlind.announcecast.integration.context.FollowContext;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
@@ -11,6 +10,9 @@ import jimlind.announcecast.storage.db.Joined;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.Nullable;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 public class FollowRssAction {
@@ -29,12 +31,14 @@ public class FollowRssAction {
 
   public FollowContext run(SlashCommandInteractionEvent event) {
     Podcast podcast = this.buildPodcast(event);
+    String channelId = ActionUtils.getChannelId(event);
+
     if (podcast != null) {
       String feedId = this.feed.addFeed(podcast.getFeedUrl(), podcast.getTitle());
-      this.channel.addChannel(feedId, event.getChannelId());
+      this.channel.addChannel(feedId, channelId);
     }
 
-    return new FollowContext(podcast, this.joined.getFeedsByChannelId(event.getChannel().getId()));
+    return new FollowContext(podcast, this.joined.getFeedsByChannelId(channelId));
   }
 
   private @Nullable Podcast buildPodcast(SlashCommandInteractionEvent event) {

@@ -1,14 +1,20 @@
 package jimlind.announcecast.integration.action;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jimlind.announcecast.integration.ActionUtils;
 import jimlind.announcecast.integration.context.UnfollowContext;
 import jimlind.announcecast.podcast.Client;
 import jimlind.announcecast.podcast.Podcast;
-import jimlind.announcecast.storage.db.*;
+import jimlind.announcecast.storage.db.Channel;
+import jimlind.announcecast.storage.db.Feed;
+import jimlind.announcecast.storage.db.Joined;
+import jimlind.announcecast.storage.db.Posted;
+import jimlind.announcecast.storage.db.PromotedFeed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.Nullable;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 public class UnfollowAction {
@@ -40,7 +46,9 @@ public class UnfollowAction {
     String feedId = idOption != null ? idOption.getAsString() : "";
 
     Podcast podcast = this.buildPodcast(feedId);
-    this.channel.deleteChannel(feedId, event.getChannelId());
+    String channelId = ActionUtils.getChannelId(event);
+
+    this.channel.deleteChannel(feedId, channelId);
 
     // Purge feed from all database tables if there are no more channels
     if (this.channel.getChannelsByFeedId(feedId).isEmpty()) {
@@ -49,8 +57,7 @@ public class UnfollowAction {
       this.promotedFeed.deletePromotedFeedByFeedId(feedId);
     }
 
-    return new UnfollowContext(
-        podcast, this.joined.getFeedsByChannelId(event.getChannel().getId()));
+    return new UnfollowContext(podcast, this.joined.getFeedsByChannelId(channelId));
   }
 
   private @Nullable Podcast buildPodcast(String feedId) {

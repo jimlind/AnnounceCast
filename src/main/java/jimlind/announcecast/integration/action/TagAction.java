@@ -1,12 +1,14 @@
 package jimlind.announcecast.integration.action;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jimlind.announcecast.integration.ActionUtils;
 import jimlind.announcecast.integration.context.SettingsContext;
 import jimlind.announcecast.storage.db.Patreon;
 import jimlind.announcecast.storage.db.Tag;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 public class TagAction {
@@ -34,7 +36,7 @@ public class TagAction {
     OptionMapping roleOption = event.getInteraction().getOption("role");
     String roleId = roleOption != null ? roleOption.getAsRole().getId() : "";
 
-    String channelId = event.getChannelId();
+    String channelId = ActionUtils.getChannelId(event);
     if (roleId.isEmpty()) {
       this.tag.removeTags(feedId, channelId);
     } else {
