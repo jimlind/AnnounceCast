@@ -1,7 +1,7 @@
 package jimlind.announcecast.discord.message;
 
 import jimlind.announcecast.Helper;
-import jimlind.announcecast.discord.UrlHelper;
+import jimlind.announcecast.core.URL;
 import jimlind.announcecast.discord.EmbedBuilder;
 import jimlind.announcecast.podcast.Episode;
 import jimlind.announcecast.podcast.Podcast;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class EpisodeMessage {
   public static MessageEmbed build(Podcast podcast, Episode episode) {
-    String authorUrl = UrlHelper.createValidUrl(podcast.getShowUrl());
+    String authorUrl = URL.rebuild(podcast.getShowUrl());
     String authorImageUrl = getAuthorImage(podcast, episode);
 
     EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -48,12 +48,12 @@ public class EpisodeMessage {
   }
 
   private static @Nullable String getTitleLink(Episode episode) {
-    String link = UrlHelper.createValidUrl(episode.getLink());
+    String link = URL.rebuild(episode.getLink());
     if (link == null || link.isBlank()) {
-      link = UrlHelper.createValidUrl(episode.getMpegUrl());
+      link = URL.rebuild(episode.getMpegUrl());
     }
     if (link == null || link.isBlank()) {
-      link = UrlHelper.createValidUrl(episode.getM4aUrl());
+      link = URL.rebuild(episode.getM4aUrl());
     }
     if (link == null || link.isBlank()) {
       return null;
@@ -62,24 +62,24 @@ public class EpisodeMessage {
   }
 
   private static @Nullable String getEpisodeImage(Podcast podcast, Episode episode) {
-    String result = UrlHelper.createValidUrl(episode.getImageUrl());
+    String result = URL.rebuild(episode.getImageUrl());
     if (result == null) {
-      result = UrlHelper.createValidUrl(episode.getThumbnailUrl());
+      result = URL.rebuild(episode.getThumbnailUrl());
     }
     if (result == null) {
-      result = UrlHelper.createValidUrl(podcast.getImageUrl());
+      result = URL.rebuild(podcast.getImageUrl());
     }
 
     return result;
   }
 
   private static @Nullable String getAuthorImage(Podcast podcast, Episode episode) {
-    String result = UrlHelper.createValidUrl(podcast.getImageUrl());
+    String result = URL.rebuild(podcast.getImageUrl());
     if (result == null) {
-      result = UrlHelper.createValidUrl(episode.getImageUrl());
+      result = URL.rebuild(episode.getImageUrl());
     }
     if (result == null) {
-      result = UrlHelper.createValidUrl(episode.getThumbnailUrl());
+      result = URL.rebuild(episode.getThumbnailUrl());
     }
     return result;
   }
