@@ -38,6 +38,7 @@ public class Helper {
               switch (option.path("type").asText()) {
                 case "boolean" -> OptionType.BOOLEAN;
                 case "role" -> OptionType.ROLE;
+                case "channel" -> OptionType.CHANNEL;
                 default -> OptionType.STRING;
               };
           OptionData optionData =

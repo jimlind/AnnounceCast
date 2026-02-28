@@ -9,6 +9,12 @@
         "name": "keywords",
         "description": "Keyword(s) used to find podcast to follow",
         "required": true
+      },
+      {
+        "type": "channel",
+        "name": "channel",
+        "description": "(Optional) Specify channel to use instead of current.",
+        "required": false
       }
     ]
   },
@@ -22,6 +28,12 @@
         "name": "feed",
         "description": "RSS feed used to identified podcast to follow",
         "required": true
+      },
+      {
+        "type": "channel",
+        "name": "channel",
+        "description": "(Optional) Specify channel to use instead of current.",
+        "required": false
       }
     ]
   },
@@ -35,12 +47,26 @@
         "name": "id",
         "description": "Podcast Id used to identified podcast to unfollow",
         "required": true
+      },
+      {
+        "type": "channel",
+        "name": "channel",
+        "description": "(Optional) Specify channel to use instead of current.",
+        "required": false
       }
     ]
   },
   {
     "name": "following",
-    "description": "Replies with the list of all podcasts (Ids & Names) followed in this channel"
+    "description": "Replies with the list of all podcasts (Ids & Names) followed in this channel",
+    "options": [
+      {
+        "type": "channel",
+        "name": "channel",
+        "description": "(Optional) Specify channel to use instead of current.",
+        "required": false
+      }
+    ]
   },
   {
     "name": "search",
