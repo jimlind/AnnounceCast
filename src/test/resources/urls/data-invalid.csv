@@ -10,3 +10,4 @@
 "http://localhost/?a=%"
 "https://[2001:db8::1]/foo"
 "http://localhost/?a=^"
+"https://.localhost/"

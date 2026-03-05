@@ -43,7 +43,11 @@ public class UrlUtils {
     Matcher domainMatcher =
         Pattern.compile("([\\w.:@-]+)(.*)", Pattern.UNICODE_CHARACTER_CLASS).matcher(rest);
     if (domainMatcher.find()) {
-      domain = IDN.toASCII(domainMatcher.group(1));
+      try {
+        domain = IDN.toASCII(domainMatcher.group(1));
+      } catch (IllegalArgumentException ignore) {
+        return null;
+      }
       String remainder = domainMatcher.group(2);
       rest = remainder.startsWith("/") ? remainder.substring(1) : remainder;
     }
