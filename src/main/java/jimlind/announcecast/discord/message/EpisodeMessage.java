@@ -15,9 +15,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class EpisodeMessage {
-  private static @Nullable String UrlValidationWrapper(String input) {
+  @Nullable
+  private static String UrlValidationWrapper(@Nullable String input) {
     String urlOutput = UrlUtils.rebuild(input);
-    if (urlOutput == null) {
+    if (urlOutput == null && input != null) {
       log.atWarn().setMessage("Unable to parse URL").addKeyValue("Input", input).log();
     }
 
@@ -58,7 +59,8 @@ public class EpisodeMessage {
     return markdownText.substring(0, newlineIndex);
   }
 
-  private static @Nullable String getTitleLink(Episode episode) {
+  @Nullable
+  private static String getTitleLink(Episode episode) {
     String link = UrlValidationWrapper(episode.getLink());
     if (link == null || link.isBlank()) {
       link = UrlValidationWrapper(episode.getMpegUrl());
@@ -72,7 +74,8 @@ public class EpisodeMessage {
     return link;
   }
 
-  private static @Nullable String getEpisodeImage(Podcast podcast, Episode episode) {
+  @Nullable
+  private static String getEpisodeImage(Podcast podcast, Episode episode) {
     String result = UrlValidationWrapper(episode.getImageUrl());
     if (result == null) {
       result = UrlValidationWrapper(episode.getThumbnailUrl());
@@ -84,7 +87,8 @@ public class EpisodeMessage {
     return result;
   }
 
-  private static @Nullable String getAuthorImage(Podcast podcast, Episode episode) {
+  @Nullable
+  private static String getAuthorImage(Podcast podcast, Episode episode) {
     String result = UrlValidationWrapper(podcast.getImageUrl());
     if (result == null) {
       result = UrlValidationWrapper(episode.getImageUrl());
