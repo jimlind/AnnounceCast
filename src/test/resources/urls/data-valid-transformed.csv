@@ -21,3 +21,4 @@
 "http://localhost/?a=jump+around","http://localhost/?a=jump+around"
 "www.no-scheme.com", "https://www.no-scheme.com/"
 "string with spaces", "https://string/%20with%20spaces"
+"https://.castos.com", "https://castos.com/"

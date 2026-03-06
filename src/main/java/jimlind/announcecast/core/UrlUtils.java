@@ -41,7 +41,7 @@ public class UrlUtils {
     }
 
     Matcher domainMatcher =
-        Pattern.compile("([\\w.:@-]+)(.*)", Pattern.UNICODE_CHARACTER_CLASS).matcher(rest);
+        Pattern.compile("\\W*([\\w.:@-]+)(.*)", Pattern.UNICODE_CHARACTER_CLASS).matcher(rest);
     if (domainMatcher.find()) {
       try {
         domain = IDN.toASCII(domainMatcher.group(1));
