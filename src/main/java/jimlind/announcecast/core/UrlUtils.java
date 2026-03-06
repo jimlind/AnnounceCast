@@ -26,7 +26,7 @@ public class UrlUtils {
     String domain = "";
     String rest = input;
 
-    Matcher schemaMatcher = Pattern.compile("(.*):+/+(.*)").matcher(input);
+    Matcher schemaMatcher = Pattern.compile("(.*?):+/+(.*)").matcher(input);
     if (schemaMatcher.find()) {
       String cleanSchema = schemaMatcher.group(1).toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "");
       schema = cleanSchema.isBlank() ? schema : cleanSchema;

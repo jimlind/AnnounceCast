@@ -10,3 +10,7 @@
 "https://user:pass@example.com/"
 "http://localhost/"
 "https://localhost/"
+"http://http://double.schema"
+"https://images.podigee-cdn.net/0x,s29EyAF1Jy0CguzdarOgACfTPpWJWV0uv7Xzm6Dlgr0Y=/https://main.podigee-cdn.net/uploads/u52859/a4c499a7-e9ed-45cd-a6b5-d622fbcc953e.png"
+"https://images.podigee-cdn.net/0x,sWaxmPo-kxYAfRznO9bEI-4mgROs1QDNaxuUXSNRZYy8=/https://main.podigee-cdn.net/uploads/u52859/fc36f2f9-17b4-4536-99e5-62fb41d3a87e.jpg"
+"https://pdrl.fm/46925c/https://dts.podtrac.com/redirect.mp3/www.buzzsprout.com/2007646/episodes/18469034-immanuel-god-with-us-level-2-36.mp3"
