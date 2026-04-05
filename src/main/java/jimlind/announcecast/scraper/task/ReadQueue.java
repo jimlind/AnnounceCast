@@ -1,6 +1,7 @@
 package jimlind.announcecast.scraper.task;
 
-import jimlind.announcecast.core.taskScheduling.InfiniteFixedRateTask;
+import jimlind.amaranth.exception.TaskException;
+import jimlind.amaranth.task.FixedRateTask;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Singleton
-public class ReadQueue extends InfiniteFixedRateTask {
+public class ReadQueue extends FixedRateTask {
   private static final long INITIAL_DELAY_MILLIS = 0;
   private static final long PERIOD_MILLIS = 200;
   private static final long TIMEOUT_MILLIS = 10000; // 10 seconds
@@ -37,6 +38,7 @@ public class ReadQueue extends InfiniteFixedRateTask {
   private final Joined joined;
   private final Manager manager;
   private final PodcastQueue podcastQueue;
+  private final TaskExceptionHandler taskExceptionHandler;
 
   @Inject
   public ReadQueue(
@@ -46,7 +48,8 @@ public class ReadQueue extends InfiniteFixedRateTask {
       Helper helper,
       Joined joined,
       Manager manager,
-      PodcastQueue podcastQueue) {
+      PodcastQueue podcastQueue,
+      TaskExceptionHandler taskExceptionHandler) {
     super(INITIAL_DELAY_MILLIS, PERIOD_MILLIS, TIMEOUT_MILLIS);
     this.channel = channel;
     this.client = client;
@@ -55,6 +58,7 @@ public class ReadQueue extends InfiniteFixedRateTask {
     this.joined = joined;
     this.manager = manager;
     this.podcastQueue = podcastQueue;
+    this.taskExceptionHandler = taskExceptionHandler;
   }
 
   @Override
@@ -106,5 +110,10 @@ public class ReadQueue extends InfiniteFixedRateTask {
             channelId, message, embed, () -> helper.recordSuccess(postedFeed.getId(), episode));
       }
     }
+  }
+
+  @Override
+  protected void exceptionConsumer(TaskException exception) {
+    taskExceptionHandler.handle(exception);
   }
 }
