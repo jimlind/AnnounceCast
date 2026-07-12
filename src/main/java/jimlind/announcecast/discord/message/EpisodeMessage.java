@@ -11,6 +11,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,13 +41,19 @@ public class EpisodeMessage {
   }
 
   private static String getDescriptionText(String defaultValue, Episode episode) {
-    String description = episode.getPubDate();
+    String description = episode.getPubDate() != null ? episode.getPubDate() : "";
     if (episode.getDescription() != null) {
       description = episode.getDescription();
     } else if (episode.getSummary() != null) {
       description = episode.getSummary();
     } else if (defaultValue != null) {
       description = defaultValue;
+    }
+
+    // If the description doesn't appear to be HTML, replace all new line characters with HTML
+    // line breaks so that we can use a consistent workflow for all inputs strings.
+    if (!Pattern.compile("<[^>]+>").matcher(description).find()) {
+      description = description.trim().replaceAll("\\R", "<br />");
     }
 
     String markdownText = Helper.htmlToMarkdown(description, 512);
