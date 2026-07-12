@@ -4,8 +4,8 @@ This document mostly serves as a record for myself so that I don't have to try t
 people might get some value from it, but that seems extremely doubtful.
 
 It is hosted on a VPS on https://www.racknerd.com running Ubuntu 24 LTS. VPS has 2 CPU Cores, 2.5 GB RAM, 40 GB SSD
-Storage, and an IPv4 address. I got it from a Black Friday thread on https://lowendtalk.com/ to replace a host that is
-discontinuing the plan I was on. It has a 6TB/month traffic allotment that I assume I'll go over as the bot's reach
+Storage, and an IPv4 address. I got it from a Black Friday thread on https://lowendtalk.com/. It has a 6TB/month traffic
+allotment that I assume I'll go over as the bot's reach
 increases.
 
 ## Why Ubuntu 24?
