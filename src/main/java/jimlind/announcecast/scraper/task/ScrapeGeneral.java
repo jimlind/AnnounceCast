@@ -1,7 +1,7 @@
 package jimlind.announcecast.scraper.task;
 
-import jimlind.amaranth.exception.TaskException;
-import jimlind.amaranth.task.FixedDelayTask;
+import io.github.jimlind.amaranth.exception.TaskException;
+import io.github.jimlind.amaranth.task.FixedDelayTask;
 import jimlind.announcecast.storage.db.Joined;
 import lombok.extern.slf4j.Slf4j;
 

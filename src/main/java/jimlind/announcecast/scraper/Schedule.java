@@ -1,6 +1,6 @@
 package jimlind.announcecast.scraper;
 
-import jimlind.amaranth.Scheduler;
+import io.github.jimlind.amaranth.Scheduler;
 import jimlind.announcecast.scraper.task.ReadQueue;
 import jimlind.announcecast.scraper.task.ScrapeGeneral;
 import jimlind.announcecast.scraper.task.ScrapePromoted;

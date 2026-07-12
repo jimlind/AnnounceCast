@@ -1,7 +1,7 @@
 package jimlind.announcecast.scraper.task;
 
-import jimlind.amaranth.exception.TaskException;
-import jimlind.amaranth.task.FixedRateTask;
+import io.github.jimlind.amaranth.exception.TaskException;
+import io.github.jimlind.amaranth.task.FixedRateTask;
 import jimlind.announcecast.discord.Manager;
 import jimlind.announcecast.discord.message.EpisodeMessage;
 import jimlind.announcecast.podcast.Client;

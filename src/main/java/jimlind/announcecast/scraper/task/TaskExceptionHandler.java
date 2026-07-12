@@ -1,10 +1,10 @@
 package jimlind.announcecast.scraper.task;
 
-import jimlind.amaranth.exception.TaskException;
-import jimlind.amaranth.exception.TaskGeneralException;
-import jimlind.amaranth.exception.TaskInterruptionException;
-import jimlind.amaranth.exception.TaskSeriousException;
-import jimlind.amaranth.exception.TaskTimeoutException;
+import io.github.jimlind.amaranth.exception.TaskException;
+import io.github.jimlind.amaranth.exception.TaskGeneralException;
+import io.github.jimlind.amaranth.exception.TaskInterruptionException;
+import io.github.jimlind.amaranth.exception.TaskSeriousException;
+import io.github.jimlind.amaranth.exception.TaskTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
