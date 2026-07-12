@@ -1,16 +1,44 @@
 package jimlind.announcecast;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.mockStatic;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 class HelperTest {
+  @Test
+  void htmlToMarkdown_withBrTag_returnsNewlines() {
+    String result = Helper.htmlToMarkdown("First line<br>Second line", 512);
+    assertEquals("First line\n\nSecond line", result);
+  }
+
+  @Test
+  void htmlToMarkdown_withNewlineCharacter_returnsCollapsedText() {
+    String result = Helper.htmlToMarkdown("First line\n\nSecond line", 512);
+    assertEquals("First line Second line", result);
+  }
+
+  @Test
+  void htmlToMarkdown_withPTag_returnsNewlines() {
+    String result = Helper.htmlToMarkdown("<p>First line</p><p>Second line</p>", 512);
+    assertEquals("First line\n\nSecond line", result);
+  }
+
+  @Test
+  void htmlToMarkdown_withLongInput_shouldTruncateAndAddEllipsis() {
+    String longText = "a".repeat(600);
+    String result = Helper.htmlToMarkdown(longText, 512);
+
+    assertTrue(result.endsWith("..."));
+    assertEquals(512 + 3, result.length());
+  }
+
   @Test
   void stringToDate_shouldParseFirstPattern_whenInputMatchesOffsetFormat() {
     ZonedDateTime expected = ZonedDateTime.of(2024, 6, 5, 10, 15, 30, 0, ZoneOffset.ofHours(2));
