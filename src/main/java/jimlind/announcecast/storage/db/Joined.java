@@ -225,8 +225,9 @@ public class Joined {
     String sql =
         """
         SELECT tag.role_id FROM tag
-        INNER JOIN patreon ON tag.user_id = patreon.user_id
+        LEFT JOIN patreon ON tag.user_id = patreon.user_id
         WHERE tag.feed_id = ? AND tag.channel_id = ?
+        AND (tag.user_id = 'OVERRIDE' OR patreon.user_id IS NOT NULL)
         """;
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, feedId);
